@@ -3,7 +3,7 @@ class InputDecorations {
   static InputDecoration inputDecoration({
     required String hintext,
     required String labeltext,
-    required Icon icono,
+    Widget? icono,
     double labelFrontSize = 16.0, // Tamaño de letra por defecto
     double hintFrontSize = 16.0 // Tamaño de letra por defecto
   }) {

@@ -7,6 +7,7 @@ import 'package:formulario_opret/screens/interfaz_User/pregunta_Encuesta_Screen.
 import 'package:formulario_opret/services/form_Registro_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FormEncuestaScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -28,11 +29,12 @@ class FormEncuestaScreen extends StatefulWidget {
 
 class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://10.0.2.2:7002');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://10.0.2.2:7190');
   final TextEditingController timePicker = TextEditingController();
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   DateTime? _selectedDate;  // Variable para almacenar la fecha seleccionada.
+  String _selectLineMetro = 'Linea1';
 
   Future<void> _showDatePicker() async {
     final picked = await showDatePicker(
@@ -63,7 +65,12 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
     if (_formKey.currentState!.saveAndValidate()) {
       final data = _formKey.currentState!.value;
 
-      final formEncuesta = FormularioRegistro(
+      final String? estaciones = data['respuestaLinea_1'] ??
+                                  data['respuestaLinea_2'] ??
+                                  data['respuestaLinea_2B'] ??
+                                  data['respuestaTeleferico'];
+
+      FormularioRegistro formEncuesta = FormularioRegistro(
         noEncuesta: data['noEncuesta'],
         // idUsuarioEmpl: widget.filtrarId.text,
         idUsuarios: data['idUsuarios'],
@@ -71,9 +78,16 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
         cedula: data['cedula'],
         fecha: datePicker.text, // Utiliza la fecha seleccionada
         hora: data['hora'],
-        estacion: data['estacion'],
-        linea: data['linea']
+        estacion: estaciones,
+        linea: _selectLineMetro
       );
+
+      if(estaciones == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor selecciona una estación'))
+        );
+        return; // Detener el flujo si no hay estación seleccionada
+      }
 
       // Imprimir los datos a enviar para depuración
       print('Datos del formulario: ${formEncuesta.toJson()}');
@@ -86,7 +100,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
             const SnackBar(content: Text('Formulario enviado con exito'))
           );
 
-          Navigator.push(
+          Navigator.pushReplacement( //para evitar que regrese a la pantalla anterior
             context,
             MaterialPageRoute(
               builder: (context) => PreguntaEncuestaScreen(
@@ -107,9 +121,9 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
         }
 
       } catch (e) {
-        // Manejo de errores
+        print('Error al enviar formulario: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('Error al enviar formulario: ${e.toString()}')),
         );
       }
     }
@@ -143,7 +157,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   labelFrontSize: 30.5,
                   icono: const Icon(Icons.numbers, size: 30.0)
                 ),
-                style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
+                style: const TextStyle(fontSize: 30.0), // Cambiar tamaño de letra del texto filtrado
                 validator: FormBuilderValidators.required(),
                 onChanged: (val) {
                   print('Numero seleccionada: $val');
@@ -151,7 +165,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
               ),
 
               FormBuilderTextField(
-                name: 'idUsuarioEmpl',
+                name: 'idUsuarios',
                 initialValue: widget.filtrarId.text,
                 decoration: InputDecorations.inputDecoration(
                   labeltext: 'Asignar ID',
@@ -160,6 +174,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   hintFrontSize: 20.0,
                   icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
                 ),
+                style: const TextStyle(fontSize: 30.0),
                 // validator: FormBuilderValidators.required(),
                 validator: (value) {
                   if (value == null || value.isEmpty){
@@ -178,7 +193,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
               ),
 
               FormBuilderTextField(
-                name: 'cedlEmpleado',
+                name: 'cedula',
                 initialValue: widget.filtrarCedula.text,
                 decoration: InputDecorations.inputDecoration(
                   labeltext: 'Cedula',
@@ -187,6 +202,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   hintFrontSize: 20.0, 
                   icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
                 ),
+                style: const TextStyle(fontSize: 30.0),
                 // validator: FormBuilderValidators.required(),
                 validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
                   FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
@@ -219,6 +235,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   labelStyle: TextStyle(fontSize: 25.0),
                   prefixIcon: Icon(Icons.access_time, size: 30.0)
                 ),
+                style: const TextStyle(fontSize: 30.0),
                 onTap: () async {
                   var time = await showTimePicker(
                     context: context, 
@@ -246,6 +263,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   labelStyle: TextStyle(fontSize: 25.0),
                   prefixIcon: Icon(Icons.calendar_month_outlined, size: 30.0)
                 ),
+                style: const TextStyle(fontSize: 30.0),
                 validator: FormBuilderValidators.required(),
                 onTap: () async {
                   FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
@@ -253,32 +271,194 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                 },
               ),
 
-              FormBuilderTextField(
+              // FormBuilderTextField(
+              //   name: 'linea',
+              //   decoration: InputDecorations.inputDecoration(
+              //     hintext: 'Linea 1, 2 ... o Teleferico',
+              //     hintFrontSize: 25.0,
+              //     labeltext: 'Linea del metro',
+              //     labelFrontSize: 30.5,
+              //     icono: const Icon(Icons.numbers, size: 30.0)
+              //   ),
+              //   style: const TextStyle(fontSize: 30.0), // Cambiar tamaño de letra del texto filtrado
+              //   validator: FormBuilderValidators.required(),
+              // ),
+              
+              FormBuilderDropdown<String>(
                 name: 'linea',
                 decoration: InputDecorations.inputDecoration(
-                  hintext: 'Linea 1, 2 ... o Teleferico',
-                  hintFrontSize: 25.0,
                   labeltext: 'Linea del metro',
-                  labelFrontSize: 30.5,
-                  icono: const Icon(Icons.numbers, size: 30.0)
+                  labelFrontSize: 30.0,
+                  hintext: 'Linea 1, 2 ... o Teleferico',
+                  hintFrontSize: 22.0,
+                  icono: const Icon(Icons.people_outline_rounded, size: 30.0)
                 ),
-                style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
-                validator: FormBuilderValidators.required(),
+                initialValue: 'Linea1',
+                items: const [
+                  DropdownMenuItem(
+                    value: 'Linea 1',
+                    child: Text('Linea 1', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Linea 2',
+                    child: Text('Linea 2', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))
+                  ),
+                  DropdownMenuItem(
+                    value: 'Linea 2B',
+                    child: Text('Linea 2B', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))
+                  ),
+                  DropdownMenuItem(
+                    value: 'Teleferico',
+                    child: Text('Teleferico', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))
+                  )
+                ],
+                style: const TextStyle(fontSize: 30.0),
+                onChanged: (value) {
+                  setState(() {
+                    _selectLineMetro = value!;
+                    print('Línea seleccionada: $_selectLineMetro'); // Depuración
+                  });
+                },
               ),
 
-              FormBuilderTextField(
-                name: 'estacion',
-                decoration: InputDecorations.inputDecoration(
-                  hintext: 'Estacion en la que se encuentre el Encuestador',
-                  hintFrontSize: 25.0,
-                  labeltext: 'Estacion del metro',
-                  labelFrontSize: 30.5,
-                  icono: const Icon(Icons.numbers, size: 30.0)
+              // En caso de selecionar 'Linea 1'
+              if (_selectLineMetro == 'Linea1')
+                FormBuilderDropdown<String>(
+                  name: 'respuestaLinea_1',
+                  style: const TextStyle(fontSize: 30.0),
+                  decoration: InputDecorations.inputDecoration(
+                    labeltext: 'Estacion del metro - Linea 1',
+                    labelFrontSize: 30.0,
+                    hintext:'',
+                    icono: const Icon(Icons.train_outlined, size: 30.0)
+                  ),
+                  // items: const [
+                  //   DropdownMenuItem(value: 'Mamá Tingó', child: Text('Mamá Tingó', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'Gregorio Urbano Gilbert', child: Text('Gregorio Urbano Gilbert', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'Gregorio Luperón', child: Text('Gregorio Luperón', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'José Francisco Peña Gómez', child: Text('José Francisco Peña Gómez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'Hermanas Mirabal', child: Text('Hermanas Mirabal', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-6', child: Text('Máximo Gómez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-7', child: Text('Los Taínos', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-8', child: Text('Pedro Livio Cedeño', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-9', child: Text('Manuel Arturo Peña Batlle', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-10', child: Text('Juan Pablo Duarte', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-11', child: Text('Juan Bosch', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-12', child: Text('Casandra Damirón', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-13', child: Text('Joaquín Balaguer', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-14', child: Text('Amín Abel', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-15', child: Text('Francisco Alberto Caamaño', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  //   DropdownMenuItem(value: 'L1-16', child: Text('Centro de los Héroes', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  // ],
+                  items: estacionesLinea1.map((estacion) {
+                    return DropdownMenuItem(
+                      value: estacion,
+                      child: Text(estacion, style: const TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
+                    );
+                  }).toList(),
+                  // onChanged: (value) {
+                  //   setState(() {
+                  //     _selectLineMetro = value!;
+                  //   });
+                  // },
                 ),
-                style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
-                maxLines: 5, // Permite hasta 5 líneas de texto
-                validator: FormBuilderValidators.required(),
-              ),
+              
+              // En caso de selecionar 'Linea 2'
+              if (_selectLineMetro == 'Linea2')
+                FormBuilderDropdown<String>(
+                  name: 'respuestaLinea_2',
+                  style: const TextStyle(fontSize: 30.0),
+                  decoration: InputDecorations.inputDecoration(
+                    labeltext: 'Estacion del metro - Linea 2',
+                    labelFrontSize: 30.0,
+                    hintext:'',
+                    icono: const Icon(Icons.train_outlined, size: 30.0)
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'L2-1', child: Text('María Montez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-2', child: Text('Pedro Francisco Bono', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-3', child: Text('Francisco Gregorio Billini', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-4', child: Text('Ulises F. Espaillat', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-5', child: Text('Pedro Mir', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-6', child: Text('Freddy Beras Goico', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-7', child: Text('Juan Ulises García', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-8', child: Text('Juan Pablo Duarte', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-9', child: Text('Coronel Rafael Tomas Fernández', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-10', child: Text('Mauricio Baez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-11', child: Text('Ramón Cáceres', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-12', child: Text('Horacio Vásquez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-13', child: Text('Manuel de Jesús Abreu Galvan', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2-14', child: Text('Eduardo Brito', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  ],
+                  // onChanged: (value) {
+                  //   setState(() {
+                  //     _selectLineMetro = value!;
+                  //   });
+                  // },
+                ),
+              
+              // En caso de selecionar 'Linea 2B'
+              if (_selectLineMetro == 'Linea2B')
+                FormBuilderDropdown<String>(
+                  name: 'respuestaLinea_2B',
+                  style: const TextStyle(fontSize: 30.0),
+                  decoration: InputDecorations.inputDecoration(
+                    labeltext: 'Estacion del metro - Linea 2B',
+                    labelFrontSize: 30.0,
+                    hintext:'',
+                    icono: const Icon(Icons.train_outlined, size: 35.0)
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'L2B-1', child: Text('Ercilia Pepín', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2B-2', child: Text('Rosa Duarte', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2B-3', child: Text('Trina de Moya de Vásquez', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'L2B-4', child: Text('Concepción Bona', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  ],
+                  // onChanged: (value) {
+                  //   setState(() {
+                  //     _selectLineMetro = value!;
+                  //   });
+                  // },
+                ),
+              
+              // En caso de selecionar 'Teleferico'
+              if (_selectLineMetro == 'Teleferico')
+                FormBuilderDropdown<String>(
+                  name: 'respuestaTeleferico',
+                  style: const TextStyle(fontSize: 30.0),
+                  decoration: InputDecorations.inputDecoration(
+                    labeltext: 'Estaciones del Teleférico',
+                    labelFrontSize: 30.0,
+                    hintext:'',
+                    icono: const FaIcon(FontAwesomeIcons.cableCar, size: 30.0), // Icono del teleférico
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'T-1', child: Text('Gualey', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'T-2', child: Text('Tres Brazos', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'T-3', child: Text('Sabana Perdida', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                    DropdownMenuItem(value: 'T-4', child: Text('Charles de Gauelle', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
+                  ],
+                  // onChanged: (value) {
+                  //   setState(() {
+                  //     _selectLineMetro = value!;
+                  //   });
+                  // },
+                ),
+              // const SizedBox(height: 30),
+
+              // FormBuilderTextField(
+              //   name: 'estacion',
+              //   decoration: InputDecorations.inputDecoration(
+              //     hintext: 'Estacion en la que se encuentre el Encuestador',
+              //     hintFrontSize: 25.0,
+              //     labeltext: 'Estacion del metro',
+              //     labelFrontSize: 30.5,
+              //     icono: const Icon(Icons.numbers, size: 30.0)
+              //   ),
+              //   style: const TextStyle(fontSize: 30.0), // Cambiar tamaño de letra del texto filtrado
+              //   maxLines: 5, // Permite hasta 5 líneas de texto
+              //   validator: FormBuilderValidators.required(),
+              // ),
 
               ElevatedButton(
                 onPressed: _registrarFormEncuesta, 
@@ -306,4 +486,24 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
       ),
     );
   }
+
+  // Lista de estaciones para la Línea 1
+  final List<String> estacionesLinea1 = [
+    'Mamá Tingó',
+    'Gregorio Urbano Gilbert',
+    'Gregorio Luperón',
+    'José Francisco Peña Gómez',
+    'Hermanas Mirabal',
+    'Máximo Gómez',
+    'Los Taínos',
+    'Pedro Livio Cedeño',
+    'Manuel Arturo Peña Batlle',
+    'Juan Pablo Duarte',
+    'Juan Bosch',
+    'Casandra Damirón',
+    'Joaquín Balaguer',
+    'Amín Abel',
+    'Francisco Alberto Caamaño',
+    'Centro de los Héroes',
+  ];
 }

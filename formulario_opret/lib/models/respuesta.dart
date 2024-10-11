@@ -1,39 +1,47 @@
 class Respuesta {
   // int idRespuesta;
-  String idUsuarioEmpl;
+  String idUsuarios;
   String noEncuesta;
-  int idPreguntas;
+  int codPregunta;
   String? respuestas;
   String? valoracion;
+  String? comentarios;
+  String? justificacion;
 
   Respuesta({
     // required this.idRespuesta,
-    required this.idUsuarioEmpl,
+    required this.idUsuarios,
     required this.noEncuesta,
-    required this.idPreguntas,
+    required this.codPregunta,
     this.respuestas,
-    this.valoracion
+    this.valoracion,
+    this.comentarios,
+    this.justificacion,
   });
 
   factory Respuesta.fromJson(Map<String, dynamic> json) {
     return Respuesta(
       // idRespuesta: json['idRespuesta'],
-      idUsuarioEmpl: json['idUsuarioEmpl'],
+      idUsuarios: json['idUsuarios'],
       noEncuesta: json['noEncuesta'],
-      idPreguntas: json['idPreguntas'],
-      respuestas: json['respuestas'],
-      valoracion: json['valoracion']
+      codPregunta: json['codPregunta'],
+      respuestas: json['respuesta1'],
+      valoracion: json['valoracion'],
+      comentarios: json['comentarios'],
+      justificacion: json['justificacion']
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     // data['idRespuesta'] = idRespuesta;
-    data['idUsuarioEmpl'] = idUsuarioEmpl;
+    data['idUsuarios'] = idUsuarios;
     data['noEncuesta'] = noEncuesta;
-    data['idPreguntas'] = idPreguntas;
-    data['respuestas'] = respuestas;
+    data['codPregunta'] = codPregunta;
+    data['respuesta1'] = respuestas;
     data['valoracion'] = valoracion;
+    data['comentarios'] = comentarios;
+    data['justificacion'] = justificacion;
     return data;
   }
 }

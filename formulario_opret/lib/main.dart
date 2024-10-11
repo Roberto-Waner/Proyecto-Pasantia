@@ -92,7 +92,8 @@ class MyApp extends StatelessWidget {
           filtrarId: filtrarId,
           filtrarCedula: filtrarCedula,
         ),
-        'registroUsuarios': (_) => RegistroEmpl(
+
+        'registroEmpleados': (_) => RegistroEmpl(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
@@ -122,7 +123,7 @@ class MyApp extends StatelessWidget {
         )
       },
 
-      initialRoute: 'preguntaNavBar',
+      initialRoute: 'presentation',
     );
   }
 }

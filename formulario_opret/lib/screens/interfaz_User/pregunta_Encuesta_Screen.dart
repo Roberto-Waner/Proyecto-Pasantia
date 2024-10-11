@@ -28,9 +28,9 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  final ApiServicePreguntas _apiQuestions = ApiServicePreguntas('https://10.0.2.2:7128');
-  final ApiServiceRespuesta _apiRespuesta = ApiServiceRespuesta('https://10.0.2.2:7128');
-  late List<Pregunta> dataQuestion = []; //para la llamada de los datos
+  final ApiServicePreguntas _apiQuestions = ApiServicePreguntas('https://10.0.2.2:7190');
+  final ApiServiceRespuesta _apiRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
+  late List<Preguntas> dataQuestion = []; //para la llamada de los datos
   final _formKey = GlobalKey<FormBuilderState>();
 
   @override
@@ -64,8 +64,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               itemCount: dataQuestion.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                  leading: Text("${dataQuestion[index].noPregunta}"),
-                  title: Text(dataQuestion[index].pregunta1 ?? ''),
+                  leading: Text("${dataQuestion[index].codPregunta}", style: const TextStyle(fontSize: 30.0),),
+                  title: Text(dataQuestion[index].pregunta ?? '',style: const TextStyle(fontSize: 30.0),),
                   onTap: () {
                     _showPreguntaDialog(dataQuestion[index]); // Muestra el diálogo al hacer clic
                   },
@@ -78,7 +78,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
-  void _showPreguntaDialog(Pregunta question) {
+  void _showPreguntaDialog(Preguntas question) {
     // final formKey = GlobalKey<FormBuilderState>();
     String? selectedResponse;
 
@@ -88,7 +88,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text('Pregunta No: ${question.noPregunta}. ${question.pregunta1}'),
+              title: Text('Pregunta No: ${question.codPregunta}. ${question.pregunta}', style: const TextStyle(fontSize: 30.0)),
               content: FormBuilder(
                 key: _formKey,
                 child: Column(
@@ -97,20 +97,21 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                     FormBuilderDropdown<String>(
                       name: 'tipoRespuesta',
                       decoration: const InputDecoration(
-                        labelText: 'Responder esta pregunta con:'
+                        labelText: 'Responder esta pregunta con:',
+                          labelStyle: TextStyle(fontSize: 30.0)
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: 'Abierta',
-                          child: Text('Respuesta-Abierta')
+                          child: Text('Respuesta-Abierta', style: TextStyle(fontSize: 30.0))
                         ),
                         DropdownMenuItem(
                           value: 'SiNoNA',
-                          child: Text('Selecionar: Si, No, N/A'),
+                          child: Text('Selecionar: Si, No, N/A', style: TextStyle(fontSize: 30.0)),
                         ),
                         DropdownMenuItem(
                           value: 'Calificacion',
-                          child: Text('Calific. 1 a 10'),
+                          child: Text('Calific. 1 a 10', style: TextStyle(fontSize: 30.0)),
                         )
                       ],
                       onChanged: (String? newValue) {
@@ -126,6 +127,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         name: 'respuestaAbierta',
                         decoration: const InputDecoration(
                           labelText: 'Escribe tu respuesta',
+                          labelStyle: TextStyle(fontSize: 20.0)
                         ),
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(),
@@ -138,6 +140,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         name: 'respuestaSiNoNA',
                         decoration: const InputDecoration(
                           labelText: 'Selecionar: Si, No, N/A',
+                          labelStyle: TextStyle(fontSize: 20.0)
                         ),
                         items: const [
                           DropdownMenuItem(value: 'Si', child: Text('Si')),
@@ -152,6 +155,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         name: 'respuestaCalificacion',
                         decoration: const InputDecoration(
                           labelText: 'Calific. 1 a 10',
+                          labelStyle: TextStyle(fontSize: 20.0)
                         ),
                         items: const [
                           DropdownMenuItem(value: '1', child: Text('1')),
@@ -177,7 +181,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: const Text("Cerrar"),
+                  child: const Text("Cerrar", style: TextStyle(fontSize: 30.0)),
                   onPressed: () {
                     Navigator.of(context).pop();
                   }
@@ -191,7 +195,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       Navigator.of(context).pop();
                     }
                   }, 
-                  child: const Text('Proxima Pregunta')
+                  child: const Text('Proxima Pregunta', style: TextStyle(fontSize: 30.0))
                 ),
 
                 TextButton(
@@ -203,7 +207,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       Navigator.of(context).pop();
                     }
                   }, 
-                  child: const Text('Finalizar Pregunta')
+                  child: const Text('Finalizar Pregunta', style: TextStyle(fontSize: 30.0))
                 )
               ]
             );
@@ -214,68 +218,70 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   // Guardar respuesta en la API
-  // void _saveRespuesta(Pregunta question, Map<String, dynamic> respuestaForm) async {
-  //   // Verificamos si el formulario es válido antes de guardar
-  //   if (_formKey.currentState!.saveAndValidate()){
-  //     final dataAnswer = _formKey.currentState!.value;
+  void _saveRespuesta(Preguntas question, Map<String, dynamic> respuestaForm) async {
+    // Verificamos si el formulario es válido antes de guardar
+    if (_formKey.currentState!.saveAndValidate()){
+      final dataAnswer = _formKey.currentState!.value;
 
-  //     // Determinamos el tipo de respuesta ingresada por el usuario
-  //     final String? respuestaFinal = dataAnswer['respuestaAbierta'] ??
-  //                                     dataAnswer['respuestaSiNoNA'] ??
-  //                                     dataAnswer['respuestaCalificacion'];
+      // Determinamos el tipo de respuesta ingresada por el usuario
+      final String? respuestaFinal = dataAnswer['respuestaAbierta'] ??
+                                      dataAnswer['respuestaSiNoNA'] ??
+                                      dataAnswer['respuestaCalificacion'];
 
-  //     // Verificamos que exista alguna respuesta válida
-  //     if(respuestaFinal == null || respuestaFinal.isEmpty) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Por favor, completa la respuesta.'))
-  //       );
-  //       return;
-  //     }
+      // Verificamos que exista alguna respuesta válida
+      if(respuestaFinal == null || respuestaFinal.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor, completa la respuesta.'))
+        );
+        return;
+      }
 
-  //     // Creamos el objeto `Respuesta` con los datos recopilados
-  //     final nuevaRespuesta = Respuesta(
-  //       // idRespuesta: int.parse(dataAnswer['idRespuesta']),
-  //       idUsuarioEmpl: widget.filtrarId.text, // ID del usuario
-  //       noEncuesta: widget.noEncuestaFiltrar.text, // Identificador de la encuesta
-  //       idPreguntas: question.idPreguntas,
-  //       respuestas: respuestaFinal,
-  //       // respuestas: dataAnswer['tipoRespuesta'],
-  //       valoracion: dataAnswer['valoracion'] // Valoración es opcional
-  //     );
+      // Creamos el objeto `Respuesta` con los datos recopilados
+      Respuesta nuevaRespuesta = Respuesta(
+        // idRespuesta: int.parse(dataAnswer['idRespuesta']),
+        idUsuarios: widget.filtrarId.text, // ID del usuario
+        noEncuesta: widget.noEncuestaFiltrar.text, // Identificador de la encuesta
+        codPregunta: question.codPregunta,
+        respuestas: respuestaFinal,
+        // respuestas: dataAnswer['tipoRespuesta'],
+        valoracion: dataAnswer['valoracion'],
+        comentarios: dataAnswer['comentarios'],
+        justificacion: dataAnswer['justificacion']
+      );
 
-  //     // Imprimir los datos a enviar para depuración
-  //     print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
+      // Imprimir los datos a enviar para depuración
+      print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
-  //     try{
-  //       final response = await _apiRespuesta.postRespuesta(nuevaRespuesta);
+      try{
+        final response = await _apiRespuesta.postRespuesta(nuevaRespuesta);
 
-  //       if (response.statusCode == 201) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(content: Text('Respuesta guardada con éxito'))
-  //         );
-  //       }else {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text('Error al guardar la respuesta: ${response.reasonPhrase}'))
-  //         );
-  //       }
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Respuesta guardada con éxito'))
+          );
+        }else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al guardar la respuesta: ${response.reasonPhrase}'))
+          );
+        }
 
-  //     } catch (e) {
-  //       // Manejo de errores
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Error: $e')),
-  //       );
-  //     }
-  //   } else {
-  //     // Si el formulario no es válido
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('Por favor, completa todos los campos requeridos.')),
-  //     );
-  //   }
-  // }
+      } catch (e) {
+        // Manejo de errores
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } else {
+      // Si el formulario no es válido
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, completa todos los campos requeridos.')),
+      );
+    }
+  }
 
   // Pasar a la siguiente pregunta (implementación pendiente)
   void _nextQuestion() {
-    // Implementar la lógica para ir a la siguiente pregunta en la lista
+    
   }
 
   // Finalizar la encuesta (implementación pendiente)

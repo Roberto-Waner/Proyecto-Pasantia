@@ -1,7 +1,6 @@
 import 'dart:convert';
 // import 'dart:ffi';
 import 'dart:io';
-// import 'package:formulario_opret/models/login_Admin.dart';
 import 'package:formulario_opret/models/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,31 +44,7 @@ class ApiServiceToken {
     }
   }
 
-  //-------------------------------------Login del Administrador------------------------------------------
-  // Future<String?> loginAdministrador (LoginAdmin loginAdmin) async {
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse('$baseUrl/api/Login/LoginAdmin'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode(loginAdmin.toJson()),
-  //     ).timeout(const Duration(seconds: 20));
-
-  //     if (response.statusCode == 200) {
-  //       var jsonResponse = jsonDecode(response.body);
-  //        isLogged = true;
-  //       return jsonResponse['result']; // Retorna el JWT'
-  //     } else {
-  //       print('Login failed: ${response.statusCode}');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     // Manejo de excepciones
-  //     print('Error occurred: $e');
-  //     rethrow;
-  //   }
-  // }
-
-  // crear una funcion que permita retornar el estado de la sesion
+  // crear una funcion que permita retornar el estado de la session
 
    bool isLoggedFuncion(){
     return isLogged;

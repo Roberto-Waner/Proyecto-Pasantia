@@ -26,7 +26,7 @@ class Usuarios {
       idUsuarios: json['idUsuarios'], 
       cedula: json['cedula'], 
       nombreApellido: json['nombreApellido'], 
-      usuario1: json['usuario1'], 
+      usuario1: json['usuario'], 
       email: json['email'], 
       passwords: json['passwords'],
       foto: json['foto'],
@@ -40,7 +40,7 @@ class Usuarios {
     data['idUsuarios'] = idUsuarios;
     data['cedula'] = cedula;
     data['nombreApellido'] = nombreApellido;
-    data['usuario1'] = usuario1;
+    data['usuario'] = usuario1;
     data['email'] = email;
     data['passwords'] = passwords;
     data['foto'] = foto;

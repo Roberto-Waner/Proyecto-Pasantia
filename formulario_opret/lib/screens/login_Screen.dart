@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _filtrarId = TextEditingController();
   final TextEditingController _filtrarCedula = TextEditingController();
 
-  final ApiServiceToken _serviceToken = ApiServiceToken('https://10.0.2.2:7128',false);
+  final ApiServiceToken _serviceToken = ApiServiceToken('https://10.0.2.2:7190',false);
   String myToken ="";
 
   Future<void> _login() async {
@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       redireccionPerRoles();
 
     }catch (e) {
-        _showSnackBar('An error occurred. Please try again later.');
+      _showSnackBar('An error occurred. Please try again later.');
     }
   }
 
@@ -142,22 +142,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Align logo(Size size) {
     return Align(
-            alignment: Alignment.topCenter,
-            child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(160),
-                  color: const Color.fromRGBO(217, 217, 217, 1)
-                ),
-                margin: EdgeInsets.only(top: size.height * 0.05),
-                width: size.width * 0.4,
-                height: size.height * 0.26,
-                child: Image.asset(
-                  'assets/Logo/Logo_Metro_transparente.png',
-                ),
-              ), 
-            ),
-          );
+      alignment: Alignment.topCenter,
+      child: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(160),
+            color: const Color.fromRGBO(217, 217, 217, 1)
+          ),
+          margin: EdgeInsets.only(top: size.height * 0.05),
+          width: size.width * 0.4,
+          height: size.height * 0.26,
+          child: Image.asset(
+            'assets/Logo/Logo_Metro_transparente.png',
+          ),
+        ), 
+      ),
+    );
   }
 
   Positioned buttonBack(Size size) {

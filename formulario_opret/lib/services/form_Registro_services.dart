@@ -11,7 +11,7 @@ class ApiServiceFormRegistro {
   // GET: api/RegistroForms
   Future<List<FormularioRegistro>> getFormRegistro() async {
     try{
-      final response = await http.get(Uri.parse('$baseUrl/api/RegistroForms')).timeout(const Duration(seconds: 20));
+      final response = await http.get(Uri.parse('$baseUrl/api/Formularios')).timeout(const Duration(seconds: 20));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -30,7 +30,7 @@ class ApiServiceFormRegistro {
   Future<http.Response> postFormRegistro(FormularioRegistro formReg) async {
     try{
       final response = await http.post(
-        Uri.parse('$baseUrl/api/RegistroForms'),
+        Uri.parse('$baseUrl/api/Formularios'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         },
@@ -55,7 +55,7 @@ class ApiServiceFormRegistro {
   Future<http.Response> putFormRegistro(String noEncuesta, FormularioRegistro formReg) async {
     try{
       final response = await http.put(
-        Uri.parse('$baseUrl/api/RegistroForms/$noEncuesta'),
+        Uri.parse('$baseUrl/api/Formularios/$noEncuesta'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         },
@@ -80,7 +80,7 @@ class ApiServiceFormRegistro {
   Future<http.Response> deleteFormRegistro(String noEncuesta) async {
     try{
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/RegistroForms/$noEncuesta'),
+        Uri.parse('$baseUrl/api/Formularios/$noEncuesta'),
       ).timeout(const Duration(seconds: 20));
 
       if(response.statusCode == 204){

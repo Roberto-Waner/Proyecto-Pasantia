@@ -31,7 +31,7 @@ class _NewUserState extends State<NewUser> {
   // late List<UserEmpleado> data = [];
   String _selectedRole = ''; // Valor inicial del Dropdown
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiService apiService = ApiService('https://10.0.2.2:7002');
+  final ApiService apiService = ApiService('https://10.0.2.2:7190');
   final UpperCaseTextEditingController _controller = UpperCaseTextEditingController();
   final TextEditingController datePicker = TextEditingController();
   DateTime? _selectedDate;
@@ -184,7 +184,7 @@ class _NewUserState extends State<NewUser> {
                       padding: const EdgeInsets.fromLTRB(80, 100, 80, 0),
                       margin: const EdgeInsets.symmetric(horizontal: 30),
                       width: double.infinity,
-                      height: 1050, //altura de la ventana "ventanaRegistro"
+                      height: 1300, //altura de la ventana "ventanaRegistro"
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(217, 217, 217, 1),
                         borderRadius: BorderRadius.circular(50),
@@ -202,10 +202,13 @@ class _NewUserState extends State<NewUser> {
                               name: 'idUsuario',
                               controller: _controller,
                               decoration: InputDecorations.inputDecoration(
-                                hintext: 'USER-000000000 o ADMIN-000000000', 
+                                hintext: 'USER-000000000 o ADMIN-000000000',
+                                hintFrontSize: 22.0,
                                 labeltext: 'ID de Usuario asignado', 
-                                icono: const Icon(Icons.account_circle_outlined)
+                                labelFrontSize: 35.0,
+                                icono: const Icon(Icons.account_circle_outlined, size: 30.0)
                               ),
+                              style: const TextStyle(fontSize: 30.0),
                               validator: (value) {
                                 if (value == null || value.isEmpty){
                                   return 'Por favor ingrese su ID-Empleado';
@@ -228,9 +231,12 @@ class _NewUserState extends State<NewUser> {
                                     keyboardType: TextInputType.name,
                                     decoration: InputDecorations.inputDecoration(
                                       hintext: 'Primer y Segundo Nom.',
+                                      hintFrontSize: 22.0,
                                       labeltext: 'Nombre',
-                                      icono: const Icon(Icons.person_2_outlined)
+                                      labelFrontSize: 35.0,
+                                      icono: const Icon(Icons.person_2_outlined, size: 30.0)
                                     ),
+                                    style: const TextStyle(fontSize: 30.0),
                                   ),
                                 ),
 
@@ -242,9 +248,12 @@ class _NewUserState extends State<NewUser> {
                                     keyboardType: TextInputType.name,
                                     decoration: InputDecorations.inputDecoration(
                                       hintext: 'Primer y Segundo Apell.',
+                                      hintFrontSize: 22.0,
                                       labeltext: 'Apellido',
-                                      icono: const Icon(Icons.person_2_outlined)
+                                      labelFrontSize: 35.0,
+                                      icono: const Icon(Icons.person_2_outlined, size: 30.0)
                                     ),
+                                    style: const TextStyle(fontSize: 30.0),
                                   ),
                                 )
                               ],
@@ -256,10 +265,13 @@ class _NewUserState extends State<NewUser> {
                               keyboardType: TextInputType.number,
                               autocorrect: true,
                               decoration: InputDecorations.inputDecoration(
-                                hintext: '000-0000000-0', 
-                                labeltext: 'Cedula de identidad', 
-                                icono: const Icon(Icons.perm_identity_rounded)
+                                hintext: '000-0000000-0',
+                                hintFrontSize: 22.0,
+                                labeltext: 'Cedula de identidad',
+                                labelFrontSize: 35.0,
+                                icono: const Icon(Icons.perm_identity_rounded, size: 30.0)
                               ),
+                              style: const TextStyle(fontSize: 30.0),
                               validator: (value) {
                                 String pattern = r'^\d{3}-\d{7}-\d{1}$';
                                 RegExp regExp = RegExp(pattern);
@@ -280,13 +292,13 @@ class _NewUserState extends State<NewUser> {
                               keyboardType: TextInputType.emailAddress,
                               autocorrect: false,
                               decoration: InputDecorations.inputDecoration(
-                                hintext: 'ejemplo20##@gmail.com', 
-                                labeltext: 'Correo Electronico', 
-                                icono: const Icon(Icons.alternate_email_rounded)                
+                                hintext: 'ejemplo20##@gmail.com',
+                                hintFrontSize: 22.0,
+                                labeltext: 'Correo Electronico',
+                                labelFrontSize: 35.0,
+                                icono: const Icon(Icons.alternate_email_rounded, size: 30.0)                
                               ),
-                              style: const TextStyle(
-                                fontSize: 20, //ajuste del tamaño
-                              ),
+                              style: const TextStyle(fontSize: 30.0),
                               validator: (value){
                                 // expresion regular
                                 String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
@@ -303,9 +315,12 @@ class _NewUserState extends State<NewUser> {
                               keyboardType: TextInputType.name,
                               decoration: InputDecorations.inputDecoration(
                                 hintext: 'MetroSantDom123',
+                                hintFrontSize: 22.0,
                                 labeltext: 'Usuario',
-                                icono: const Icon(Icons.person_pin_circle)
+                                labelFrontSize: 35.0,
+                                icono: const Icon(Icons.person_pin_circle, size: 30.0)
                               ),
+                              style: const TextStyle(fontSize: 30.0),
                             ),
 
                             const SizedBox(height: 30),
@@ -315,9 +330,12 @@ class _NewUserState extends State<NewUser> {
                               obscureText: true,
                               decoration: InputDecorations.inputDecoration(
                                 hintext: '******', 
-                                labeltext: 'Contraseña', 
-                                icono: const Icon(Icons.lock_person_rounded)
+                                hintFrontSize: 22.0,
+                                labeltext: 'Contraseña',
+                                labelFrontSize: 35.0,
+                                icono: const Icon(Icons.lock_person_rounded, size: 30.0)
                               ),
+                              style: const TextStyle(fontSize: 30.0),
                               validator: (value) {
                                 if(value == null || value.isEmpty){
                                   return 'Por favor ingrese la nueva contraseña';
@@ -336,12 +354,13 @@ class _NewUserState extends State<NewUser> {
                               name: 'fechaCreacion',
                               controller: datePicker,
                               decoration: InputDecorations.inputDecoration(
-                                hintext: 'Hora actual',
-                                hintFrontSize: 20.0,
-                                labeltext: 'Fecha de Encuesta',
-                                labelFrontSize: 25.0,
+                                hintext: 'Fecha de primer Inicio sesion',
+                                hintFrontSize: 22.0,
+                                labeltext: 'Fecha',
+                                labelFrontSize: 35.0,
                                 icono: const Icon(Icons.calendar_month_outlined, size: 30.0)
                               ),
+                              style: const TextStyle(fontSize: 30.0),
                               validator: FormBuilderValidators.required(),
                               onTap: () async {
                                 FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
@@ -376,17 +395,20 @@ class _NewUserState extends State<NewUser> {
                               name: 'rol',
                               decoration: InputDecorations.inputDecoration(
                                   labeltext: 'Tipo Usuario',
+                                  labelFrontSize: 30.0,
                                   hintext: 'Selecciona el tipo de usuario',
-                                  icono: const Icon(Icons.people_outline_rounded)),
+                                  hintFrontSize: 22.0,
+                                  icono: const Icon(Icons.people_outline_rounded, size: 30.0)),
                               initialValue: 'Empleado',
                               items: const [
                                 DropdownMenuItem(
                                     value: 'Empleado',
-                                    child: Text('Empleado')),
+                                    child: Text('Empleado', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
                                 DropdownMenuItem(
                                     value: 'Administrador',
-                                    child: Text('Administrador')),
+                                    child: Text('Administrador', style: TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1)))),
                               ],
+                              style: const TextStyle(fontSize: 30.0),
                               onChanged: (value) {
                                 setState(() {
                                   _selectedRole = value!;

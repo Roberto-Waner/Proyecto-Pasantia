@@ -13,7 +13,7 @@ class ApiService {
   Future<http.Response> createUsuarios(Usuarios user) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/Usuarios'),
+        Uri.parse('$baseUrl/api/RegistroUsuarios'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         },

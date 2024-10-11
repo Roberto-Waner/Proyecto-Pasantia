@@ -8,14 +8,14 @@ class ApiServicePreguntas {
 
   ApiServicePreguntas(this.baseUrl);
 
-  // GET: api/Preguntas
-  Future<List<Pregunta>> getPreguntas() async {
+  // GET: api/SesionPreguntas
+  Future<List<Preguntas>> getPreguntas() async {
     try{
       final response = await http.get(Uri.parse('$baseUrl/api/Preguntas')).timeout(const Duration(seconds: 20));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
-        return body.map((json) => Pregunta.fromJson(json)).toList();
+        return body.map((json) => Preguntas.fromJson(json)).toList();
       } else {
         throw Exception('Error al cargar las Preguntas: ${response.statusCode}');
       }
@@ -26,15 +26,15 @@ class ApiServicePreguntas {
     }
   }
 
-  Future<List<Pregunta>> getPreguntasListada() async {
-    List<Pregunta> dataQuestion = [];
+  Future<List<Preguntas>> getPreguntasListada() async {
+    List<Preguntas> dataQuestion = [];
 
     try{
       final response = await http.get(Uri.parse('$baseUrl/api/Preguntas')).timeout(const Duration(seconds: 20));
 
       if(response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
-        dataQuestion = jsonData.map((json) => Pregunta.fromJson(json)).toList();
+        dataQuestion = jsonData.map((json) => Preguntas.fromJson(json)).toList();
       } else {
         throw Exception('Error al cargar las Preguntas: ${response.statusCode}');
       }
@@ -47,8 +47,8 @@ class ApiServicePreguntas {
     return dataQuestion;
   }
 
-  // POST: api/Preguntas
-  Future<http.Response> postPreguntas(Pregunta pregunta) async {
+  // POST: api/SesionPreguntas
+  Future<http.Response> postPreguntas(Preguntas pregunta) async {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/Preguntas'),
@@ -73,8 +73,8 @@ class ApiServicePreguntas {
     }
   }
 
-  // PUT: api/Preguntas/5
-  Future<http.Response> putPreguntas(int id, Pregunta pregunta) async {
+  // PUT: api/SesionPreguntas/5
+  Future<http.Response> putPreguntas(int id, Preguntas pregunta) async {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
@@ -98,7 +98,7 @@ class ApiServicePreguntas {
     }
   }
 
-  // DELETE: api/Preguntas/5
+  // DELETE: api/SesionPreguntas/5
   Future<http.Response> deletePreguntas(int id) async {
     try{
       final response = await http.delete(

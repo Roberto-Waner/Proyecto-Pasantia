@@ -1,75 +1,128 @@
-//------------------------------------------------Modelo de la tabla Pregunta
-class Pregunta {
-  int noPregunta;
+class Sesion {
+  int? idSesion;
   String tipoRespuesta;
-  String? gurpoTema;
-  String? pregunta1;
-  int? idSubPregunta;
-  int? idRango;
-  // Relación con TipoRespuesta
-  RangoRespuestas? rangoRespuestas; /*esto se hace cuando un modelo que representa a una tabla que tenga foreign key con otra tabla*/
-
-  Pregunta({
-    required this.noPregunta,
-    required this.tipoRespuesta,
-    this.gurpoTema, 
-    this.pregunta1,
-    this.idSubPregunta,
-    this.idRango,
-    this.rangoRespuestas // Inicializa la relación
-  });
-
-  factory Pregunta.fromJson(Map<String, dynamic> json) {
-    return Pregunta(
-      noPregunta: json['noPregunta'],
-      tipoRespuesta: json['tipoRespuesta'],
-      gurpoTema: json['gurpoTema'],
-      pregunta1: json['pregunta1'],
-      idSubPregunta: json['idSubPregunta'] ,
-      idRango: json['idRango'],
-      rangoRespuestas: json['rangoRespuestas'] != null
-          ? RangoRespuestas.fromJson(json['rangoRespuestas']) // Si hay datos en tipoRespuesta
-          : null, // Maneja el caso de que tipoRespuesta sea null
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['noPregunta'] = noPregunta;
-    data['tipoPregunta'] = tipoRespuesta;
-    data['gurpoTema'] = gurpoTema;
-    data['pregunta1'] = pregunta1;
-    data['idSubPregunta'] = idSubPregunta;
-    data['idRango'] = idRango;
-    if (rangoRespuestas != null) {
-      data['rangoRespuestas'] = rangoRespuestas!.toJson(); // Si existe tipoRespuesta, incluirlo en el JSON
-    }
-    return data;
-  }
-}
-
-//--------------------------------------------------Modelo de la tabla Tipo Respuesta
-
-class RangoRespuestas {
-  int? idRango;
+  String? grupoTema;
+  int codPregunta;
+  String? codSubPregunta;
   String? rango;
+  Preguntas? preguntas_;
+  SubPregunta? subPregunta_;
 
-  RangoRespuestas({
-    this.idRango,
-    this.rango
+  Sesion({
+    this.idSesion,
+    required this.tipoRespuesta,
+    this.grupoTema,
+    required this.codPregunta,
+    this.codSubPregunta,
+    this.rango,
+    this.preguntas_,
+    this.subPregunta_
   });
 
-  factory RangoRespuestas.fromJson(Map<String, dynamic> json) {
-    return RangoRespuestas(
-      idRango: json['idRango'],
-      rango: json['rango']
+  factory Sesion.fromJson(Map<String, dynamic> json) {
+    return Sesion(
+      idSesion: json['idSesion'],
+      tipoRespuesta: json['tipoRespuesta'],
+      grupoTema: json['grupoTema'],
+      codPregunta: json['codPregunta'],
+      codSubPregunta: json['codSubPregunta'],
+      rango: json['rango'],
+      preguntas_: json['preguntas_'] != null
+          ? Preguntas.fromJson(json['preguntas_']) : null,
+      subPregunta_: json['subPregunta_']  != null
+          ? SubPregunta.fromJson(json['subPregunta_']) : null
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    // data['idTipRespuesta'] = idTipRespuesta;
+    // data['idSesion'] = idSesion;
+    data['tipoRespuesta'] = tipoRespuesta;
+    data['grupoTema'] = grupoTema;
+    data['codPregunta'] = codPregunta;
+    data['codSubPregunta'] = codSubPregunta;
     data['rango'] = rango;
+    if(preguntas_ != null) {data['preguntas_'] = preguntas_!.toJson();}
+    if(subPregunta_ != null) {data['subPregunta_'] = subPregunta_!.toJson();}
+    // print(data);
     return data;
   }
 }
+
+//                                                    Preguntas
+
+class Preguntas {
+  int codPregunta;
+  String pregunta;
+
+  Preguntas({
+    required this.codPregunta,
+    required this.pregunta
+  });
+
+  factory Preguntas.fromJson(Map<String, dynamic> json) {
+    return Preguntas(
+      codPregunta: json['codPregunta'],
+      pregunta: json['pregunta1'],
+    );
+  }
+
+  Map<String, dynamic> toJson(){
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['codPregunta'] = codPregunta;
+    data['pregunta1'] = pregunta;
+    return data;
+  }
+}
+
+//                                                    class SubPregunta 
+
+class SubPregunta {
+  String codSubPregunta;
+  String? subPreguntas;
+
+  SubPregunta({
+    required this.codSubPregunta,
+    this.subPreguntas
+  });
+
+  factory SubPregunta.fromJson(Map<String, dynamic> json) {
+    return SubPregunta(
+      codSubPregunta: json['codSubPregunta'],
+      subPreguntas: json['subPreguntas']
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['codSubPregunta'] = codSubPregunta;
+    data['subPreguntas'] = subPreguntas;
+    return data;
+  }
+}
+
+// class RangoRespuestas {
+//   int? idRango;
+//   String? rango;
+
+//   RangoRespuestas({
+//     this.idRango,
+//     this.rango
+//   });
+
+//   factory RangoRespuestas.fromJson(Map<String, dynamic> json) {
+//     return RangoRespuestas(
+//       idRango: json['idRango'],
+//       rango: json['rango']
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     // data['idRango'] = idRango;
+//     data['rango'] = rango;
+//     return data;
+//   }
+// }
+
+// class SubPregunta

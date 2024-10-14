@@ -123,7 +123,7 @@ class MyApp extends StatelessWidget {
         )
       },
 
-      initialRoute: 'pregunta',
+      initialRoute: 'login',
     );
   }
 }

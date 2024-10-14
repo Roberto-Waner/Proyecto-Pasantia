@@ -79,7 +79,7 @@ class _NavbarState extends State<Navbar> {
                   filtrarCedula: widget.filtrarCedula,
                 ))
               );
-              // Navigator.of(context).pop();
+              Navigator.of(context).pop();
             }
           ),
           ListTile(
@@ -98,7 +98,7 @@ class _NavbarState extends State<Navbar> {
                   filtrarCedula: widget.filtrarCedula,
                 ))
               );
-              // Navigator.of(context).pop();
+              Navigator.of(context).pop();
             }
           ),
           ListTile(

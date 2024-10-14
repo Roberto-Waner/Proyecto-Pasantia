@@ -34,6 +34,18 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   late Future<List<SubPregunta>> _subPreguntas;
   final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
   late Future<List<Sesion>> _sesion;
+  String selectedTipRespuestas = '';
+  final tipoRespuestaController = TextEditingController();
+  List<double> rangoArray = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+  int _rangoValor = 0;
+
+  String numbersToRango(int rango) {
+    String result = '';
+    for (var i = 0; i <= rango; i++) {
+      result += '|$i| ';
+    }
+    return result.trim();
+  }
 
   @override
   void initState(){
@@ -223,16 +235,16 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                           cells: [
                             DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
                             DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
-                            DataCell(Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0))),
+                            DataCell(section.grupoTema != null ? Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
                             DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
                             DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            DataCell(Text(section.rango!, style: const TextStyle(fontSize: 20.0))),
+                            DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
                             DataCell(
                               Row(
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      // _showEditDialogSubPregunta(section);
+                                      _showEditDialogSesion(section);
                                     }, 
                                     icon: const Icon(Icons.edit)
                                   ),
@@ -263,6 +275,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             bottom: 155,
             right: 10,
             child: FloatingActionButton.extended( //aqui se crea un boton flotante para agregar
+              heroTag: 'Preguntas_tap',
               onPressed: () {
                 _showCreateDialog();
               },
@@ -274,6 +287,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             bottom: 80,
             right: 10,
             child: FloatingActionButton.extended( //aqui se crea un boton flotante para agregar
+              heroTag: 'SubPreguntas_tap',
               onPressed: () {
                 _showCreateDialogSubPregunta();
               },
@@ -285,6 +299,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             bottom: 5,
             right: 10,
             child: FloatingActionButton.extended( //aqui se crea un boton flotante para agregar
+              heroTag: 'Sesion_tap',
               onPressed: () {
                 _showCreateDialogSesion();
               },
@@ -349,7 +364,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   final dataPreg = _formKey.currentState!.value;
 
                   Preguntas nuevaPregunta = Preguntas(
-                    codPregunta: int.tryParse(dataPreg['noPregunta']) ?? 0, 
+                    codPregunta: int.parse(dataPreg['noPregunta']), 
                     // tipoRespuesta: dataPreg['tipoRespuesta'],
                     // grupoTema: dataPreg['grupoTema'] ?? 'Sin grupo tema',
                     pregunta: dataPreg['pregunta'] ?? 'Sin pregunta',
@@ -381,7 +396,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showEditDialog(Preguntas questionUpLoad) {
-
     showDialog(
       context: context, 
       builder: (context) {
@@ -751,18 +765,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showCreateDialogSesion() {
-    final tipoRespuestaController = TextEditingController();
-    List<double> rangoArray = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
-    int _rangoValor = 0;
-
-    String numbersToRango(int rango) {
-      String result = '';
-      for (var i = 0; i <= rango; i++) {
-        result += '|$i| ';
-      }
-      return result.trim();
-    }
-
     showDialog(
       context: context, 
       builder: (context) {
@@ -777,17 +779,89 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  FormBuilderTextField(
+                  // FormBuilderTextField(
+                  //   name: 'tipoRespuesta',
+                  //   decoration: InputDecorations.inputDecoration(
+                  //     labeltext: 'Tipo de Respuesta',
+                  //     labelFrontSize: 30.5,
+                  //     hintext: 'Como se respondera esta pregunta',
+                  //     hintFrontSize: 30.0,
+                  //     icono: const Icon(Icons.numbers,size: 30.0),
+                  //   ),
+                  //   style: const TextStyle(fontSize: 30.0),
+                  //   validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+                  // ),
+                  FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
                     decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Tipo de Respuesta',
+                      labeltext: 'Elige Tipo de Respuesta',
                       labelFrontSize: 30.5,
-                      hintext: 'Como se respondera esta pregunta',
-                      hintFrontSize: 30.0,
+                      // hintext: 'Eliga como se responder esta pregunta',
+                      // hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
                     ),
                     style: const TextStyle(fontSize: 30.0),
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Respuesta Abierta',
+                        child: Text('Respuesta Abierta', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1)))
+                      ),
+                      DropdownMenuItem(
+                        value: 'Selecionar: Si, No, N/A',
+                        child: Text('Selecionar: Si, No, N/A', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Calificar del 1 a 10',
+                        child: Text('Calificar del 1 a 10', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Solo SI o No',
+                        child: Text('Solo SI o No', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Edad',
+                        child: Text('Edad', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Nacionalidad',
+                        child: Text('Nacionalidad', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Título de transporte',
+                        child: Text('Título de transporte', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Producto utilizado',
+                        child: Text('Producto utilizado', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Genero',
+                        child: Text('Genero', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Frecuencia de viajes por semana',
+                        child: Text('Frecuencia de viajes por semana', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Expectativa del pasajero',
+                        child: Text('Expectativa del pasajero', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Conclusion',
+                        child: Text('Conclusion', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      // DropdownMenuItem(
+                      //   value: 'Calificar del 1 a 10',
+                      //   child: Text('Calificar del 1 a 10', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      // )
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedTipRespuestas = value!;
+                      });
+                    },
+                    initialValue: 'Respuesta Abierta',
                   ),
 
                   FormBuilderTextField(
@@ -883,11 +957,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                   Sesion nuevaSesion = Sesion(
                     tipoRespuesta: dataSesion['tipoRespuesta'],
-                    grupoTema: dataSesion['grupoTema'] ?? 'Sin grupo tema',
-                    codPregunta: int.tryParse(dataSesion['codPregunta']) ?? 0,
-                    codSubPregunta: dataSesion['codSubPregunta'] ?? 'No hay sub preguntas',
+                    grupoTema: dataSesion['grupoTema'],
+                    codPregunta: int.parse(dataSesion['codPregunta']),
+                    codSubPregunta: dataSesion['codSubPregunta'],
                     rango: dataSesion['rango']
                   );
+
+                  print('Resultados ${nuevaSesion}');
 
                   try{
                     final response = await ApiServiceSesion('https://10.0.2.2:7190').postSesion(nuevaSesion);
@@ -905,6 +981,224 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 }
               },
               child: const Text('Crear', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  void _showEditDialogSesion(Sesion sectionUpload) {
+    showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Modificar La Sesion', style: TextStyle(fontSize: 33.0)),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
+            child: FormBuilder(
+              key: _formKey,
+              initialValue: {
+                'tipoRespuesta': sectionUpload.tipoRespuesta,
+                'grupoTema': sectionUpload.grupoTema,
+                'codPregunta': sectionUpload.codPregunta.toString(),
+                'codSubPregunta': sectionUpload.codSubPregunta,
+                'rango': sectionUpload.rango
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FormBuilderDropdown<String>(
+                    name: 'tipoRespuesta',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Elige Tipo de Respuesta',
+                      labelFrontSize: 30.5,
+                      // hintext: 'Eliga como se responder esta pregunta',
+                      // hintFrontSize: 30.0,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 30.0),
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Respuesta Abierta',
+                        child: Text('Respuesta Abierta', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1)))
+                      ),
+                      DropdownMenuItem(
+                        value: 'Selecionar: Si, No, N/A',
+                        child: Text('Selecionar: Si, No, N/A', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Calificar del 1 a 10',
+                        child: Text('Calificar del 1 a 10', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Solo SI o No',
+                        child: Text('Solo SI o No', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Edad',
+                        child: Text('Edad', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Nacionalidad',
+                        child: Text('Nacionalidad', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Título de transporte',
+                        child: Text('Título de transporte', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Producto utilizado',
+                        child: Text('Producto utilizado', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Genero',
+                        child: Text('Genero', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Frecuencia de viajes por semana',
+                        child: Text('Frecuencia de viajes por semana', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Expectativa del pasajero',
+                        child: Text('Expectativa del pasajero', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Conclusion',
+                        child: Text('Conclusion', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      ),
+                      // DropdownMenuItem(
+                      //   value: 'Calificar del 1 a 10',
+                      //   child: Text('Calificar del 1 a 10', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      // )
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedTipRespuestas = value!;
+                      });
+                    },
+                    initialValue: 'Respuesta Abierta',
+                  ),
+
+                  FormBuilderTextField(
+                    name: 'grupoTema',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Tema',
+                      labelFrontSize: 30.5,
+                      hintext: ' ',
+                      hintFrontSize: 30.0,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 30.0),
+                    // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+                  ),
+
+                  FormBuilderTextField(
+                    name: 'codPregunta',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'No. Pregunta',
+                      labelFrontSize: 30.5,
+                      hintext: ' ',
+                      hintFrontSize: 30.0,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 30.0),
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+                  ),
+
+                  FormBuilderTextField(
+                    name: 'codSubPregunta',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Cod. Sub Pregunta',
+                      labelFrontSize: 30.5,
+                      hintext: 'Ingrese el codigo de la Sub-pregunta',
+                      hintFrontSize: 30.0,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 30.0),
+                    // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+                  ),
+
+                  FormBuilderTextField(
+                    name: 'rango',
+                    controller: tipoRespuestaController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Determinar el Rango requerido',
+                      labelFrontSize: 30.5,
+                      hintext: 'Usa el slider para determinar el rango deseado.',
+                      hintFrontSize: 20.0,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 30.0),
+                    // validator: FormBuilderValidators.numeric(errorText: 'Este campo es requerido')
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _rangoValor.toDouble(),
+                          min: 0,
+                          max: (rangoArray.length - 1).toDouble(),
+                          divisions: rangoArray.length - 1,
+                          label: rangoArray[_rangoValor].toString(),
+                          onChanged: (double valor) {
+                            setState(() {
+                              _rangoValor = valor.toInt();
+                              // Actualiza el valor del controlador con el formato requerido
+                              tipoRespuestaController.text = numbersToRango(_rangoValor);
+                            });
+                          },
+                        ),
+                      ]
+                    ),
+                  )
+                ],
+              )
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo si se cancela
+              },
+            ),
+            TextButton(
+              onPressed: () async {
+                if(_formKey.currentState!.saveAndValidate()) {
+                  final dataSesion = _formKey.currentState!.value;
+
+                  Sesion sesionUpLoad = Sesion(
+                    idSesion: sectionUpload.idSesion,
+                    tipoRespuesta: selectedTipRespuestas,
+                    grupoTema: dataSesion['grupoTema'],
+                    codPregunta: int.parse(dataSesion['codPregunta']),
+                    codSubPregunta: dataSesion['codSubPregunta'] ?? '',
+                    rango: dataSesion['rango'] ?? ''
+                  );
+
+                  try{
+                    final response = await ApiServiceSesion('https://10.0.2.2:7190')
+                      .putSesion(sectionUpload.idSesion!, sesionUpLoad);
+
+                    if(response.statusCode == 204) {
+                      print('La Sesion fue modificada con éxito');
+                      Navigator.of(context).pop();
+                      _refreshSubPreguntas();
+                    } else {
+                      print('Error al modificar la Sesion: ${response.body}');
+                    }
+                  } catch (e) {
+                    print('Excepción al modificar la Sesion: $e');
+                  }
+                }
+              }, 
+              child: const Text('Editar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
             )
           ],
         );

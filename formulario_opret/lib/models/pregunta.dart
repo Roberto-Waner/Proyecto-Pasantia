@@ -44,7 +44,7 @@ class Sesion {
     data['rango'] = rango;
     if(preguntas_ != null) {data['preguntas_'] = preguntas_!.toJson();}
     if(subPregunta_ != null) {data['subPregunta_'] = subPregunta_!.toJson();}
-    // print(data);
+    print(data);
     return data;
   }
 }

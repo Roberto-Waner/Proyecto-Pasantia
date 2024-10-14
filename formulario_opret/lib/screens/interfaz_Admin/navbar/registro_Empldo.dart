@@ -141,6 +141,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         }
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'RegEmpleado_tag',
         onPressed: () {
           _showCreateDialog();
         },

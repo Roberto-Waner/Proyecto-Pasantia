@@ -36,7 +36,7 @@ class Sesion {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    // data['idSesion'] = idSesion;
+    data['idSesion'] = idSesion;
     data['tipoRespuesta'] = tipoRespuesta;
     data['grupoTema'] = grupoTema;
     data['codPregunta'] = codPregunta;
@@ -44,7 +44,7 @@ class Sesion {
     data['rango'] = rango;
     if(preguntas_ != null) {data['preguntas_'] = preguntas_!.toJson();}
     if(subPregunta_ != null) {data['subPregunta_'] = subPregunta_!.toJson();}
-    // print(data);
+    print(data);
     return data;
   }
 }

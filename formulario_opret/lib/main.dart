@@ -1,13 +1,12 @@
 // "mateapp" utilizado para importar de manera automatica el main()
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:formulario_opret/screens/interfaz_Admin/modifyTable_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
 import 'package:formulario_opret/screens/interfaz_User/Empleado_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/administrador_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/pregunta_Encuesta_Screen.dart';
-// import 'package:formulario_opret/screens/interfaz_User/formEncuesta_screen.dart';
-// import 'package:formulario_opret/screens/interfaz_User/pregunta_Encuesta_Screen.dart';
 import 'package:formulario_opret/screens/login_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.dart';
 import 'package:formulario_opret/screens/new_User.dart';
@@ -116,6 +115,13 @@ class MyApp extends StatelessWidget {
         ),
 
         'preguntaNavBar': (_) => PreguntaScreenNavbar(
+          filtrarUsuarioController: filtrarUsuarioController,
+          filtrarEmailController: filtrarEmailController,
+          filtrarId: filtrarId,
+          filtrarCedula: filtrarCedula,
+        ),
+
+        'ModifyTable': (_) => ModifyTable(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,

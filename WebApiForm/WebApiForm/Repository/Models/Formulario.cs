@@ -38,17 +38,23 @@ public partial class Formulario
     [Unicode(false)]
     public string? Hora { get; set; }
 
-    [Column("estacion")]
-    [StringLength(200)]
-    [Unicode(false)]
-    public string? Estacion { get; set; }
+    [Column("id_estacion")]
+    public int? IdEstacion { get; set; }
 
-    [Column("linea")]
-    [StringLength(11)]
+    [Column("id_linea")]
+    [StringLength(20)]
     [Unicode(false)]
-    public string? Linea { get; set; }
+    public string? IdLinea { get; set; }
+
+    [ForeignKey("IdEstacion")]
+    [InverseProperty("Formularios")]
+    public virtual Estacion? IdEstacionNavigation { get; set; }
+
+    [ForeignKey("IdLinea")]
+    [InverseProperty("Formularios")]
+    public virtual Linea? IdLineaNavigation { get; set; }
 
     [ForeignKey("IdUsuarios")]
     [InverseProperty("Formularios")]
-    public virtual RegistroUsuario? IdUsuariosNavigation { get; set; } = null!;
+    public virtual RegistroUsuario IdUsuariosNavigation { get; set; } = null!;
 }

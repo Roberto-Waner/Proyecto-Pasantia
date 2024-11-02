@@ -5,9 +5,10 @@ class Usuarios {
   String usuario1;
   String email;
   String passwords;
-  String? foto;
   String fechaCreacion;
   String rol;
+  final int isUpdated;
+  final int isDeleted;
 
   Usuarios({
     required this.idUsuarios,
@@ -16,11 +17,13 @@ class Usuarios {
     required this.usuario1,
     required this.email,
     required this.passwords,
-    this.foto,
     required this.fechaCreacion,
     required this.rol,
+    this.isUpdated = 0,
+    this.isDeleted = 0,
   });
 
+  // Constructor para crear una instancia desde JSON
   factory Usuarios.fromJson(Map<String, dynamic> json) {
     return Usuarios(
       idUsuarios: json['idUsuarios'], 
@@ -29,12 +32,14 @@ class Usuarios {
       usuario1: json['usuario'], 
       email: json['email'], 
       passwords: json['passwords'],
-      foto: json['foto'],
       fechaCreacion: json['fechaCreacion'],
-      rol: json['rol']
+      rol: json['rol'],
+      isUpdated: json['isUpdated'] ?? 0,
+      isDeleted: json['isDeleted'] ?? 0,
     );
   }
 
+  // Método para convertir una instancia a JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['idUsuarios'] = idUsuarios;
@@ -43,13 +48,15 @@ class Usuarios {
     data['usuario'] = usuario1;
     data['email'] = email;
     data['passwords'] = passwords;
-    data['foto'] = foto;
     data['fechaCreacion'] = fechaCreacion;
     data['rol'] = rol;
+    data['isUpdated'] = isUpdated;
+    data['isDeleted'] = isDeleted;
     return data;
   }
 }
 
+/*
 class ObtenerEmpleados {
   String idUsuarios$;
   String cedula$;
@@ -81,3 +88,4 @@ class ObtenerEmpleados {
     );
   }
 }
+*/

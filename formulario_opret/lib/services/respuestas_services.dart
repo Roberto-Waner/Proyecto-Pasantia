@@ -1,8 +1,40 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:formulario_opret/models/respuesta.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 
+class ApiServiceRespuesta {
+  final String baseUrl;
+  final ApiService service;
+
+  ApiServiceRespuesta(this.baseUrl) : service = ApiService(baseUrl);
+
+  Future<http.Response> postRespuesta(Respuesta respuesta) async {
+    // Intenta realizar una verificación de conexión antes de hacer la solicitud.
+    final isCheckOk = await service.check();
+    if (isCheckOk) {
+      try {
+        final response = await service.postData('Respuestas', respuesta.toJson());
+
+        if (response.statusCode == 201) {
+          print('Respuesta enviada a la API HTTP');
+        } else {
+          print('Error al enviar respuesta a la API HTTP: ${response.statusCode}');
+          print('Cuerpo de la respuesta: ${response.body}');
+        }
+
+        return response;
+      } catch (e) {
+        print('Error al enviar respuesta a la API: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('No hay conexión con la API.');
+    }
+  }
+}
+
+
+/*
 class ApiServiceRespuesta {
   final String baseUrl;
 
@@ -98,3 +130,4 @@ class ApiServiceRespuesta {
     }
   }
 }
+*/

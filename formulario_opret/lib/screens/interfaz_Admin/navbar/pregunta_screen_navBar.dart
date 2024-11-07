@@ -909,10 +909,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                         value: 'Conclusion',
                         child: Text('Conclusion', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
                       ),
-                      // DropdownMenuItem(
-                      //   value: 'Calificar del 1 a 10',
-                      //   child: Text('Calificar del 1 a 10', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
-                      // )
+                      DropdownMenuItem(
+                        value: 'Motivo del viaje',
+                        child: Text('Motivo del viaje', style: TextStyle(fontSize: 30.0, color: Color.fromARGB(255, 1, 1, 1))),
+                      )
                     ],
                     onChanged: (value) {
                       setState(() {

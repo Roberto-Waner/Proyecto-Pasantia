@@ -56,11 +56,10 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE Respuestas (
-        idRespuestas INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        idUsuarios TEXT NOT NULL,
-        noEncuesta TEXT NOT NULL,
-        codPregunta INTEGER NOT NULL,
+      CREATE TABLE RespuestasLocal (
+        idUsuarios TEXT NULL,
+        noEncuesta TEXT NULL,
+        codPregunta INTEGER NULL,
         respuesta1 TEXT NULL,
         valoracion TEXT NULL,
         comentarios TEXT NULL,

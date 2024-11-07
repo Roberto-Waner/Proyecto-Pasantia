@@ -2,7 +2,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:formulario_opret/data/section_crud.dart';
+import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/models/respuesta.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
@@ -33,7 +33,8 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   // final ApiServicePreguntas _apiQuestions = ApiServicePreguntas('https://10.0.2.2:7190');
   final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
-  final SectionCrud _sectionCrud = SectionCrud();
+  // final SectionCrud _sectionCrud = SectionCrud();
+  final SectionController _sectionController = SectionController();
   final ApiServiceRespuesta _apiRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   final _formKey = GlobalKey<FormBuilderState>();
@@ -45,18 +46,18 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
   }
 
-  void _refreshPreguntas() async {
+  Future<void> _refreshPreguntas() async {
     try {
-      dataQuestion = await _apiSesion.getSpPreguntascompletaListada();
+      dataQuestion = await _sectionController.loadFromApi(); // Intentar cargar desde la API primero
     } catch (e) {
-      print('Error al cargar desde la API, cargando desde SQLite: $e');
-      dataQuestion = await _sectionCrud.querySectionCrud().timeout(const Duration(seconds: 10));
+      print('Error refreshing questions: $e');
+      dataQuestion = await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5)); // Cargar desde SQLite si ocurre un error
     }
+
     setState(() {
       _isExpandedList = List<bool>.filled(dataQuestion.length, false);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +69,25 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         filtrarCedula: widget.filtrarCedula,
       ),
 
-      appBar: AppBar(title: const Text('Preguntas de Encuesta')),
+      appBar: AppBar(
+        title: const Text('Preguntas de Encuesta'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Recargar',
+            onPressed: () {
+              setState(() {
+                _refreshPreguntas();
+              });
+            },
+          )
+        ],
+      ),
 
       body:FutureBuilder(
         future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
           print('Error al cargar desde la API, cargando desde SQLite: $e');
-          return await _sectionCrud.querySectionCrud();
+          return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
         }),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

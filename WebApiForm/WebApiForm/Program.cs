@@ -48,6 +48,7 @@ builder.Services.AddScoped<EstacionPorLineaService>();
 builder.Services.AddScoped<EmpleadoService>();
 builder.Services.AddScoped<PreguntaCompletaService>();
 builder.Services.AddScoped<RespuestaService>();
+builder.Services.AddScoped<FormularioServices>();
 
 var app = builder.Build();
 

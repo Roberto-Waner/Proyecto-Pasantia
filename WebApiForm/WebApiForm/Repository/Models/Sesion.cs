@@ -43,4 +43,7 @@ public partial class Sesion
     [ForeignKey("CodSubPregunta")]
     [InverseProperty("Sesions")]
     public virtual SubPregunta? CodSubPreguntaNavigation { get; set; }
+
+    [InverseProperty("IdSesionNavigation")]
+    public virtual ICollection<Respuesta> Respuestas { get; set; } = new List<Respuesta>();
 }

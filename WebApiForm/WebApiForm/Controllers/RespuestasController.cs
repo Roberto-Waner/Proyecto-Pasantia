@@ -122,7 +122,7 @@ namespace WebApiForm.Controllers
             return _context.Respuestas.Any(e => e.IdRespuestas == id);
         }
 
-        [HttpPost("respueta")]
+        [HttpPost("insertar")]
         public async Task<IActionResult> postInsertarRespuesta([FromBody] Respuesta_Dto respuesta)
         {
             try
@@ -136,5 +136,20 @@ namespace WebApiForm.Controllers
 
             return Ok();
         }
+
+        [HttpGet("filtrar")]
+        public async Task<IActionResult> postFiltrarRespuesta([FromBody] FiltrarRespuestas_Dto filtrar)
+        {
+            try
+            {
+                var filtrarRespuestas = await _respuestaService.FiltrarRespuestaAsyncServices(filtrar); 
+                return Ok(filtrarRespuestas);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al filtrar la respuesta", details = ex.Message });
+            }
+        }
+
     }
 }

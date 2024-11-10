@@ -41,6 +41,10 @@ public partial class FormEncuestaDbContext : DbContext
 
     public DbSet<ObtenerEmpleados> FiltrarUsuarios { get; set; }
 
+    public DbSet<FiltrarRespuestas_Dto> FiltrarRespuestasDtos { get; set; }
+
+    public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; }
+
     //public DbSet<Respuesta_Dto> RespuestaDtos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -91,11 +95,11 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<Respuesta>(entity =>
         {
-            entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C8E8B1BE2");
+            entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C87CC83D9");
 
-            entity.HasOne(d => d.CodPreguntaNavigation).WithMany(p => p.Respuestas)
+            entity.HasOne(d => d.IdSesionNavigation).WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_Respuestas_Pregunta");
+                .HasConstraintName("fk_Respuestas_Sesion");
 
             entity.HasOne(d => d.IdUsuariosNavigation).WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -125,6 +129,8 @@ public partial class FormEncuestaDbContext : DbContext
         modelBuilder.Entity<PreguntaCompleta>().HasNoKey();
         modelBuilder.Entity<EstacionPorLinea>().HasNoKey();
         modelBuilder.Entity<ObtenerEmpleados>().HasNoKey();
+        modelBuilder.Entity<FiltrarRespuestas_Dto>().HasNoKey();
+        modelBuilder.Entity<FiltrarFormularios_Dto>().HasNoKey();
 
         base.OnModelCreating(modelBuilder);
         OnModelCreatingPartial(modelBuilder);
@@ -147,48 +153,60 @@ public partial class FormEncuestaDbContext : DbContext
         return await this.FiltrarUsuarios.FromSqlRaw("EXEC sp_ObtenerEmpleados").ToListAsync();
     }
 
-    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto)
+    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync(
+        "EXEC sp_InsertarRespuesta " +
+            "@idUsuarios = {0}," +
+            "@idSesion = {1}, " +
+            "@respuesta = {2}, " +
+            "@comentarios = {3}, " +
+            "@justificacion = {4}, " +
+            "@finalizarSesion = {5}",
+        respuesta_Dto.IdUsuarios,
+        respuesta_Dto.IdSesion,
+        respuesta_Dto.Respuesta,
+        respuesta_Dto.Comentarios,
+        respuesta_Dto.Justificacion,
+        respuesta_Dto.FinalizarSesion
+    );
+
+    public async Task<List<FiltrarRespuestas_Dto>> FiltrarRespuestaAsync(FiltrarRespuestas_Dto filtrarResp)
     {
-        await this.Database.ExecuteSqlRawAsync(
-                "EXEC sp_InsertarRespuesta " +
-                    "@idUsuarios = {0}," +
-                    " @codPregunta = {1}, " +
-                    "@respuesta = {2}, " +
-                    "@comentarios = {3}, " +
-                    "@justificacion = {4}, " +
-                    "@finalizarSesion = {5}",
-                respuesta_Dto.IdUsuarios,
-                respuesta_Dto.CodPregunta,
-                respuesta_Dto.Respuesta,
-                respuesta_Dto.Comentarios,
-                respuesta_Dto.Justificacion,
-                respuesta_Dto.FinalizarSesion
-            );
+        return await this.FiltrarRespuestasDtos.FromSqlRaw(
+                "EXEC sp_filtrar_Respuesta @id_usuarios = {0}, @no_encuesta = {1}, @id_sesion = {2}",
+                filtrarResp.IdUsuarios, filtrarResp.NoEncuesta, filtrarResp.IdSesion
+            ).ToListAsync();
     }
 
-    /*
-    public async Task<string> InsertarRespuestaAsync(RespuestaDto respuestaDto)
+    public async Task<List<FiltrarFormularios_Dto>> FiltrarFormularioAsync(string filtrarFormulario)
     {
-        var noEncuestaParam = new Microsoft.Data.SqlClient.SqlParameter
-        {
-            ParameterName = "@noEncuesta",
-            SqlDbType = System.Data.SqlDbType.VarChar,
-            Size = 100,
-            Direction = System.Data.ParameterDirection.Output
-        };
-
-        await this.Database.ExecuteSqlRawAsync(
-            "EXEC sp_InsertarRespuesta @idUsuarios = {0}, @codPregunta = {1}, @respuesta = {2}, @comentarios = {3}, @justificacion = {4}, @finalizarSesion = {5}, @noEncuesta = {6} OUTPUT",
-            respuestaDto.IdUsuarios,
-            respuestaDto.CodPregunta,
-            respuestaDto.Respuesta,
-            respuestaDto.Comentarios,
-            respuestaDto.Justificacion,
-            respuestaDto.FinalizarSesion,
-            noEncuestaParam
-        );
-
-        return noEncuestaParam.Value as string;
+        return await this.filtrarFormulariosDtos
+            .FromSqlRaw("EXEC sp_FiltrarFormulario @Filtro = {0}", filtrarFormulario)
+            .ToListAsync();
     }
-    */
 }
+
+/*
+public async Task<string> InsertarRespuestaAsync(RespuestaDto respuestaDto)
+{
+    var noEncuestaParam = new Microsoft.Data.SqlClient.SqlParameter
+    {
+        ParameterName = "@noEncuesta",
+        SqlDbType = System.Data.SqlDbType.VarChar,
+        Size = 100,
+        Direction = System.Data.ParameterDirection.Output
+    };
+
+    await this.Database.ExecuteSqlRawAsync(
+        "EXEC sp_InsertarRespuesta @idUsuarios = {0}, @codPregunta = {1}, @respuesta = {2}, @comentarios = {3}, @justificacion = {4}, @finalizarSesion = {5}, @noEncuesta = {6} OUTPUT",
+        respuestaDto.IdUsuarios,
+        respuestaDto.CodPregunta,
+        respuestaDto.Respuesta,
+        respuestaDto.Comentarios,
+        respuestaDto.Justificacion,
+        respuestaDto.FinalizarSesion,
+        noEncuestaParam
+    );
+
+    return noEncuestaParam.Value as string;
+}
+*/

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiForm.Repository.Models;
 using WebApiForm.Services.DTO__Data_Transfer_Object_;
 using WebApiForm.Services;
+using WebApiForm.DTO__Data_Transfer_Object_;
 
 namespace WebApiForm.Repository;
 
@@ -39,6 +40,8 @@ public partial class FormEncuestaDbContext : DbContext
     public DbSet<EstacionPorLinea> EstacionPorLineas { get; set; }
 
     public DbSet<ObtenerEmpleados> FiltrarUsuarios { get; set; }
+
+    //public DbSet<Respuesta_Dto> RespuestaDtos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=DBConnection");
@@ -101,7 +104,11 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<Sesion>(entity =>
         {
-            entity.HasKey(e => e.IdSesion).HasName("PK__Sesion__8D3F9DFE95939BB5");
+            entity.HasKey(e => e.IdSesion).HasName("PK__Sesion__8D3F9DFE2D1CD128");
+
+            entity.ToTable("Sesion", tb => tb.HasTrigger("trg_increment_Sesion"));
+
+            entity.Property(e => e.IdSesion).ValueGeneratedNever();
 
             entity.HasOne(d => d.CodPreguntaNavigation).WithMany(p => p.Sesions)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -139,4 +146,49 @@ public partial class FormEncuestaDbContext : DbContext
     {
         return await this.FiltrarUsuarios.FromSqlRaw("EXEC sp_ObtenerEmpleados").ToListAsync();
     }
+
+    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto)
+    {
+        await this.Database.ExecuteSqlRawAsync(
+                "EXEC sp_InsertarRespuesta " +
+                    "@idUsuarios = {0}," +
+                    " @codPregunta = {1}, " +
+                    "@respuesta = {2}, " +
+                    "@comentarios = {3}, " +
+                    "@justificacion = {4}, " +
+                    "@finalizarSesion = {5}",
+                respuesta_Dto.IdUsuarios,
+                respuesta_Dto.CodPregunta,
+                respuesta_Dto.Respuesta,
+                respuesta_Dto.Comentarios,
+                respuesta_Dto.Justificacion,
+                respuesta_Dto.FinalizarSesion
+            );
+    }
+
+    /*
+    public async Task<string> InsertarRespuestaAsync(RespuestaDto respuestaDto)
+    {
+        var noEncuestaParam = new Microsoft.Data.SqlClient.SqlParameter
+        {
+            ParameterName = "@noEncuesta",
+            SqlDbType = System.Data.SqlDbType.VarChar,
+            Size = 100,
+            Direction = System.Data.ParameterDirection.Output
+        };
+
+        await this.Database.ExecuteSqlRawAsync(
+            "EXEC sp_InsertarRespuesta @idUsuarios = {0}, @codPregunta = {1}, @respuesta = {2}, @comentarios = {3}, @justificacion = {4}, @finalizarSesion = {5}, @noEncuesta = {6} OUTPUT",
+            respuestaDto.IdUsuarios,
+            respuestaDto.CodPregunta,
+            respuestaDto.Respuesta,
+            respuestaDto.Comentarios,
+            respuestaDto.Justificacion,
+            respuestaDto.FinalizarSesion,
+            noEncuestaParam
+        );
+
+        return noEncuestaParam.Value as string;
+    }
+    */
 }

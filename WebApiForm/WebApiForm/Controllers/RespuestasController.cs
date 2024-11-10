@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiForm.Capa_de_Servicio;
+using WebApiForm.DTO__Data_Transfer_Object_;
 using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
 
@@ -15,10 +17,12 @@ namespace WebApiForm.Controllers
     public class RespuestasController : ControllerBase
     {
         private readonly FormEncuestaDbContext _context;
+        private readonly RespuestaService _respuestaService;
 
-        public RespuestasController(FormEncuestaDbContext context)
+        public RespuestasController(FormEncuestaDbContext context, RespuestaService respuestaService)
         {
             _context = context;
+            _respuestaService = respuestaService;
         }
 
         // GET: api/Respuestas
@@ -78,10 +82,23 @@ namespace WebApiForm.Controllers
         [HttpPost]
         public async Task<ActionResult<Respuesta>> PostRespuesta(Respuesta respuesta)
         {
-            _context.Respuestas.Add(respuesta);
-            await _context.SaveChangesAsync();
+            try
+            {
+                // Deshabilitar el seguimiento de cambios para permitir que el trigger maneje la clave primaria
+                //_context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-            return CreatedAtAction("GetRespuesta", new { id = respuesta.IdRespuestas }, respuesta);
+                _context.Respuestas.Add(respuesta);
+                await _context.SaveChangesAsync();
+
+                // Rehabilitar el seguimiento de cambios
+                //_context.ChangeTracker.AutoDetectChangesEnabled = true;
+
+                return CreatedAtAction("GetRespuesta", new { id = respuesta.IdRespuestas }, respuesta);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al crear enviar la Respuesta", details = ex.Message });
+            }
         }
 
         // DELETE: api/Respuestas/5
@@ -103,6 +120,21 @@ namespace WebApiForm.Controllers
         private bool RespuestaExists(int id)
         {
             return _context.Respuestas.Any(e => e.IdRespuestas == id);
+        }
+
+        [HttpPost("respueta")]
+        public async Task<IActionResult> postInsertarRespuesta([FromBody] Respuesta_Dto respuesta)
+        {
+            try
+            {
+                await _respuestaService.InsertarRespuestaAsyncServices(respuesta);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al enviar la respuesta", details = ex.Message });
+            }
+
+            return Ok();
         }
     }
 }

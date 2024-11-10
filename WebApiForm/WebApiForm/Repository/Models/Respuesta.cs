@@ -20,7 +20,7 @@ public partial class Respuesta
     [Column("no_encuesta")]
     [StringLength(100)]
     [Unicode(false)]
-    public string NoEncuesta { get; set; } = null!;
+    public string? NoEncuesta { get; set; }
 
     [Column("cod_pregunta")]
     public int CodPregunta { get; set; }
@@ -45,9 +45,9 @@ public partial class Respuesta
 
     [ForeignKey("CodPregunta")]
     [InverseProperty("Respuestas")]
-    public virtual Pregunta CodPreguntaNavigation { get; set; } = null!;
+    public virtual Pregunta? CodPreguntaNavigation { get; set; } = null!;
 
     [ForeignKey("IdUsuarios")]
     [InverseProperty("Respuestas")]
-    public virtual RegistroUsuario IdUsuariosNavigation { get; set; } = null!;
+    public virtual RegistroUsuario? IdUsuariosNavigation { get; set; } = null!;
 }

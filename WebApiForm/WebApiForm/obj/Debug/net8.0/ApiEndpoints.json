@@ -1,5 +1,15 @@
 [
   {
+    "ContainingType": "WebApiForm.Controllers.CheckController",
+    "Method": "Check",
+    "RelativePath": "api/Check",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "WebApiForm.Controllers.EstacionsController",
     "Method": "GetEstacions",
     "RelativePath": "api/Estacions",
@@ -730,6 +740,22 @@
       {
         "Name": "id",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApiForm.Controllers.RespuestasController",
+    "Method": "postInsertarRespuesta",
+    "RelativePath": "api/Respuestas/respueta",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "respuesta",
+        "Type": "WebApiForm.DTO__Data_Transfer_Object_.Respuesta_Dto",
         "IsRequired": true
       }
     ],

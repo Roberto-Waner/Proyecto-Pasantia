@@ -39,11 +39,15 @@ public partial class FormEncuestaDbContext : DbContext
 
     public DbSet<EstacionPorLinea> EstacionPorLineas { get; set; }
 
-    public DbSet<ObtenerEmpleados> FiltrarUsuarios { get; set; }
+    public DbSet<ObtenerEmpleados> FiltrarUsuarios { get; set; } //no esta en uso actualmente
 
     public DbSet<FiltrarRespuestas_Dto> FiltrarRespuestasDtos { get; set; }
 
-    public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; }
+    public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; } //no esta en uso actualmente
+
+    public DbSet<ObtenerForm_Dto> obtenerFormDtos { get; set; }
+
+    public DbSet<ObtenerRespuestas_Dto> obtenerRespuestasDtos { get; set; }
 
     //public DbSet<Respuesta_Dto> RespuestaDtos { get; set; }
 
@@ -128,9 +132,11 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<PreguntaCompleta>().HasNoKey();
         modelBuilder.Entity<EstacionPorLinea>().HasNoKey();
-        modelBuilder.Entity<ObtenerEmpleados>().HasNoKey();
-        modelBuilder.Entity<FiltrarRespuestas_Dto>().HasNoKey();
-        modelBuilder.Entity<FiltrarFormularios_Dto>().HasNoKey();
+        modelBuilder.Entity<ObtenerEmpleados>().HasNoKey(); //no esta en uso actualmente
+        modelBuilder.Entity<FiltrarRespuestas_Dto>().HasNoKey(); //no esta en uso actualmente
+        modelBuilder.Entity<FiltrarFormularios_Dto>().HasNoKey(); //no esta en uso actualmente
+        modelBuilder.Entity<ObtenerForm_Dto>().HasNoKey();
+        modelBuilder.Entity<ObtenerRespuestas_Dto>().HasNoKey();
 
         base.OnModelCreating(modelBuilder);
         OnModelCreatingPartial(modelBuilder);
@@ -153,7 +159,17 @@ public partial class FormEncuestaDbContext : DbContext
         return await this.FiltrarUsuarios.FromSqlRaw("EXEC sp_ObtenerEmpleados").ToListAsync();
     }
 
-    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync(
+    public async Task<List<ObtenerForm_Dto>> ObtenerFormularioAsync()
+    {
+        return await this.obtenerFormDtos.FromSqlRaw("EXEC sp_ObtenerForm_Linea_Estacion").ToListAsync();
+    }
+
+    public async Task<List<ObtenerRespuestas_Dto>> ObtenerRespuestasAsync()
+    {
+        return await this.obtenerRespuestasDtos.FromSqlRaw("EXEC sp_ObtenerRespuestas").ToListAsync();
+    }
+
+    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync( //no esta en uso actualmente
         "EXEC sp_InsertarRespuesta " +
             "@idUsuarios = {0}," +
             "@idSesion = {1}, " +
@@ -177,7 +193,7 @@ public partial class FormEncuestaDbContext : DbContext
             ).ToListAsync();
     }
 
-    public async Task<List<FiltrarFormularios_Dto>> FiltrarFormularioAsync(string filtrarFormulario)
+    public async Task<List<FiltrarFormularios_Dto>> FiltrarFormularioAsync(string filtrarFormulario) //no esta en uso actualmente
     {
         return await this.filtrarFormulariosDtos
             .FromSqlRaw("EXEC sp_FiltrarFormulario @Filtro = {0}", filtrarFormulario)

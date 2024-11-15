@@ -21,6 +21,7 @@ namespace WebApiForm.Capa_de_Servicio
             await _context.InsertarRespuestaAsync(respuesta);
         }
 
+        //para filtrar datos de la tabla Respuesta usando parametros, como: IdUsuario, NoEncuesta, IdSesion
         public async Task<List<FiltrarRespuestas_Dto>> FiltrarRespuestaAsyncServices(FiltrarRespuestas_Dto filtrar)
         {
             var query = "EXEC sp_filtrar_Respuesta @id_usuarios = {0}, @no_encuesta = {1}, @id_sesion = {2}";
@@ -34,5 +35,10 @@ namespace WebApiForm.Capa_de_Servicio
             return await _context.FiltrarRespuestasDtos.FromSqlRaw(query, parameters.ToArray()).ToListAsync();
         }
 
+        //Obtener todas las Respuesta de su tabla Respuestas mas el Usuario, Sesion, Preguntas, Subpreguntas, basado en un stored procedure
+        public async Task<List<ObtenerRespuestas_Dto>> ObtenerRespuestasAsyncService()
+        {
+            return await _context.ObtenerRespuestasAsync();
+        }
     }
 }

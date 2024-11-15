@@ -131,5 +131,19 @@ namespace WebApiForm.Controllers
                 return BadRequest(new { message = "Error al filtrar el formulario", details = ex.Message });
             }
         }
+
+        [HttpGet("ObtenerForm")]
+        public async Task<ActionResult<List<ObtenerForm_Dto>>> getObtenerFormularios()
+        {
+            try
+            {
+                var form = await _formularioServices.ObtenerFormularioAsyncService();
+                return Ok(form);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al filtrar el formulario", details = ex.Message });
+            }
+        }
     }
 }

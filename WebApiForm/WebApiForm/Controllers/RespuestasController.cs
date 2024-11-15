@@ -123,11 +123,18 @@ namespace WebApiForm.Controllers
         }
 
         [HttpPost("insertar")]
-        public async Task<IActionResult> postInsertarRespuesta([FromBody] Respuesta_Dto respuesta)
+        public async Task<IActionResult> postInsertarRespuesta([FromBody] List<Respuesta_Dto> respuestas)
         {
+            if (respuestas == null || !respuestas.Any()) { 
+                return BadRequest(new { message = "El cuerpo de la solicitud debe ser un array de respuestas." }); 
+            }
+
             try
             {
-                await _respuestaService.InsertarRespuestaAsyncServices(respuesta);
+                foreach (var answer in respuestas)
+                {
+                    await _respuestaService.InsertarRespuestaAsyncServices(answer);
+                }
             }
             catch (Exception ex)
             {
@@ -151,5 +158,18 @@ namespace WebApiForm.Controllers
             }
         }
 
+        [HttpGet("ObtenerResp")]
+        public async Task<ActionResult<List<ObtenerRespuestas_Dto>>> getObtenerRespuestas()
+        {
+            try
+            {
+                var answer = await _respuestaService.ObtenerRespuestasAsyncService();
+                return Ok(answer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al obtener el Reporte de las Respuestas", details = ex.Message });
+            }
+        }
     }
 }

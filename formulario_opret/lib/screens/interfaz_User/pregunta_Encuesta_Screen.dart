@@ -4,9 +4,10 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
 import 'package:formulario_opret/Controllers/section_Controller.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
-import 'package:formulario_opret/models/respuesta.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
+import 'package:formulario_opret/services/respuestas_services.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 
@@ -38,27 +39,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   // final ApiServiceRespuesta _apiRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
+  late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
-  List<bool> _isExpandedList = []; //una lista de booleanos para controlar si cada Card está expandido o no.
-  // final TextEditingController noEncuesta = TextEditingController();
-  // String year = DateFormat('yyyy').format(DateTime.now());
-  // int _counter = 0;
-
-  // int orderNumber = 1;
-  // late String noEncuesta;
+  List<bool> _isExpandedList = [];
 
   @override
   void initState() {
     super.initState();
-    // noEncuesta = generateNoEncuesta(orderNumber); // Inicializa noEncuesta
     _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
   }
-
-  // String generateNoEncuesta(int orderNumber) {
-  //   final year = DateTime.now().year;
-  //   final orderString = orderNumber.toString().padLeft(2, '0');
-  //   return '$year - $orderString';
-  // }
 
   void _refreshPreguntas() async {
     try {
@@ -71,20 +60,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       print('Error al cargar las preguntas: $e');
     }
   }
-
-
-  // Future<void> _refreshPreguntas() async {
-  //   try {
-  //     dataQuestion = await _sectionController.loadFromApi(); // Intentar cargar desde la API primero
-  //   } catch (e) {
-  //     print('Error refreshing questions: $e');
-  //     dataQuestion = await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5)); // Cargar desde SQLite si ocurre un error
-  //   }
-
-  //   setState(() {
-  //     _isExpandedList = List<bool>.filled(dataQuestion.length, false);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -111,23 +86,61 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         ],
       ),
 
-      body:FutureBuilder(
-        future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
-          print('Error al cargar desde la API, cargando desde SQLite: $e');
-          return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
-        }),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
-          } else if (dataQuestion.isEmpty) {
-            return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
-          } else {
-            // dataQuestion = snapshot.data!;
-            return _buildPreguntaList(); // Construye la lista de preguntas si hay datos
-          }
-        }
+      body:Column(
+        children: [
+          Expanded(
+            child: FutureBuilder(
+              future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
+                print('Error al cargar desde la API, cargando desde SQLite: $e');
+                return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
+              }),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
+                } else if (dataQuestion.isEmpty) {
+                  return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
+                } else {
+                  // dataQuestion = snapshot.data!;
+                  return _buildPreguntaList(); // Construye la lista de preguntas si hay datos
+                }
+              }
+            ),
+          ),
+          // Botón para finalizar la sesión, ubicado fuera del scroll
+          // Padding(
+          //   padding: const EdgeInsets.all(20.0),
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       if(dataRespuesta.isNotEmpty) {
+          //         _saveRespuesta(dataQuestion.first, {}, finalizarSesion: true);
+          //       }
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: const Color.fromRGBO(1, 135, 76, 1), // Color de fondo del primer botón
+          //       foregroundColor: const Color.fromARGB(255, 254, 255, 255), // Color del texto
+          //       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          //       shape: const RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.only(
+          //           topLeft: Radius.circular(50),
+          //           topRight: Radius.circular(50),
+          //           bottomLeft: Radius.circular(50),
+          //           bottomRight: Radius.circular(50),
+          //         ),
+          //       ),
+          //     ),
+          //     child: const Row(
+          //       mainAxisSize: MainAxisSize.min, // Asegura que el botón se ajuste al contenido
+          //       children: [
+          //         Icon(Icons.exit_to_app, size: 30.0), // Icono del botón
+          //         SizedBox(width: 10), // Espacio entre el icono y el texto
+          //         Text('Finalizar Sesión', style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold)),
+          //       ],
+          //     ),
+          //   ),
+          // )
+        ],
       )
     );
   }
@@ -139,15 +152,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text( 
-              //   'Encuesta: $noEncuesta', 
-              //   style: const TextStyle( 
-              //     fontSize: 24.0, 
-              //     fontWeight: FontWeight.bold, 
-              //     color: Color.fromARGB(255, 1, 1, 1) 
-              //   ), 
-              // ),
-              const SizedBox(height: 20),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: dataQuestion.length,
@@ -275,7 +279,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   void _showPreguntaDialog(SpPreguntascompleta question) {
-    // String? selectedResponse = question.sp_TipoRespuesta;
 
     showDialog(
       context: context, 
@@ -579,8 +582,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   onPressed: () {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
-                      _saveRespuesta(question, responseForm, false);
-                      // _nextPregunta(); // Llamar a la función para la próxima pregunta
+                      _saveRespuesta(question, responseForm, finalizarSesion: false);
                       Navigator.of(context).pop();
                     }
                   }, 
@@ -591,8 +593,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   onPressed: () {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
-                      _saveRespuesta(question, responseForm, true);
-                      // _finalizarEncuesta();
+                      _saveRespuesta(question, responseForm, finalizarSesion: true);
                       Navigator.of(context).pop();
                     }
                   }, 
@@ -607,7 +608,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   // Guardar respuesta en la API
-  void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, bool finalizarSesion) async {
+  void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, {bool finalizarSesion = false}) async {
     // Verificamos si el formulario es válido antes de guardar
     if (_formKey.currentState!.saveAndValidate()){
       final dataAnswer = _formKey.currentState!.value;
@@ -636,26 +637,22 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       }
 
       // Creamos el objeto `Respuesta` con los datos recopilados
-      Respuesta nuevaRespuesta = Respuesta(
-        idUsuarios: widget.filtrarId.text, // ID del usuario
-        idSesion: question.sp_CodPregunta!,
-        respuestas: respuestaFinal,
+      SpInsertarRespuestas nuevaRespuesta = SpInsertarRespuestas(
+        idUsuarios: widget.filtrarId.text, // ID del usuario extraido del token
+        idSesion: question.sp_CodPregunta!, //  sp_CodPregunta estraido del modelo SpPreguntascompleta que hace referencia a un stored procedure 
+        respuesta: respuestaFinal, // para recibir diferentes tipos de respuestas
         comentarios: dataAnswer['comentarios'],
-        justificacion: dataAnswer['justificacion']
+        justificacion: dataAnswer['justificacion'],
+        finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con true y false
       );
 
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
       try {
-        await _respuestaController.saveRespuesta(nuevaRespuesta, finalizarSesion);
+        await _respuestaController.saveRespuesta(nuevaRespuesta);
+        // await _apiRespuesta.postRespuesta(nuevaRespuesta);
         print('Respuesta guardada localmente');
-
-        // Si finalizarSesion es true, intenta sincronizar los datos con el backend
-        if (finalizarSesion) {
-          print('Generando noEncuesta y sincronizando con el backend...');
-          await _respuestaController.syncDataResp();
-        }
 
         ScaffoldMessenger.of(context).showSnackBar( 
           const SnackBar(content: Text('Respuesta guardada con éxito')) 
@@ -674,52 +671,3 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     }
   }
 }
-
-// try{
-//   final response = await _apiRespuesta.postRespuesta(nuevaRespuesta);
-
-//   if (response.statusCode == 201) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text('Respuesta guardada con éxito'))
-//     );
-
-//     _finalizarEncuesta();
-//   }else {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text('Error al guardar la respuesta: ${response.reasonPhrase}'))
-//     );
-//   }
-
-// } catch (e) {
-//   // Manejo de errores
-//   ScaffoldMessenger.of(context).showSnackBar(
-//     SnackBar(content: Text('Error: $e')),
-//   );
-// }
-
-
-  // void _nextPregunta() {
-  //   // Verificar si hay más preguntas disponibles
-  //   if (_isExpandedList.any((isExpanded) => !isExpanded)) {
-  //     setState(() {
-  //       // Expandir la siguiente pregunta no respondida
-  //       int nextIndex = _isExpandedList.indexWhere((isExpanded) => !isExpanded);
-  //       _isExpandedList[nextIndex] = true;
-  //     });
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('No hay más preguntas disponibles'))
-  //     );
-  //   }
-  // }
-
-  // Finalizar la encuesta (implementación pendiente)
-  // void _finalizarEncuesta() {
-  //   setState(() {
-  //     orderNumber++;
-  //     noEncuesta = generateNoEncuesta(orderNumber);
-  //   });
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(content: Text('Encuesta finalizada con éxito'))
-  //   );
-  // }

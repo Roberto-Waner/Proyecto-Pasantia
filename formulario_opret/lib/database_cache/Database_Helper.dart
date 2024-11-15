@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   final _databaseName = "database_FormOpret.db";
+  // final _databaseName = "database_FormOpret_Cache.db";
   final _databaseVersion = 1;
 
   DatabaseHelper._privateConstructor();
@@ -25,6 +26,12 @@ class DatabaseHelper {
     await deleteDatabase(path); // Elimina la base de datos
   }
 
+  // Future<void> resetDatabase() async {
+  //   await DatabaseHelper.instance._deleteDatabase(); // Elimina la base de datos
+  //   await DatabaseHelper.instance.database; // Recrea la base de datos
+  //   print('Base de datos formateada y recreada');
+  // }
+
   Future<Database> _initDatabase() async {
     try {
       String path = join(await getDatabasesPath(), _databaseName);
@@ -42,27 +49,14 @@ class DatabaseHelper {
   // creacion de las tabla para la cache
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      create table RegistroUsuarios (
-        idUsuarios TEXT primary key not null,
-        cedula TEXT unique not null,
-        nombreApellido  TEXT not null,
-        usuario TEXT unique not null,
-        email TEXT unique not null,
-        passwords TEXT unique not null,
-        fechaCreacion  TEXT,
-        rol TEXT,
-        isUpdated INTEGER DEFAULT 0,
-        isDeleted INTEGER DEFAULT 0
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE RespuestasLocal (
+      CREATE TABLE localRespuestas (
+        id INTEGER NULL,
         idUsuarios TEXT NULL,
-        noEncuesta TEXT NULL,
         idSesion INTEGER NULL,
-        respuesta1 TEXT NULL,
+        respuesta TEXT NULL,
         comentarios TEXT NULL,
         justificacion TEXT NULL,
+        finalizarSesion BIT DEFAULT 0,
         isUpdated INTEGER DEFAULT 0,
         isDeleted INTEGER DEFAULT 0
       )

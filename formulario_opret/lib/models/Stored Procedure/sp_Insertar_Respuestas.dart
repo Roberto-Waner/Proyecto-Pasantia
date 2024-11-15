@@ -4,7 +4,7 @@ class SpInsertarRespuestas {
   String respuesta;
   String? comentarios;
   String? justificacion;
-  bool finalizarSesion;
+  bool? finalizarSesion;
 
   SpInsertarRespuestas({
     required this.idUsuarios,
@@ -15,16 +15,16 @@ class SpInsertarRespuestas {
     required this.finalizarSesion
   });
 
-  // factory SpInsertarRespuestas.fromJson(Map<String, dynamic> json) {
-  //   return SpInsertarRespuestas(
-  //     idUsuarios: json['idUsuarios'],
-  //     idSesion: json['idSesion'],
-  //     respuesta: json['respuesta'],
-  //     comentarios: json['comentarios'],
-  //     justificacion: json['justificacion'],
-  //     finalizarSesion: json['finalizarSesion']
-  //   );
-  // }
+  factory SpInsertarRespuestas.fromJson(Map<String, dynamic> json) {
+    return SpInsertarRespuestas(
+      idUsuarios: json['idUsuarios'],
+      idSesion: json['idSesion'],
+      respuesta: json['respuesta'],
+      comentarios: json['comentarios'],
+      justificacion: json['justificacion'],
+      finalizarSesion: json['finalizarSesion']
+    );
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -33,7 +33,7 @@ class SpInsertarRespuestas {
     data['respuesta'] = respuesta;
     data['comentarios'] = comentarios;
     data['justificacion'] = justificacion;
-    data['finalizarSesion'] = finalizarSesion;
+    data['finalizarSesion'] = finalizarSesion; // SQLite maneja booleanos como 0 y 1
     return data;
   }
 }

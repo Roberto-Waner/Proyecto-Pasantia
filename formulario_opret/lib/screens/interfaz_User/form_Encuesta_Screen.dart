@@ -311,6 +311,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
               
               FormBuilderDropdown<String>(
                 name: 'linea_metro',
+                validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                 decoration: InputDecorations.inputDecoration(
                   labeltext: 'Linea del metro',
                   labelFrontSize: 30.0,
@@ -338,10 +339,11 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   }
                 },
               ),
-              if (_selectLineMetro != null)
+              // if (_selectLineMetro != null)
                 FormBuilderDropdown<int>(
                   name: 'estacion_metro',
                   style: const TextStyle(fontSize: 30.0),
+                  validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                   decoration: InputDecorations.inputDecoration(
                     labeltext: 'Estacion del metro - $_selectLineMetro',
                     labelFrontSize: 30.0,

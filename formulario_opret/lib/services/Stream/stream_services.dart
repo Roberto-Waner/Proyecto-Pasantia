@@ -17,7 +17,7 @@ class StreamServices {
 
   Future<void> _checkBackendAvailability() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/Check')).timeout(const Duration(seconds: 5));
+      final response = await http.get(Uri.parse('$baseUrl/api/Check')).timeout(const Duration(seconds: 1));
       if (response.statusCode == 200) {
         _controller.sink.add(true);
         _cancelRetryTimer(); // Cancelar cualquier intento de reintento programado si la conexión es exitosa
@@ -33,7 +33,7 @@ class StreamServices {
 
   void _scheduleRetry() {
     _cancelRetryTimer();
-    _timer = Timer(const Duration(minutes: 5), _checkBackendAvailability);
+    _timer = Timer(const Duration(minutes: 1), _checkBackendAvailability);
   }
 
   void _cancelRetryTimer() {

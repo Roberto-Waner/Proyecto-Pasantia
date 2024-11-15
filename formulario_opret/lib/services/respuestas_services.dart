@@ -1,3 +1,5 @@
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/respuesta.dart';
 import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
@@ -8,20 +10,21 @@ class ApiServiceRespuesta {
 
   ApiServiceRespuesta(this.baseUrl) : service = ApiService(baseUrl);
 
-  Future<http.Response> postRespuesta(Respuesta respuesta) async {
+  Future<http.Response> postRespuesta(SpInsertarRespuestas respuesta) async {
     // Intenta realizar una verificación de conexión antes de hacer la solicitud.
     final isCheckOk = await service.check();
     if (isCheckOk) {
       try {
-        final response = await service.postData('Respuestas', respuesta.toJson());
+        final response = await service.postData('Respuestas/insertar', respuesta.toJson());
 
         if (response.statusCode == 201) {
-          print('Respuesta enviada a la API HTTP');
+          print('Respuesta enviada a la API HTTP correctamente');
         } else {
           print('Error al enviar respuesta a la API HTTP: ${response.statusCode}');
           print('Cuerpo de la respuesta: ${response.body}');
         }
 
+        print('Respuesta $response');
         return response;
       } catch (e) {
         print('Error al enviar respuesta a la API: $e');
@@ -29,6 +32,30 @@ class ApiServiceRespuesta {
       }
     } else {
       throw Exception('No hay conexión con la API.');
+    }
+  }
+
+  Future<http.Response> putRespuesta (String noEncuesta, Respuesta respuesta) async {
+    final isCheckOk = await service.check();
+    if(isCheckOk) {
+      return await service.putData('Respuestas', respuesta.toJson(), noEncuesta);
+    } else {
+      return http.Response('Actualizado en SQLite', 204);
+    }
+  }
+
+  Future<List<SpFiltrarRespuestas>> getRespuestas() async {
+    final isCheckOk = await service.check();
+    if (isCheckOk) {
+      try{
+        final response = await service.getAllData('Respuestas/ObtenerResp');
+        return response.map((json) => SpFiltrarRespuestas.fromJson(json)).toList();
+      } catch(e) {
+        print('Error al cargar las Respuestas: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('No se pudo conectar a la API');
     }
   }
 }

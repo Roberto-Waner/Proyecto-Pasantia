@@ -59,9 +59,8 @@ class DatabaseHelper {
       CREATE TABLE RespuestasLocal (
         idUsuarios TEXT NULL,
         noEncuesta TEXT NULL,
-        codPregunta INTEGER NULL,
+        idSesion INTEGER NULL,
         respuesta1 TEXT NULL,
-        valoracion TEXT NULL,
         comentarios TEXT NULL,
         justificacion TEXT NULL,
         isUpdated INTEGER DEFAULT 0,

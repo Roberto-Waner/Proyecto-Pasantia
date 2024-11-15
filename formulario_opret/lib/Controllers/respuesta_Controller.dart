@@ -29,23 +29,20 @@ class RespuestaController {
   //   }
   // }
 
-  Future<void> saveRespuesta(SpInsertarRespuestas respuesta) async {
-    await _respuestaCrud.insertRespuesta(respuesta);
-    // try{
-    //   final localResponse = await _respuestaCrud.insertRespuesta(respuesta);
-    //   if(localResponse == 201) {
-    //     print('Respuesta guardado localmente');
-    //   } else {
-    //     final remoteResponse = await _apiServiceRespuesta.postRespuesta(respuesta);
-    //     if(remoteResponse.statusCode == 201) {
-    //       print('Respuesta guardado en servidor');
-    //     } else {
-    //       localResponse;
-    //     }
-    //   }
-    // } catch (e) {
-    //   rethrow;
-    // }
+  Future<void> saveRespuesta(List<SpInsertarRespuestas> respuesta) async {
+    try{
+      final remoteResponse = await _apiServiceRespuesta.postRespuesta(respuesta);
+
+      if(remoteResponse.statusCode == 201) {
+        print('Respuesta guardado en servidor');
+      } else {
+        await _respuestaCrud.insertRespuestas(respuesta);
+      }
+    } catch (e) {
+      print('Error al enviar respuesta a la api: $e');
+      await _respuestaCrud.insertRespuestas(respuesta);
+      print('Respuesta guardado en base de datos local SQLite con éxito');
+    }
   }
 
   Future<void> syncDataResp() async {
@@ -55,7 +52,7 @@ class RespuestaController {
       for (SpInsertarRespuestas answer in respuestasPendientes) {
         final isCheckOk = await _apiServiceRespuesta.service.check();
         if (isCheckOk) {
-          final postResponse = await _apiServiceRespuesta.postRespuesta(answer);
+          final postResponse = await _apiServiceRespuesta.postRespuesta([answer]);
           if (postResponse.statusCode == 201) {
             await _respuestaCrud.marcarRespuestaSincronizada(answer.idSesion); // usamos idSesion para identificar
             print('Respuesta sincronizada con la api');
@@ -76,3 +73,20 @@ class RespuestaController {
   //   _streamServices.dispose();
   // }
 }
+
+// await _respuestaCrud.insertRespuesta(respuesta);
+// try{
+//   final localResponse = await _respuestaCrud.insertRespuesta(respuesta);
+//   if(localResponse == 201) {
+//     print('Respuesta guardado localmente');
+//   } else {
+//     final remoteResponse = await _apiServiceRespuesta.postRespuesta(respuesta);
+//     if(remoteResponse.statusCode == 201) {
+//       print('Respuesta guardado en servidor');
+//     } else {
+//       localResponse;
+//     }
+//   }
+// } catch (e) {
+//   rethrow;
+// }

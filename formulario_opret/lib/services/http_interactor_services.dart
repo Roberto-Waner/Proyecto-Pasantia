@@ -67,6 +67,21 @@ class ApiService {
     }
   }
 
+  // Método POST en listados
+  Future<http.Response> postDataList(String endpoint, List<Map<String, dynamic>> data) async {
+    final isCheckOk = await check();
+    if (isCheckOk) {
+      final url = Uri.parse('$baseUrl/api/$endpoint');
+      return await http.post( 
+        url, 
+        headers: {'Content-Type': 'application/json'}, 
+        body: json.encode(data), 
+      ).timeout(const Duration(seconds: 30));
+    } else { 
+      return http.Response('Creado en SQLite', 201); 
+    }
+  }
+
   // Método PUT
   Future<http.Response> putData(String endpoint, Map<String, dynamic> data, String id) async {
     final isCheckOk = await check();

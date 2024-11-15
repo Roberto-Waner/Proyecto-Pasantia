@@ -7,7 +7,6 @@ import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
-import 'package:formulario_opret/services/respuestas_services.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 
@@ -108,38 +107,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               }
             ),
           ),
-          // Botón para finalizar la sesión, ubicado fuera del scroll
-          // Padding(
-          //   padding: const EdgeInsets.all(20.0),
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       if(dataRespuesta.isNotEmpty) {
-          //         _saveRespuesta(dataQuestion.first, {}, finalizarSesion: true);
-          //       }
-          //     },
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: const Color.fromRGBO(1, 135, 76, 1), // Color de fondo del primer botón
-          //       foregroundColor: const Color.fromARGB(255, 254, 255, 255), // Color del texto
-          //       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-          //       shape: const RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.only(
-          //           topLeft: Radius.circular(50),
-          //           topRight: Radius.circular(50),
-          //           bottomLeft: Radius.circular(50),
-          //           bottomRight: Radius.circular(50),
-          //         ),
-          //       ),
-          //     ),
-          //     child: const Row(
-          //       mainAxisSize: MainAxisSize.min, // Asegura que el botón se ajuste al contenido
-          //       children: [
-          //         Icon(Icons.exit_to_app, size: 30.0), // Icono del botón
-          //         SizedBox(width: 10), // Espacio entre el icono y el texto
-          //         Text('Finalizar Sesión', style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold)),
-          //       ],
-          //     ),
-          //   ),
-          // )
         ],
       )
     );
@@ -650,7 +617,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
       try {
-        await _respuestaController.saveRespuesta(nuevaRespuesta);
+        await _respuestaController.saveRespuesta([nuevaRespuesta]);
         // await _apiRespuesta.postRespuesta(nuevaRespuesta);
         print('Respuesta guardada localmente');
 

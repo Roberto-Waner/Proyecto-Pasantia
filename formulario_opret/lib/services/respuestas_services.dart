@@ -10,12 +10,16 @@ class ApiServiceRespuesta {
 
   ApiServiceRespuesta(this.baseUrl) : service = ApiService(baseUrl);
 
-  Future<http.Response> postRespuesta(SpInsertarRespuestas respuesta) async {
+  Future<http.Response> postRespuesta(List<SpInsertarRespuestas> respuestas) async {
     // Intenta realizar una verificación de conexión antes de hacer la solicitud.
     final isCheckOk = await service.check();
     if (isCheckOk) {
       try {
-        final response = await service.postData('Respuestas/insertar', respuesta.toJson());
+        // Convertir la lista de respuestas a JSON 
+        List<Map<String, dynamic>> respuestasJson = respuestas.map((r) => r.toJson()).toList();
+
+        // Enviar el array de respuestas a la API
+        final response = await service.postDataList('Respuestas/insertar', respuestasJson);
 
         if (response.statusCode == 201) {
           print('Respuesta enviada a la API HTTP correctamente');

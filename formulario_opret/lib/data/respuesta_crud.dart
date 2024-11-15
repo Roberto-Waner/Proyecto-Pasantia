@@ -15,6 +15,24 @@ class RespuestaCrud {
     );
   }
 
+  // Insertar múltiples respuestas localmente
+  Future<void> insertRespuestas(List<SpInsertarRespuestas> respuestas) async {
+    final db = await _databaseHelper.database;
+
+    // Usamos un batch para realizar múltiples inserciones en una sola transacción
+    Batch batch = db.batch();
+    for (var respuesta in respuestas) {
+      batch.insert(
+        'localRespuestas', 
+        respuesta.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit(noResult: true); 
+    print('Respuestas guardadas en la base de datos local SQLite con éxito');
+  }
+
   Future<List<SpInsertarRespuestas>> getAnswerCrud() async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -28,69 +46,18 @@ class RespuestaCrud {
     });
   }
 
-  // Obtener respuestas pendientes de sincronización
-  // Future<List<SpInsertarRespuestas>> obtenerRespuestasPendientes() async {
-  //   final db = await _databaseHelper.database;
-  //   final List<Map<String, dynamic>> maps = await db.query(
-  //     'RespuestasLocal',
-  //     where: 'isUpdated = 0',
-  //   );
-  //   return maps.map((map) => SpInsertarRespuestas.fromJson(map)).toList();
-  // }
-
-  // Eliminar respuestas que ya fueron sincronizadas
-  // Future<int> eliminarRespuesta(String noEncuesta) async {
-  //   final db = await _databaseHelper.database;
-  //   return await db.delete(
-  //     'RespuestasLocal',
-  //     where: 'noEncuesta = ?',
-  //     whereArgs: [noEncuesta],
-  //   );
-  // }
-
   // Marcar respuesta como sincronizada
   Future<void> marcarRespuestaSincronizada(int id) async {
     final db = await _databaseHelper.database;
     await db.update(
       'localRespuestas',
       {'isUpdated': 1},
-      where: 'id = ?', 
+      where: 'idSesion = ?', 
       whereArgs: [id]
     );
   }
 
-  Future<void> insertarRespuesta(SpInsertarRespuestas respuesta) async {
-    final db = await DatabaseHelper.instance.database;
-
-    // Verificar si finalizarSesion es true para incrementar el id
-    if(respuesta.finalizarSesion!) {
-      // Obtener el último ID utilizado y sumarle 1
-      List<Map<String, dynamic>> result = await db.rawQuery('SELECT IFNULL(MAX(id), 0) + 1 AS id FROM localRespuestas');
-      int id = result.first['id'];
-
-      // Insertar la nueva respuesta con el nuevo ID
-      await db.insert(
-        'localRespuestas',
-        respuesta.toJson()..['id'] = id,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-
-      print('Sesión finalizada. Respuesta con ID $id insertada.');
-    } else {
-      // Mantener el mismo id para respuestas de la misma sesión
-      List<Map<String, dynamic>> result = await db.rawQuery('SELECT IFNULL(MAX(id), 1) AS id FROM localRespuestas');
-      int id = result.first['id'];
-
-      // Insertar la nueva respuesta con el nuevo ID
-      await db.insert(
-        'localRespuestas',
-        respuesta.toJson()..['id'] = id,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-
-      print('Respuesta añadida a la sesión con ID $id.');
-    }
-  }
+  
 
   // Future<int> marcarRespuestaSincronizada(String noEncuesta) async {
   //   final db = await _databaseHelper.database;
@@ -156,3 +123,56 @@ class RespuestaCrud {
     );
   }
   */
+
+  // Future<void> insertarRespuesta(SpInsertarRespuestas respuesta) async {
+  //   final db = await DatabaseHelper.instance.database;
+
+  //   // Verificar si finalizarSesion es true para incrementar el id
+  //   if(respuesta.finalizarSesion!) {
+  //     // Obtener el último ID utilizado y sumarle 1
+  //     List<Map<String, dynamic>> result = await db.rawQuery('SELECT IFNULL(MAX(id), 0) + 1 AS id FROM localRespuestas');
+  //     int id = result.first['id'];
+
+  //     // Insertar la nueva respuesta con el nuevo ID
+  //     await db.insert(
+  //       'localRespuestas',
+  //       respuesta.toJson()..['id'] = id,
+  //       conflictAlgorithm: ConflictAlgorithm.replace,
+  //     );
+
+  //     print('Sesión finalizada. Respuesta con ID $id insertada.');
+  //   } else {
+  //     // Mantener el mismo id para respuestas de la misma sesión
+  //     List<Map<String, dynamic>> result = await db.rawQuery('SELECT IFNULL(MAX(id), 1) AS id FROM localRespuestas');
+  //     int id = result.first['id'];
+
+  //     // Insertar la nueva respuesta con el nuevo ID
+  //     await db.insert(
+  //       'localRespuestas',
+  //       respuesta.toJson()..['id'] = id,
+  //       conflictAlgorithm: ConflictAlgorithm.replace,
+  //     );
+
+  //     print('Respuesta añadida a la sesión con ID $id.');
+  //   }
+  // }
+
+  // Obtener respuestas pendientes de sincronización
+  // Future<List<SpInsertarRespuestas>> obtenerRespuestasPendientes() async {
+  //   final db = await _databaseHelper.database;
+  //   final List<Map<String, dynamic>> maps = await db.query(
+  //     'RespuestasLocal',
+  //     where: 'isUpdated = 0',
+  //   );
+  //   return maps.map((map) => SpInsertarRespuestas.fromJson(map)).toList();
+  // }
+
+  // Eliminar respuestas que ya fueron sincronizadas
+  // Future<int> eliminarRespuesta(String noEncuesta) async {
+  //   final db = await _databaseHelper.database;
+  //   return await db.delete(
+  //     'RespuestasLocal',
+  //     where: 'noEncuesta = ?',
+  //     whereArgs: [noEncuesta],
+  //   );
+  // }

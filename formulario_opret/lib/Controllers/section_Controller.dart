@@ -45,40 +45,12 @@ class SectionController {
     }
   }
 
-  // Future<List<SpPreguntascompleta>> loadFromApi() async {
-  //   try{
-  //     final response = await _apiServiceSesion2.getSpPreguntascompletaListada();
-
-  //     if(response.isNotEmpty) {
-  //       // Truncar la tabla solo si los datos obtenidos son diferentes 
-  //       final preguntasLocales = await _sectionCrud.querySectionCrud();
-
-  //       if(!listEquals(preguntasLocales, response)) {
-  //         await _sectionCrud.truncateSectionCrud();
-
-  //         for (var question in response) {
-  //           await _sectionCrud.insertSectionCrud(question);
-  //         }
-  //         print('Datos sincronizados con éxito desde la API y guardados en SQLite.');
-  //       }
-  //       return response;
-
-  //     } else { 
-  //       throw Exception('API response is empty.'); 
-  //     }
-
-  //   } catch (e) { 
-  //     print('Error loading from API: $e'); 
-  //     rethrow; 
-  //   }
-  // }
-
   Future<List<SpPreguntascompleta>> loadFromApi() async {
     try{
       final response = await _apiServiceSesion2.getSpPreguntascompletaListada();
       if(response.isNotEmpty) {
         await syncData(response);
-        print('Datos sincronizados con éxito desde la API y guardados en SQLite.'); 
+        print('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
         return response;
       } else { 
         throw Exception('API response is empty.'); 

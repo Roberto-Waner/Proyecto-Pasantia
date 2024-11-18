@@ -12,7 +12,7 @@ class DatabaseHelper {
   static Database? _database;
 
   // Indicador para eliminar la base de datos, puedes cambiarlo a 'true' solo si necesitas limpiar la base de datos
-  final bool _shouldDeleteDatabase = false;
+  final bool _shouldDeleteDatabase = true;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -26,11 +26,11 @@ class DatabaseHelper {
     await deleteDatabase(path); // Elimina la base de datos
   }
 
-  // Future<void> resetDatabase() async {
-  //   await DatabaseHelper.instance._deleteDatabase(); // Elimina la base de datos
-  //   await DatabaseHelper.instance.database; // Recrea la base de datos
-  //   print('Base de datos formateada y recreada');
-  // }
+  Future<void> resetDatabase() async {
+    await DatabaseHelper.instance._deleteDatabase(); // Elimina la base de datos
+    await DatabaseHelper.instance.database; // Recrea la base de datos
+    print('Base de datos formateada y recreada');
+  }
 
   Future<Database> _initDatabase() async {
     try {
@@ -50,7 +50,7 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE localRespuestas (
-        id INTEGER NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         idUsuarios TEXT NULL,
         idSesion INTEGER NULL,
         respuesta TEXT NULL,

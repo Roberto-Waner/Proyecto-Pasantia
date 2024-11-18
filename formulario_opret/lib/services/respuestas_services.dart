@@ -28,7 +28,7 @@ class ApiServiceRespuesta {
           print('Cuerpo de la respuesta: ${response.body}');
         }
 
-        print('Respuesta $response');
+        // print('Respuesta $response');
         return response;
       } catch (e) {
         print('Error al enviar respuesta a la API: $e');

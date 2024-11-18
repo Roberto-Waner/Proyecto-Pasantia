@@ -4,7 +4,7 @@ class SpInsertarRespuestas {
   String respuesta;
   String? comentarios;
   String? justificacion;
-  bool? finalizarSesion;
+  bool finalizarSesion;
 
   SpInsertarRespuestas({
     required this.idUsuarios,
@@ -22,7 +22,9 @@ class SpInsertarRespuestas {
       respuesta: json['respuesta'],
       comentarios: json['comentarios'],
       justificacion: json['justificacion'],
-      finalizarSesion: json['finalizarSesion']
+      finalizarSesion: json['finalizarSesion'] == null
+          ? false
+          : json['finalizarSesion'] == 1, // Convierte 1 a true y 0 a false
     );
   }
 
@@ -33,7 +35,7 @@ class SpInsertarRespuestas {
     data['respuesta'] = respuesta;
     data['comentarios'] = comentarios;
     data['justificacion'] = justificacion;
-    data['finalizarSesion'] = finalizarSesion; // SQLite maneja booleanos como 0 y 1
+    data['finalizarSesion'] = finalizarSesion ? 1 : 0; // Convierte true a 1 y false a 0
     return data;
   }
 }

@@ -40,8 +40,6 @@ class RespuestaCrud {
       where: 'isUpdated = 0'
     );
     return List.generate(maps.length, (i) {
-      var map = maps[i];
-      map.remove('id'); // Removemos el campo 'id' antes de enviar a la API
       return SpInsertarRespuestas.fromJson(maps[i]);
     });
   }
@@ -51,23 +49,18 @@ class RespuestaCrud {
     final db = await _databaseHelper.database;
     await db.update(
       'localRespuestas',
-      {'isUpdated': 1},
+      {'isUpdated': 0},
       where: 'idSesion = ?', 
       whereArgs: [id]
     );
   }
 
-  
-
-  // Future<int> marcarRespuestaSincronizada(String noEncuesta) async {
-  //   final db = await _databaseHelper.database;
-  //   return await db.update(
-  //     'RespuestasLocal',
-  //     {'isUpdated': 1, 'isDeleted': 0},
-  //     where: 'noEncuesta = ?',
-  //     whereArgs: [noEncuesta],
-  //   );
-  // }
+  // para vaciar la tabla despues de que se hayan guardado hacia la api
+  Future<void> vaciarTable() async {
+    final db = await _databaseHelper.database;
+    await db.delete('localRespuestas');
+    print('Todos los registros eliminados de la tabla localRespuestas');
+  }
 }
 
   /*
@@ -176,3 +169,13 @@ class RespuestaCrud {
   //     whereArgs: [noEncuesta],
   //   );
   // }
+
+// Future<int> marcarRespuestaSincronizada(String noEncuesta) async {
+//   final db = await _databaseHelper.database;
+//   return await db.update(
+//     'RespuestasLocal',
+//     {'isUpdated': 1, 'isDeleted': 0},
+//     where: 'noEncuesta = ?',
+//     whereArgs: [noEncuesta],
+//   );
+// }

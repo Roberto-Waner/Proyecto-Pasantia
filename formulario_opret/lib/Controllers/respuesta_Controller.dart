@@ -13,21 +13,12 @@ class RespuestaController {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {
       if (isAvailable) {
         syncDataResp();
+        print('API disponible: puedes sincronizar datos.');
+      } else {
+        print('API no disponible: guarda datos localmente.');
       }
     });
   }
-
-  // Guardar respuesta localmente
-  // Future<void> saveRespuesta(SpInsertarRespuestas respuesta) async {
-  //   // await _respuestaCrud.insertRespuesta(respuesta);
-  //   await _respuestaCrud.insertRespuesta(respuesta);
-  //   print('Respuesta guardada localmente');
-
-  //   // Sincronizar los datos si hay conexión
-  //   if (respuesta.finalizarSesion){
-  //     syncDataResp();
-  //   }
-  // }
 
   Future<void> saveRespuesta(List<SpInsertarRespuestas> respuesta) async {
     try{
@@ -49,19 +40,20 @@ class RespuestaController {
     try{
       List<SpInsertarRespuestas> respuestasPendientes = await _respuestaCrud.getAnswerCrud();
 
-      for (SpInsertarRespuestas answer in respuestasPendientes) {
-        final isCheckOk = await _apiServiceRespuesta.service.check();
-        if (isCheckOk) {
-          final postResponse = await _apiServiceRespuesta.postRespuesta([answer]);
-          if (postResponse.statusCode == 201) {
-            await _respuestaCrud.marcarRespuestaSincronizada(answer.idSesion); // usamos idSesion para identificar
-            print('Respuesta sincronizada con la api');
-          }else { 
-            print('Error al sincronizar la respuesta: ${postResponse.statusCode}'); 
-          }
-        } else { 
-          print('No hay conexión a la API para sincronizar la respuesta.'); 
+      if (respuestasPendientes.isNotEmpty) {
+        // Envía las respuestas al backend
+        final postResponse = await _apiServiceRespuesta.postRespuesta(respuestasPendientes);
+
+        // Si la sincronización es exitosa, vacía la tabla local
+        if (postResponse.statusCode == 201) {
+          await _respuestaCrud.vaciarTable();
+          print('Respuestas sincronizadas con la API y tabla local vaciada');
+        } else {
+          print('Error al sincronizar las respuestas: ${postResponse.statusCode}');
+          print('Cuerpo de la respuesta: ${postResponse.body}');
         }
+      } else {
+        print('No hay respuestas pendientes para sincronizar');
       }
     } catch (e) {
       print('Error al sincronizar la respuesta: $e');
@@ -90,3 +82,30 @@ class RespuestaController {
 // } catch (e) {
 //   rethrow;
 // }
+
+/*
+Future<void> syncDataResp() async {
+  try{
+    List<SpInsertarRespuestas> respuestasPendientes = await _respuestaCrud.getAnswerCrud();
+
+    if(respuestasPendientes.isNotEmpty) {
+      for (var answer in respuestasPendientes) {
+        final isCheckOk = await _apiServiceRespuesta.service.check();
+        if (isCheckOk) {
+          final postResponse = await _apiServiceRespuesta.postRespuesta([answer]);
+          if (postResponse.statusCode == 201) {
+            await _respuestaCrud.marcarRespuestaSincronizada(answer.idSesion); // usamos idSesion para identificar
+            print('Respuesta sincronizada con la api');
+          }else {
+            print('Error al sincronizar la respuesta: ${postResponse.statusCode}');
+          }
+        } else {
+          print('No hay conexión a la API para sincronizar la respuesta.');
+        }
+      }
+    }
+  } catch (e) {
+    print('Error al sincronizar la respuesta: $e');
+  }
+}
+*/

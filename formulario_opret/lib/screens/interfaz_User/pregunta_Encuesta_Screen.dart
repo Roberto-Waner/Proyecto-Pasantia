@@ -31,11 +31,8 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  // final ApiServicePreguntas _apiQuestions = ApiServicePreguntas('https://10.0.2.2:7190');
   final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
-  // final SectionCrud _sectionCrud = SectionCrud();
   final SectionController _sectionController = SectionController();
-  // final ApiServiceRespuesta _apiRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
@@ -51,6 +48,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void _refreshPreguntas() async {
     try {
       List<SpPreguntascompleta> preguntas = await _sectionController.loadFromApi();
+      _respuestaController.syncDataResp();
       setState(() {
         dataQuestion = preguntas;
         _isExpandedList = List.filled(dataQuestion.length, false);
@@ -74,7 +72,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         title: const Text('Preguntas de Encuesta'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, size: 30.0),
             tooltip: 'Recargar',
             onPressed: () {
               setState(() {
@@ -561,6 +559,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
                       _saveRespuesta(question, responseForm, finalizarSesion: true);
+                      _respuestaController.syncDataResp();
                       Navigator.of(context).pop();
                     }
                   }, 

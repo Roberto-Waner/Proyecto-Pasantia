@@ -77,8 +77,8 @@ class ApiService {
         headers: {'Content-Type': 'application/json'}, 
         body: json.encode(data), 
       ).timeout(const Duration(seconds: 30));
-    } else { 
-      return http.Response('Creado en SQLite', 201); 
+    } else {
+      throw Exception('La API no está disponible');
     }
   }
 

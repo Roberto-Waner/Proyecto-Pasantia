@@ -37,7 +37,7 @@ class RespuestaCrud {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'localRespuestas',
-      where: 'isUpdated = 0'
+      // where: 'isUpdated = 0'
     );
     return List.generate(maps.length, (i) {
       return SpInsertarRespuestas.fromJson(maps[i]);

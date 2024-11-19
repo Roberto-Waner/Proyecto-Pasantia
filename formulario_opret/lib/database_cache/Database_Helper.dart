@@ -56,7 +56,7 @@ class DatabaseHelper {
         respuesta TEXT NULL,
         comentarios TEXT NULL,
         justificacion TEXT NULL,
-        finalizarSesion BIT DEFAULT 0,
+        finalizarSesion INTEGER DEFAULT 0,
         isUpdated INTEGER DEFAULT 0,
         isDeleted INTEGER DEFAULT 0
       )
@@ -74,35 +74,3 @@ class DatabaseHelper {
     ''');
   }
 }
-
-  /*
-  // Método genérico para insertar datos
-  Future<int> insert(String table, Map<String, dynamic> values) async {
-    Database db = await instance.database;
-    return await db.insert(table, values);
-  }
-
-  // Método genérico para actualizar datos
-  Future<int> update(String table, Map<String, dynamic> values, String whereClause, List<dynamic> whereArgs) async {
-    Database db = await instance.database;
-    return await db.update(table, values, where: whereClause, whereArgs: whereArgs);
-  }
-
-  // Método genérico para eliminar datos
-  Future<int> delete(String table, String whereClause, List<dynamic> whereArgs) async {
-    Database db = await instance.database;
-    return await db.delete(table, where: whereClause, whereArgs: whereArgs);
-  }
-
-  // Método genérico para obtener todos los datos de una tabla
-  Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
-    Database db = await instance.database;
-    return await db.query(table);
-  }
-
-  // Método genérico para obtener una fila con condiciones
-  Future<List<Map<String, dynamic>>> queryRows(String table, String whereClause, List<dynamic> whereArgs) async {
-    Database db = await instance.database;
-    return await db.query(table, where: whereClause, whereArgs: whereArgs);
-  }
-  */

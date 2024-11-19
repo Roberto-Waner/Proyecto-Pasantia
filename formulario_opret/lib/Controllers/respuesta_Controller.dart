@@ -45,7 +45,7 @@ class RespuestaController {
         final postResponse = await _apiServiceRespuesta.postRespuesta(respuestasPendientes);
 
         // Si la sincronización es exitosa, vacía la tabla local
-        if (postResponse.statusCode == 201) {
+        if (postResponse.statusCode == 200 || postResponse.statusCode == 201) {
           await _respuestaCrud.vaciarTable();
           print('Respuestas sincronizadas con la API y tabla local vaciada');
         } else {

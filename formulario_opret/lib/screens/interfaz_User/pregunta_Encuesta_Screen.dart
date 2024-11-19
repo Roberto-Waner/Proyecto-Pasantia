@@ -547,7 +547,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   onPressed: () {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
-                      _saveRespuesta(question, responseForm, finalizarSesion: false);
+                      _saveRespuesta(question, responseForm, finalizarSesion: 0);
                       Navigator.of(context).pop();
                     }
                   }, 
@@ -558,7 +558,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   onPressed: () {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
-                      _saveRespuesta(question, responseForm, finalizarSesion: true);
+                      _saveRespuesta(question, responseForm, finalizarSesion: 1);
                       _respuestaController.syncDataResp();
                       Navigator.of(context).pop();
                     }
@@ -574,7 +574,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   // Guardar respuesta en la API
-  void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, {bool finalizarSesion = false}) async {
+  void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, {int finalizarSesion = 0}) async {
     // Verificamos si el formulario es válido antes de guardar
     if (_formKey.currentState!.saveAndValidate()){
       final dataAnswer = _formKey.currentState!.value;

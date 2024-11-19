@@ -7,6 +7,6 @@
         public string Respuesta { get; set; }
         public string? Comentarios { get; set; }
         public string? Justificacion { get; set; }
-        public bool FinalizarSesion { get; set; }
+        public int FinalizarSesion { get; set; }
     }
 }

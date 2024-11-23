@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:formulario_opret/Controllers/User_Controller.dart';
-// import 'package:formulario_opret/models/userEmpleado.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
+import 'package:formulario_opret/services/user_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 import 'package:intl/intl.dart';
 
@@ -27,12 +26,18 @@ class RegistroEmpl extends StatefulWidget {
 }
 
 class _RegistroEmplState extends State<RegistroEmpl> {
-  // final ApiServiceUser _apiService = ApiServiceUser('https://10.0.2.2:7190'); // Cambia por tu URL
-  final UserController _userController = UserController();
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190'); // Cambia por tu URL
+  // final UserController _userController = UserController();
   late Future<List<Usuarios>> _usuariosdata;
   final TextEditingController datePicker = TextEditingController();
+  // final TextEditingController idUsuarioController = TextEditingController();
+  // final TextEditingController cedulaController = TextEditingController();
+  // final TextEditingController usuarioController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
+  Usuarios? usuariosFiltrados;
   DateTime? _selectedDate;
   Offset position = const Offset(700, 1150); // Posición inicial del botón
+  String selectedRole = '';
 
   @override
   void initState() {
@@ -42,14 +47,55 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
   Future<void> _loadUsuarios() async {
     setState(() {
-      _usuariosdata = _userController.getUsers();
+      _usuariosdata = _apiServiceUser.getUsuarios();
     });
   }
 
   void _refreshUsuarios() {
     setState(() {
-      _usuariosdata = _userController.getUsers();
+      _usuariosdata = _apiServiceUser.getUsuarios();
     });
+  }
+
+  void _filtrarUsuarioPorId(String query) async {
+    final usuarios = await _usuariosdata;
+    // final id = idUsuarioController.text; 
+    // final cedula = cedulaController.text; 
+    // final user = usuarioController.text;
+
+    final filtrar = usuarios.firstWhere(
+      (usuario) => 
+        // (id.isNotEmpty && usuario.idUsuarios == id) ||
+        // (cedula.isNotEmpty && usuario.cedula == cedula) ||
+        // (user.isNotEmpty && usuario.usuario1 == user),
+        usuario.idUsuarios.toLowerCase().contains(query.toLowerCase()) ||
+        usuario.cedula.toLowerCase().contains(query.toLowerCase()) ||
+        usuario.usuario1.toLowerCase().contains(query.toLowerCase()),
+      orElse: () => Usuarios(
+        idUsuarios: '',
+        cedula: '',
+        nombreApellido: '',
+        usuario1: '',
+        email: '',
+        passwords: '',
+        fechaCreacion: '',
+        rol: ''
+      ) // Devolver un objeto de Usuario vacío
+    );
+
+    setState(() {
+      usuariosFiltrados = filtrar.idUsuarios.isNotEmpty ? filtrar : null;
+    });
+  }
+
+  void _limpiarBusqueda() { 
+    // idUsuarioController.clear();
+    // cedulaController.clear();
+    // usuarioController.clear();
+    searchController.clear();
+    setState(() { 
+      usuariosFiltrados = null; 
+    }); 
   }
 
   Future<void> _showDatePicker() async {
@@ -86,70 +132,264 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         filtrarId: widget.filtrarId,
         filtrarCedula: widget.filtrarCedula,
       ),
-      appBar: AppBar(title: const Text('Registro Empleados')),
-      body: SingleChildScrollView(
-        child: FutureBuilder<List<Usuarios>>(
-          future: _usuariosdata,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting){
-              return const Center(child: CircularProgressIndicator());
-            }else if (snapshot.hasError){
-              return Center(child: Text('Error al cargar los datos: ${snapshot.error}'));
-            }else {
-              final usuariostabla = snapshot.data ?? [];
-        
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal, // Permitir scroll horizontal
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('ID', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Cedula', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Usuario', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Rol', style: TextStyle(fontSize: 23.0))),
-                    DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                  ], 
-                  rows: usuariostabla.map((usuario){
-                    // Usuarios usuario = _convertirAUsuario(obtenerEmpleado);
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(usuario.idUsuarios, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.cedula, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
-                        DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
-                        // DataCell(Text(usuario.estado.toString(), style: const TextStyle(fontSize: 20.0))),
-                        DataCell(
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit), 
-                                onPressed: (){
-                                  _showEditDialog(usuario);
-                                },
+      appBar: AppBar(
+        title: const Text('Registro Empleados'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 30.0),
+            tooltip: 'Recargar',
+            onPressed: () {
+              setState(() {
+                _refreshUsuarios();
+              });
+            },
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          // Campo de entrada para búsqueda
+          Padding( 
+            padding: const EdgeInsets.all(16.0), 
+            child: FormBuilder( 
+              child: FormBuilderTextField( 
+                name: 'search', 
+                controller: searchController,
+                style: const TextStyle(fontSize: 20.0),
+                decoration: InputDecoration( 
+                  labelText: 'Buscar por su ID, Cedula o Usuario',
+                  labelStyle: const TextStyle(fontSize: 20),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: _limpiarBusqueda,
+                      )
+                    : null                          
+                ), 
+                onChanged: (value) { 
+                  if (value != null && value.isNotEmpty) { 
+                    _filtrarUsuarioPorId(value); 
+                  } else { 
+                    setState(() { 
+                      usuariosFiltrados = null; 
+                    }); 
+                  } 
+                }, 
+              ), 
+            ), 
+          ),
+
+          // Mostrar detalles del usuario seleccionado
+          if (usuariosFiltrados != null) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 5.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30.0,
+                            backgroundColor: Colors.blue,
+                            child: Text(
+                              usuariosFiltrados!.nombreApellido[0],
+                              style: const TextStyle(
+                                fontSize: 30.0,
+                                color: Colors.white
                               ),
-                
-                              IconButton(
-                                onPressed: () {
-                                  _showDeleteDialog(usuario);
-                                }, 
-                                icon: const Icon(Icons.delete)
+                            ),
+                          ),
+                          const SizedBox(width: 16.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                usuariosFiltrados!.nombreApellido,
+                                style: const TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold
+                                )
+                              ),
+                              Text(
+                                usuariosFiltrados!.email,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.grey[700]
+                                )
                               )
                             ],
                           )
+                        ],
+                      ),
+                      const SizedBox(height: 20.0),
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.perm_identity, size: 30.0),
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'ID: ', 
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black),
+                              ),
+                              TextSpan( 
+                                text: usuariosFiltrados!.idUsuarios, 
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black), 
+                              ),
+                            ]
+                          )
                         )
-                      ]
-                    );
-                  }).toList(),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.account_circle, size: 30.0),
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'Usuario: ', 
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black),
+                              ),
+                              TextSpan( 
+                                text: usuariosFiltrados!.usuario1, 
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black), 
+                              ),
+                            ]
+                          )
+                        )
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'Cédula: ', 
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black),
+                              ),
+                              TextSpan( 
+                                text: usuariosFiltrados!.cedula, 
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black), 
+                              ),
+                            ]
+                          )
+                        )
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.calendar_month_outlined, size: 30.0),
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'Fecha de Creación: ', 
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black),
+                              ),
+                              TextSpan( 
+                                text: usuariosFiltrados!.fechaCreacion, 
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black), 
+                              ),
+                            ]
+                          )
+                        )
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.people_outline_rounded, size: 30.0),
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'Rol: ', 
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black),
+                              ),
+                              TextSpan( 
+                                text: usuariosFiltrados!.rol, 
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black), 
+                              ),
+                            ]
+                          )
+                        )
+                      )
+                    ],
+                  ),
                 ),
-              );
-            }
-          }
-        ),
+              ),
+            ),
+            const SizedBox(height: 20)
+          ],
+
+          Expanded(
+            child: FutureBuilder<List<Usuarios>>(
+              future: _usuariosdata,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting){
+                  return const Center(child: CircularProgressIndicator());
+                }else if (snapshot.hasError){
+                  return Center(child: Text('Error al cargar los datos: ${snapshot.error}'));
+                }else {
+                  final usuariostabla = snapshot.data ?? [];
+            
+                  return SingleChildScrollView(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal, // Permitir scroll horizontal
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(label: Text('ID', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Cedula', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Usuario', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Rol', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                        ], 
+                        rows: usuariostabla.map((usuario){
+                          return DataRow(
+                            cells: [
+                              DataCell(Text(usuario.idUsuarios, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.cedula, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
+                              DataCell(
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit), 
+                                      onPressed: (){
+                                        _showEditDialog(usuario);
+                                      },
+                                    ),
+                      
+                                    IconButton(
+                                      onPressed: () {
+                                        _showDeleteDialog(usuario);
+                                      }, 
+                                      icon: const Icon(Icons.delete)
+                                    )
+                                  ],
+                                )
+                              )
+                            ]
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                }
+              }
+            ),
+          )
+        ]
       ),
       floatingActionButton: Stack(
         children: [
@@ -192,31 +432,9 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     );
   }
 
-  // Usuarios _convertirAUsuario(ObtenerEmpleados obtenerEmpleado) {
-  //   return Usuarios(
-  //     idUsuarios: obtenerEmpleado.idUsuarios$,
-  //     cedula: obtenerEmpleado.cedula$,
-  //     nombreApellido: obtenerEmpleado.nombreApellido$,
-  //     usuario1: obtenerEmpleado.usuario$,
-  //     email: obtenerEmpleado.email$,
-  //     passwords: '',  // Campo vacío o cargado según sea necesario
-  //     fechaCreacion: obtenerEmpleado.fechaCreacion$,
-  //     rol: obtenerEmpleado.rol$,
-  //   );
-  // }
-
   // Mostrar diálogo para crear un nuevo usuario
   void _showCreateDialog(BuildContext parentContext) {
     final formKey = GlobalKey<FormBuilderState>();
-    // final passwordController = TextEditingController();
-    // final confirmPasswordController = TextEditingController();
-
-    // @override
-    // void dispose(){
-    //   passwordController.dispose();
-    //   confirmPasswordController.dispose();
-    //   super.dispose();
-    // }
 
     showDialog(
       context: context,
@@ -241,7 +459,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Asignar ID',
                         labelFrontSize: 30.5, // Tamaño de letra personalizado
-                        hintext: 'USER-000000000',
+                        hintext: 'USER o ADMIN-0000',
                         hintFrontSize: 25.0,
                         icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
                       ),
@@ -251,7 +469,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                           return 'Por favor ingrese su ID-Empleado';
                         }
             
-                        if (!RegExp(r'^USER-\d{4,10}$').hasMatch(value)){
+                        if (!RegExp(r'^(USER|ADMIN)-\d{4,10}$').hasMatch(value)){
                           return 'Por favor ingrese un ID-Empleado valido';
                         }
             
@@ -364,9 +582,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                       controller: datePicker,
                       style: const TextStyle(fontSize: 30.0),
                       decoration: InputDecorations.inputDecoration(
-                        hintext: 'Hora actual',
-                        hintFrontSize: 25.0,
-                        labeltext: 'Fecha de Encuesta',
+                        labeltext: 'Fecha de Ingreso',
                         labelFrontSize: 30.5,
                         icono: const Icon(Icons.calendar_month_outlined, size: 30.0)
                       ),
@@ -376,30 +592,32 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                         await _showDatePicker(); // Muestra el DatePicker
                       },
                     ),
-                    
-                    FormBuilderTextField(
+
+                    FormBuilderDropdown<String>(
                       name: 'rol',
-                      style: const TextStyle(fontSize: 30.0),
                       decoration: InputDecorations.inputDecoration(
-                        labeltext: 'Rol',
-                        labelFrontSize: 30.5,
-                        hintext: 'Empleado',
-                        hintFrontSize: 25.0,
-                        icono: const Icon(Icons.groups_3_outlined, size: 30.0),
+                        labeltext: 'Tipo Usuario',
+                        labelFrontSize: 30.0,
+                        hintext: 'Selecciona el tipo de usuario',
+                        hintFrontSize: 22.0,
+                        icono: const Icon(Icons.people_outline_rounded, size: 30.0)
                       ),
-                      // validator: FormBuilderValidators.required(),
-                      validator: (value) {
-                        if(value == null || value.isEmpty){
-                          return 'Por favor ingrese el rol';
-                        }
-            
-                        if(value != 'Empleado'){
-                          return 'Solo se permite el rol de Empleado';
-                        }
-            
-                        return null;
+                      initialValue: 'Empleado',
+                      style: const TextStyle(fontSize: 25.0, color: Color.fromARGB(255, 1, 1, 1)),
+                      items: const [
+                        DropdownMenuItem(
+                            value: 'Empleado',
+                            child: Text('Empleado' )),
+                        DropdownMenuItem(
+                            value: 'Administrador',
+                            child: Text('Administrador')),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedRole = value!;
+                        });
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -412,8 +630,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   final formData = formKey.currentState!.value;
                   final newIdUser = formData['id'];
 
-                  // Usuarios? existingUser = await _apiService('https://10.0.2.2:7190').getOneUsuarios(newIdUser);
-                  Usuarios? existingUser = await _userController.getOneUser(newIdUser);
+                  Usuarios? existingUser = await _apiServiceUser.getOneUsuario(newIdUser);
 
                   if (existingUser != null) {
                     showDialog(
@@ -441,7 +658,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   }
 
                   Usuarios nuevoUsuario = Usuarios(
-                    idUsuarios: formData['id'],
+                    idUsuarios: newIdUser,
                     cedula: formData['cedula'],
                     nombreApellido: formData['nombre'],
                     usuario1: formData['usuario'],
@@ -455,7 +672,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   // Llamar al servicio para crear el usuario
                   // Guardar el nuevo usuario
                   try {
-                    await _userController.createUser(nuevoUsuario);
+                    await _apiServiceUser.createUsuario(nuevoUsuario);
                     Navigator.of(parentContext).pop();
                     _refreshUsuarios();
                   } catch (e) {
@@ -581,7 +798,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
                   // Actualizar usuario
                   try {
-                    await _userController.updateUser(userUpload.idUsuarios, usuarioActualizado);
+                    await _apiServiceUser.updateUsuario(userUpload.idUsuarios, usuarioActualizado);
                     Navigator.of(context).pop();
                     _refreshUsuarios();
                   } catch (e) {
@@ -617,7 +834,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               onPressed: () async {
                 // Eliminar usuario
                 try {
-                  await _userController.deleteUser(userDelete.idUsuarios);
+                  await _apiServiceUser.deleteUsuario(userDelete.idUsuarios);
                   Navigator.of(context).pop();
                   _refreshUsuarios();
                 } catch (e) {

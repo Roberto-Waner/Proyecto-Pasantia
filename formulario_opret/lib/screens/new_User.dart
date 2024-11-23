@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:formulario_opret/Controllers/User_Controller.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_User/Empleado_screen.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
@@ -34,7 +33,7 @@ class _NewUserState extends State<NewUser> {
   final UpperCaseTextEditingController _controller = UpperCaseTextEditingController();
   final TextEditingController datePicker = TextEditingController();
   DateTime? _selectedDate;
-  final UserController _userController = UserController(); // Añadir el controlador
+  // final UserController _userController = UserController(); // Añadir el controlador
   final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190');
 
   void _registrarUser() async {
@@ -54,7 +53,7 @@ class _NewUserState extends State<NewUser> {
       );
 
       try {
-        await _userController.createUser(user);
+        // await _userController.createUser(user);
         final response = await _apiServiceUser.createUsuario(user);
 
         if (response.statusCode == 201) {
@@ -294,6 +293,7 @@ class _NewUserState extends State<NewUser> {
                             icono: const Icon(Icons.person_pin_circle, size: 30.0)
                           ),
                           style: const TextStyle(fontSize: 30.0),
+                          validator: FormBuilderValidators.required(),
                         ),
                                 
                         const SizedBox(height: 30),

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using WebApiForm.DTO__Data_Transfer_Object_;
 using WebApiForm.Repository.Models;
 using WebApiForm.Services.DTO__Data_Transfer_Object_;
 using WebApiForm.Services;
-using WebApiForm.DTO__Data_Transfer_Object_;
 
 namespace WebApiForm.Repository;
 
@@ -43,13 +43,11 @@ public partial class FormEncuestaDbContext : DbContext
 
     public DbSet<FiltrarRespuestas_Dto> FiltrarRespuestasDtos { get; set; }
 
-    public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; } //no esta en uso actualmente
+    public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; }
 
     public DbSet<ObtenerForm_Dto> obtenerFormDtos { get; set; }
 
     public DbSet<ObtenerRespuestas_Dto> obtenerRespuestasDtos { get; set; }
-
-    //public DbSet<Respuesta_Dto> RespuestaDtos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=DBConnection");
@@ -95,6 +93,8 @@ public partial class FormEncuestaDbContext : DbContext
         modelBuilder.Entity<RegistroUsuario>(entity =>
         {
             entity.HasKey(e => e.IdUsuarios).HasName("PK__Registro__854B73B3E3501785");
+
+            entity.ToTable(tb => tb.HasTrigger("trg_Increment_Usuarios"));
         });
 
         modelBuilder.Entity<Respuesta>(entity =>
@@ -200,7 +200,6 @@ public partial class FormEncuestaDbContext : DbContext
             .ToListAsync();
     }
 }
-
 /*
 public async Task<string> InsertarRespuestaAsync(RespuestaDto respuestaDto)
 {

@@ -7937,11 +7937,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Proyecto Pasantias\\backup\\Repositorio\\Pricipal\\Proyecto-Pasantia\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
+      "projectUniqueName": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
       "projectName": "WebApiForm",
-      "projectPath": "D:\\Proyecto Pasantias\\backup\\Repositorio\\Pricipal\\Proyecto-Pasantia\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
+      "projectPath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
       "packagesPath": "C:\\Users\\rober\\.nuget\\packages\\",
-      "outputPath": "D:\\Proyecto Pasantias\\backup\\Repositorio\\Pricipal\\Proyecto-Pasantia\\WebApiForm\\WebApiForm\\obj\\",
+      "outputPath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rober\\AppData\\Roaming\\NuGet\\NuGet.Config",

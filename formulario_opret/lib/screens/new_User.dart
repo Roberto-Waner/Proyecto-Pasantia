@@ -8,6 +8,7 @@ import 'package:formulario_opret/widgets/input_decoration.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:formulario_opret/widgets/upperCaseText.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart'; // Importa esto para controlar la orientación
 
 class NewUser extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -33,8 +34,30 @@ class _NewUserState extends State<NewUser> {
   final UpperCaseTextEditingController _controller = UpperCaseTextEditingController();
   final TextEditingController datePicker = TextEditingController();
   DateTime? _selectedDate;
-  // final UserController _userController = UserController(); // Añadir el controlador
   final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190');
+
+  // Bloquear la orientación de la pantalla
+  @override
+  void initState() {
+    super.initState();
+    // Bloquear la orientación a solo vertical
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp, // Para orientación vertical hacia arriba
+      DeviceOrientation.portraitDown, // Para orientación vertical hacia abajo
+    ]);
+  }
+
+  // Restaurar la orientación cuando la pantalla se cierre
+  @override
+  void dispose() {
+    super.dispose();
+    // Restaurar la orientación de la pantalla
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
 
   void _registrarUser() async {
     if(_formkey.currentState!.saveAndValidate()){
@@ -42,7 +65,7 @@ class _NewUserState extends State<NewUser> {
       final nombreCompleto = '${data['nombre']} ${data['apellido']}';
 
       final user = Usuarios(
-        idUsuarios:  data['idUsuario'],
+        // idUsuarios:  data['idUsuario'],
         cedula: data['cedula'],
         nombreApellido: nombreCompleto, // Concatenación de nombre y apellido
         usuario1: data['nombreUsuario'],
@@ -53,7 +76,6 @@ class _NewUserState extends State<NewUser> {
       );
 
       try {
-        // await _userController.createUser(user);
         final response = await _apiServiceUser.createUsuario(user);
 
         if (response.statusCode == 201) {
@@ -70,27 +92,6 @@ class _NewUserState extends State<NewUser> {
       } catch (e) {
         print('Error al crear usuario: $e');
       }
-
-      /*
-      try {
-        final response = await apiService.createUsuarios(user);
-        if (response.statusCode == 201) {
-          // Mostrar mensaje de éxito
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario agregado exitosamente')),
-          );
-        } else {
-          // Mostrar mensaje de error
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al agregar usuario: ${response.reasonPhrase} de rol: $_selectedRole')),
-          );
-        }
-      } catch (e) {
-        // Manejo de errores
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }*/
     }
   }
 
@@ -170,30 +171,30 @@ class _NewUserState extends State<NewUser> {
                         texto(size),
                         const SizedBox(height: 50),
                                 
-                        FormBuilderTextField(
-                          name: 'idUsuario',
-                          controller: _controller,
-                          decoration: InputDecorations.inputDecoration(
-                            hintext: 'USER-000000000 o ADMIN-000000000',
-                            hintFrontSize: 22.0,
-                            labeltext: 'ID de Usuario asignado', 
-                            labelFrontSize: 35.0,
-                            icono: const Icon(Icons.account_circle_outlined, size: 30.0)
-                          ),
-                          style: const TextStyle(fontSize: 30.0),
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return 'Por favor ingrese su ID-Empleado';
-                            }
+                        // FormBuilderTextField(
+                        //   name: 'idUsuario',
+                        //   controller: _controller,
+                        //   decoration: InputDecorations.inputDecoration(
+                        //     hintext: 'USER-000000000 o ADMIN-000000000',
+                        //     hintFrontSize: 22.0,
+                        //     labeltext: 'ID de Usuario asignado', 
+                        //     labelFrontSize: 35.0,
+                        //     icono: const Icon(Icons.account_circle_outlined, size: 30.0)
+                        //   ),
+                        //   style: const TextStyle(fontSize: 30.0),
+                        //   validator: (value) {
+                        //     if (value == null || value.isEmpty){
+                        //       return 'Por favor ingrese su ID-Empleado';
+                        //     }
                                 
-                            if (!RegExp(r'^(USER|ADMIN)-\d{4,10}$').hasMatch(value)){
-                              return 'Por favor ingrese un ID-Empleado valido';
-                            }
+                        //     if (!RegExp(r'^(USER|ADMIN)-\d{4,10}$').hasMatch(value)){
+                        //       return 'Por favor ingrese un ID-Empleado valido';
+                        //     }
                                 
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 30),
+                        //     return null;
+                        //   },
+                        // ),
+                        // const SizedBox(height: 30),
                                 
                         Row( //para hacer que los TextFormField se olganicen en filas
                           children: [

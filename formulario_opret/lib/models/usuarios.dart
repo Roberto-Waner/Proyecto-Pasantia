@@ -1,5 +1,5 @@
 class Usuarios {
-  String idUsuarios;
+  String? idUsuarios;
   String cedula;
   String nombreApellido;
   String usuario1;
@@ -9,7 +9,7 @@ class Usuarios {
   String rol;
 
   Usuarios({
-    required this.idUsuarios,
+    this.idUsuarios,
     required this.cedula,
     required this.nombreApellido,
     required this.usuario1,
@@ -36,7 +36,7 @@ class Usuarios {
   // Método para convertir una instancia a JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['idUsuarios'] = idUsuarios;
+    if (idUsuarios != null) {data['idUsuarios'] = idUsuarios;}
     data['cedula'] = cedula;
     data['nombreApellido'] = nombreApellido;
     data['usuario'] = usuario1;

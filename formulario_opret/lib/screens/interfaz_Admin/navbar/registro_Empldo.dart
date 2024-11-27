@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -58,7 +60,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     final usuarios = await _usuariosdata;
     final filtrar = usuarios.firstWhere(
       (usuario) => 
-        usuario.idUsuarios.toLowerCase().contains(query.toLowerCase()) ||
+        usuario.idUsuarios!.toLowerCase().contains(query.toLowerCase()) ||
         usuario.cedula.toLowerCase().contains(query.toLowerCase()) ||
         usuario.usuario1.toLowerCase().contains(query.toLowerCase()) ||
         usuario.nombreApellido.toLowerCase().contains(query.toLowerCase()),
@@ -75,7 +77,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     );
 
     setState(() {
-      usuariosFiltrados = filtrar.idUsuarios.isNotEmpty ? filtrar : null;
+      usuariosFiltrados = filtrar.idUsuarios!.isNotEmpty ? filtrar : null;
     });
   }
 
@@ -146,7 +148,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                 style: const TextStyle(fontSize: 20.0),
                 decoration: InputDecoration( 
                   labelText: 'Buscar Usuario aqui',
-                  labelStyle: const TextStyle(fontSize: 20),
+                  labelStyle: const TextStyle(fontSize: 30),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: searchController.text.isNotEmpty
@@ -367,8 +369,8 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                                       : Colors.white;
                               }),
                               cells: [
-                                DataCell(Text(usuario.idUsuarios, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(usuario.cedula, style: const TextStyle(fontSize: 20.0))),
+                                DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                DataCell(/*usuario.cedula != null ? */Text(usuario.cedula, style: const TextStyle(fontSize: 20.0))/* : const Text('')*/),
                                 DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
                                 DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
                                 DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
@@ -484,31 +486,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   key: formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      FormBuilderTextField(
-                        name: 'id',
-                        style: const TextStyle(fontSize: 30.0),
-                        decoration: InputDecorations.inputDecoration(
-                          labeltext: 'Asignar ID',
-                          labelFrontSize: 30.5, // Tamaño de letra personalizado
-                          hintext: 'USER o ADMIN-0000',
-                          hintFrontSize: 25.0,
-                          icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
-                        ),
-                        // validator: FormBuilderValidators.required(),
-                        validator: (value) {
-                          if (value == null || value.isEmpty){
-                            return 'Por favor ingrese su ID-Empleado';
-                          }
-              
-                          if (!RegExp(r'^(USER|ADMIN)-\d{4,10}$').hasMatch(value)){
-                            return 'Por favor ingrese un ID-Empleado valido';
-                          }
-              
-                          return null;
-                        },
-                      ),
-              
+                    children: [              
                       FormBuilderTextField(
                         name: 'cedula',
                         style: const TextStyle(fontSize: 30.0),
@@ -658,37 +636,9 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                             onPressed: () async {
                               if(formKey.currentState!.saveAndValidate()){
                                 final formData = formKey.currentState!.value;
-                                final newIdUser = formData['id'];
-
-                                Usuarios? existingUser = await _apiServiceUser.getOneUsuario(newIdUser);
-
-                                if (existingUser != null) {
-                                  showDialog(
-                                    context: parentContext, 
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('ID de Usuario ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
-                                        contentPadding: EdgeInsets.zero,
-                                        content: Container(
-                                          margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
-                                          child: Text('El ID. $newIdUser ya está en uso. Por favor ingrese otro.', style: const TextStyle(fontSize: 28.0))
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
-                                            },
-                                            child: const Text('Aceptar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  );
-                                  return;
-                                }
 
                                 Usuarios nuevoUsuario = Usuarios(
-                                  idUsuarios: newIdUser,
+                                  // idUsuarios: newIdUser,
                                   cedula: formData['cedula'],
                                   nombreApellido: formData['nombre'],
                                   usuario1: formData['usuario'],
@@ -702,11 +652,20 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                                 // Llamar al servicio para crear el usuario
                                 // Guardar el nuevo usuario
                                 try {
-                                  await _apiServiceUser.createUsuario(nuevoUsuario);
-                                  Navigator.of(parentContext).pop();
-                                  _refreshUsuarios();
+                                  final response = await _apiServiceUser.createUsuario(nuevoUsuario);
+                                  final responseBody = jsonDecode(response.body);
+
+                                  if (response.statusCode == 201) {
+                                    Navigator.of(parentContext).pop();
+                                    _refreshUsuarios();
+                                  } else if (response.statusCode == 400) {
+                                    String errorMessage = responseBody['message'] ?? 'Error desconocido.';
+                                    _showErrorDialog(context, errorMessage);
+                                  }
+                                  
                                 } catch (e) {
                                   print('Error al crear usuario: $e');
+                                  _showErrorDialog(context, 'Ocurrió un error inesperado');
                                 }
                               }
                             }, 
@@ -841,7 +800,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
                   // Actualizar usuario
                   try {
-                    await _apiServiceUser.updateUsuario(userUpload.idUsuarios, usuarioActualizado);
+                    await _apiServiceUser.updateUsuario(userUpload.idUsuarios!, usuarioActualizado);
                     Navigator.of(context).pop();
                     _refreshUsuarios();
                   } catch (e) {
@@ -877,7 +836,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               onPressed: () async {
                 // Eliminar usuario
                 try {
-                  await _apiServiceUser.deleteUsuario(userDelete.idUsuarios);
+                  await _apiServiceUser.deleteUsuario(userDelete.idUsuarios!);
                   Navigator.of(context).pop();
                   _refreshUsuarios();
                 } catch (e) {
@@ -888,6 +847,30 @@ class _RegistroEmplState extends State<RegistroEmpl> {
           ],
         );
       },
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+            child: Text(message, style: const TextStyle(fontSize: 28))
+          ),
+          actions: [ 
+            TextButton( 
+              child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
+              onPressed: () { 
+                Navigator.of(context).pop(); 
+              }, 
+            ), 
+          ],
+        );
+      }
     );
   }
 }

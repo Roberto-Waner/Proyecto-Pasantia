@@ -43,6 +43,7 @@ void main() {
   ));
 }
 
+// la conexion hacia el backEnd con .net c#
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -96,13 +97,6 @@ class MyApp extends StatelessWidget {
           filtrarId: filtrarId,
           filtrarCedula: filtrarCedula,
         ),
-
-        // 'adminScreens': (_) => AdministradorScreen(
-        //   filtrarUsuarioController: filtrarUsuarioController,
-        //   filtrarEmailController: filtrarEmailController,
-        //   filtrarId: filtrarId,
-        //   filtrarCedula: filtrarCedula,
-        // ),
 
         'registroEmpleados': (_) => RegistroEmpl(
           filtrarUsuarioController: filtrarUsuarioController,
@@ -162,7 +156,7 @@ class MyApp extends StatelessWidget {
         )
       },
 
-      initialRoute: 'reportForm',
+      initialRoute: 'registroEmpleados',
     );
   }
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DWxT3ooam24=",
+  "dgSpecHash": "ZfgsVMvPsm4=",
   "success": true,
-  "projectFilePath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
+  "projectFilePath": "D:\\Proyecto Pasantias\\backup\\Repositorio\\Pricipal\\Proyecto-Pasantia\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rober\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

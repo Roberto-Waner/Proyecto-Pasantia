@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -80,7 +79,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
       usuariosFiltrados = filtrar.idUsuarios!.isNotEmpty ? filtrar : null;
     });
   }
-
+  
   void _limpiarBusqueda() { 
     searchController.clear();
     setState(() { 
@@ -452,6 +451,13 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   // Mostrar diálogo para crear un nuevo usuario
   void _showCreateDialog(BuildContext parentContext) {
     final formKey = GlobalKey<FormBuilderState>();
+    bool _obscureText = true;
+
+    void _togglePasswordVisibility() {
+      setState(() {
+        _obscureText = !_obscureText;
+      });
+    }
 
     showDialog(
       context: context,
@@ -563,7 +569,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                       FormBuilderTextField(
                         name: 'password',
                         autocorrect: false,
-                        obscureText: true,
+                        obscureText: _obscureText,
                         style: const TextStyle(fontSize: 30.0),
                         // controller: passwordController,
                         decoration: InputDecorations.inputDecoration(
@@ -571,7 +577,13 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                           labelFrontSize: 30.5,
                           hintext: '******',
                           hintFrontSize: 25.0,
-                          icono: const Icon(Icons.lock_person_outlined, size: 30.0),
+                          icono: IconButton(
+                            onPressed: _togglePasswordVisibility, 
+                            icon: Icon(
+                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                              size: 30.0,
+                            )
+                          )
                         ),
                         // validator: FormBuilderValidators.required(),
                         validator: (value) {

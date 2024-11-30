@@ -156,7 +156,7 @@ class MyApp extends StatelessWidget {
         )
       },
 
-      initialRoute: 'registroEmpleados',
+      initialRoute: 'newuser',
     );
   }
 }

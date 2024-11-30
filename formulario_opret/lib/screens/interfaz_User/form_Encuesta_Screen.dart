@@ -46,6 +46,8 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
 
   final TextEditingController fechaController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
+  bool isLoading = false; // Variable de control para el cuadro de carga
+  bool hasError = false;
 
   void initState() {
     super.initState();
@@ -119,9 +121,13 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   void _registrarFormEncuesta() async {
     if (_formKey.currentState!.saveAndValidate()) {
       final data = _formKey.currentState!.value;
-
       String currentDate = fechaController.text;
       String currentTime = horaController.text;
+
+      setState(() {
+        isLoading = true; // Mostrar el cuadro de carga
+        hasError = false;
+      });
 
       FormularioRegistro formEncuesta = FormularioRegistro(
         idUsuarios: data['idUsuarios'],
@@ -138,14 +144,17 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
       try{
         final response = await _apiServiceFormRegistro.postFormRegistro(formEncuesta);
 
+        setState(() {
+          isLoading = false; // Ocultar el cuadro de carga
+          hasError = true;
+        });
+
         // Imprimir la respuesta completa para depuración
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
 
         if(response.statusCode == 201){
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Formulario enviado con exito'))
-          );
+          _showSuccessDialog(context);
 
           Navigator.pushReplacement( //para evitar que regrese a la pantalla anterior
             context,
@@ -161,10 +170,16 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
           );
 
         } else {
+          setState(() {
+            isLoading = false; // Ocultar el cuadro de carga
+            hasError = true;
+          });
+
+          _showErrorDialog(context, 'Error al enviar formulario: ${response.reasonPhrase}');
           // Mostrar mensaje de error
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al enviar formulario: ${response.reasonPhrase}')),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text('Error al enviar formulario: ${response.reasonPhrase}')),
+          // );
         }
 
       } catch (e) {
@@ -188,38 +203,45 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
 
       appBar: AppBar(title: const Text('Formulario')),
 
-      body: SingleChildScrollView(
+      body: isLoading // Si está cargando, mostrar el cuadro de carga
+        ? Center(
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: Container(
+                width: 200,
+                height: 220,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    hasError 
+                        ? const Icon(
+                            Icons.close,
+                            size: 80,
+                            color: Colors.red,
+                          )
+                        : const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                          ),
+                    const SizedBox(height: 20),
+                    Text(
+                      hasError ? 'Error' : 'Cargando...',
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          )
+        : SingleChildScrollView(
         child: FormBuilder(
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: FormBuilderTextField(
-              //         name: 'noEncuesta',
-              //         controller: noEncuestaFiltrar,
-              //         decoration: InputDecorations.inputDecoration(
-              //           hintext: '#',
-              //           hintFrontSize: 25.0,
-              //           labeltext: 'No. de Encuesta',
-              //           labelFrontSize: 30.5,
-              //           prefixText: '$year - ',
-              //           icono: const Icon(Icons.numbers, size: 30.0)
-              //         ),
-              //         style: const TextStyle(fontSize: 30.0), // Cambiar tamaño de letra del texto filtrado
-              //         validator: FormBuilderValidators.required(),
-              //         onChanged: (val) {
-              //           // noEncuestaFiltrar.text = '$year - $val';
-              //           noEncuestaFiltrar.selection = TextSelection.fromPosition(TextPosition(offset: noEncuestaFiltrar.text.length));
-              //           print('Numero seleccionada: $val');
-              //         },
-              //       ),
-              //     )
-              //   ]
-              // ),
-
               FormBuilderTextField(
                 name: 'idUsuarios',
                 initialValue: widget.filtrarId.text,
@@ -232,18 +254,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                   icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
                 ),
                 style: const TextStyle(fontSize: 30.0),
-                // validator: FormBuilderValidators.required(),
-                validator: (value) {
-                  if (value == null || value.isEmpty){
-                    return 'Por favor ingrese su ID-Empleado';
-                  }
-
-                  if (!RegExp(r'^USER-\d{4,10}$').hasMatch(value)){
-                    return 'Por favor ingrese un ID-Empleado valido';
-                  }
-
-                  return null;
-                },
                 onChanged: (val) {
                   print('Id seleccionada: $val');
                 },
@@ -268,9 +278,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                     // Expresión regular para validar la cedula
                     String pattern = r'^\d{3}-\d{7}-\d{1}$';
                     RegExp regExp = RegExp(pattern);
-                    // if(value == null || value.isEmpty){
-                    //   return 'Por favor ingrese su cédula';
-                    // }
 
                     if(!regExp.hasMatch(value ?? '')){
                       return 'Formato de cédula incorrecto';
@@ -388,6 +395,112 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
+                const SizedBox(height: 20),
+                const Text( 
+                  '¡Éxito!', 
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold), 
+                ),
+                const SizedBox(height: 8.0),
+                const Text( 
+                  'Formulario enviado con exito', 
+                  style: TextStyle(fontSize: 18.0), 
+                  textAlign: TextAlign.center, 
+                ), 
+                const SizedBox(height: 24.0),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(), 
+                  child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
+
+    // Hacer que el cuadro de éxito se cierre automáticamente después de 2 segundos
+    Future.delayed(const Duration(seconds: 2), () {
+      // Comprobamos si el widget aún está montado antes de intentar realizar cualquier acción
+      if (mounted) {
+        Navigator.of(context).pop(); // Cierra el cuadro de éxito solo si el widget está montado
+      }
+    });
+  }
+  
+  /*
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,  // Evita que el usuario cierre el cuadro de carga
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16.0),
+                Text('Enviando datos...', style: TextStyle(fontSize: 18.0)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  */
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+            child: Text(message, style: const TextStyle(fontSize: 28))
+          ),
+          actions: [ 
+            TextButton( 
+              child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
+              onPressed: () { 
+                Navigator.of(context).pop(); 
+              }, 
+            ), 
+          ],
+        );
+      }
     );
   }
 }

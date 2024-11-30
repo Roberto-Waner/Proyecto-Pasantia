@@ -33,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         filtrarCedula: widget.filtrarCedula,
       ),
 
-      appBar: AppBar(title: const Text('Pantalla de Ajustes')),
+      appBar: AppBar(title: const Text('Ajustes')),
 
       body: ListView(
         padding: EdgeInsets.zero,

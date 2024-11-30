@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -29,33 +31,47 @@ class ModifyTable extends StatefulWidget {
 class _ModifyTableState extends State<ModifyTable> {
   final _formKey = GlobalKey<FormBuilderState>();
   final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://10.0.2.2:7190');
-  late Future<List<Linea>> _linea;
+  late Future<List<Linea>> _lineaData;
   final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://10.0.2.2:7190');
-  late Future<List<Estacion>> _estacion;
+  late Future<List<Estacion>> _estacionData;
   String _selectedLinea = 'Linea Metro';
   String? _savedLinea;
   Offset position = const Offset(700, 1090); // Posición inicial del botón
-  
+  //---------------------------------------------------------Filtrar-Linea--------------------------------------------------------
+  final TextEditingController searchLineaController = TextEditingController();
+  List<Linea> _lineaFiltrada = [];
+  List<Linea> _todosCampLinea = [];
+  String selectedFilterLinea = 'Id Linea metro';
+  //-----------------------------------------------------------Filtrar-Estacion-------------------------------------------------------
+  final TextEditingController searchEstacionController = TextEditingController();
+  List<Estacion> _estacionFiltrada = [];
+  List<Estacion> _todosCampEstacion = [];
+  String selectedFilterEstacion = 'No de Estacion';
+  //---------------------------------------------------------------------------------------------------------------------------------
+
   List<Linea> _lineas = [];
   // List<Estacion> _estaciones = [];
 
   @override
   void initState() {
     super.initState();
-    _linea = _apiServiceLineas.getLinea();
-    _estacion = _apiServiceEstacion.getEstacion();
+    _lineaData = Future.value([]);
+    _lineaData = _apiServiceLineas.getLinea();
+
+    _estacionData = Future.value([]);
+    _estacionData = _apiServiceEstacion.getEstacion();
     _fetchData();
   }
 
   void _refreshLinea() {
     setState(() {
-      _linea = _apiServiceLineas.getLinea();
+      _lineaData = _apiServiceLineas.getLinea();
     });
   }
 
   void _refreshEstacion() {
     setState(() {
-      _estacion = _apiServiceEstacion.getEstacion();
+      _estacionData = _apiServiceEstacion.getEstacion();
     });
   }
 
@@ -63,13 +79,73 @@ class _ModifyTableState extends State<ModifyTable> {
     try{
       List<Linea> lineas = await _apiServiceLineas.getLinea();
 
+      final line = await _apiServiceLineas.getLinea();
+      final station = await _apiServiceEstacion.getEstacion();
+
       setState(() {
+        _lineaFiltrada = line;
+        _todosCampLinea = line;
+        _lineaData = Future.value(line);
+        //---------------------------------------
+        _estacionFiltrada = station;
+        _todosCampEstacion = station;
+        _estacionData = Future.value(station);
+
         _lineas = lineas;
         print('Lineas obtenidas: $_lineas');
       });
     } catch (e) {
       print('Error fetching data: $e');
     }
+  }
+
+  void _filtrarLinea (String query) async {
+    final queryLower = query.toLowerCase();
+    final filtrar = _todosCampLinea.where((ln) {
+      switch (selectedFilterLinea) {
+        case 'Id Linea metro':
+          return ln.idLinea.toLowerCase().contains(queryLower);
+        case 'Tipo de Linea':
+          return ln.tipo.toLowerCase().contains(queryLower);
+        case 'Nombre de la Linea':
+          return ln.nombreLinea.toLowerCase().contains(queryLower);
+        default:
+          return false;
+      }
+    }).toList();
+
+    setState(() {
+      _lineaFiltrada = filtrar;
+    });
+  }
+
+  void _filtrarEstacion (String query) async {
+    final queryLower = query.toLowerCase();
+    final filtrar = _todosCampEstacion.where((et) {
+      switch (selectedFilterEstacion) {
+        case 'No de Estacion':
+          return et.idEstacion.toString().toLowerCase().contains(queryLower);
+        case 'Id Linea del metro':
+          return et.idLinea.toLowerCase().contains(queryLower);
+        case 'Nombre de Estacion':
+          return et.nombreEstacion.toLowerCase().contains(queryLower);
+        default:
+          return false;
+      }
+    }).toList();
+
+    setState(() {
+      _estacionFiltrada = filtrar;
+    });
+  }
+
+  void _limpiarBusqueda() {
+    searchLineaController.clear();
+    searchEstacionController.clear();
+    setState(() {
+      _lineaFiltrada = _todosCampLinea;
+      _estacionFiltrada = _todosCampEstacion;
+    });
   }
 
   @override
@@ -82,130 +158,332 @@ class _ModifyTableState extends State<ModifyTable> {
         filtrarCedula: widget.filtrarCedula,
       ),
 
-      appBar: AppBar(title: const Text('Modificar tabla')),
+      appBar: AppBar(
+        title: const Text('Modificar tabla'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 30.0),
+            tooltip: 'Recargar',
+            onPressed: () {
+              setState(() {
+                _refreshLinea();
+                _refreshEstacion();
+              });
+            },
+          )
+        ],
+      ),
 
       body: Stack(
         children: [
+          // Cuerpo principal con las tablas
           SingleChildScrollView(
             child: Column(
               children: [
-                const Text(
-                  'Tablas de Lineas de Metro',
-                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-          
-                FutureBuilder<List<Linea>>(
-                  future: _linea, 
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }else if(snapshot.hasError) {
-                      return const Center(child: Text('Error al cargar la Linea de metro.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                    } else {
-                      final lineTable = snapshot.data ?? [];
-          
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(label: Text('Id Linea metro', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Tipo de Linea', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Nombre de la Linea', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                          ], 
-                          rows: lineTable.map((linasDatos) {
-                            return DataRow(
-                              cells: [
-                                DataCell(Text(linasDatos.idLinea, style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
-                                DataCell(Text(linasDatos.tipo, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(linasDatos.nombreLinea, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          _showEditDialogLinea(linasDatos);
-                                        }, 
-                                        icon: const Icon(Icons.edit)
-                                      ),
-                                      
-                                      IconButton(
-                                        onPressed: () {
-                                          _showDeleteDialogLinea(linasDatos);
-                                        },
-                                        icon: const Icon(Icons.delete)
-                                      )
-                                    ],
-                                  )
-                                )
-                              ]
+                // Sección de filtros y tabla de Líneas de Metro
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      
+                      const Text(
+                        'Tablas de Lineas de Metro',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                  
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FormBuilderDropdown<String>(
+                              name: 'filtrarLineas',
+                              initialValue: selectedFilterLinea,
+                              style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                              decoration: const InputDecoration(
+                                labelText: 'Filtrar por',
+                                labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                                border: OutlineInputBorder(),
+                              ),
+                              items: [
+                                'Id Linea metro',
+                                'Tipo de Linea',
+                                'Nombre de la Linea',
+                              ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                              onChanged: (value) => setState(() {
+                                selectedFilterLinea = value!;
+                              }),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                
+                          Expanded(
+                            flex: 2,
+                            child: FormBuilderTextField(
+                              name: 'searchLinea',
+                              controller: searchLineaController,
+                              style: const TextStyle(fontSize: 20.0),
+                              decoration: InputDecoration( 
+                                labelText: 'Buscar', 
+                                labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: searchLineaController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: _limpiarBusqueda,
+                                    )
+                                  : null 
+                              ),
+                              onChanged: (value) {
+                                if (value!.isNotEmpty) {
+                                  _filtrarLinea(value);
+                                } else {
+                                  setState(() { 
+                                    _lineaFiltrada = []; 
+                                  }); 
+                                }
+                              },
+                            )
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      const Divider(),
+                      FutureBuilder<List<Linea>>(
+                        future: _lineaData, 
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }else if(snapshot.hasError) {
+                            return const Center(child: Text('Error al cargar la Linea de metro.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                          } else {
+                            final lineTable = _lineaFiltrada.isNotEmpty 
+                                ? _lineaFiltrada
+                                : snapshot.data ?? [];
+                            
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                margin: const EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]
+                                ),
+                                child: DataTable(
+                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                  headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
+                                  columns: const [
+                                    DataColumn(label: Text('Id Linea metro', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Tipo de Linea', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Nombre de la Linea', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                                  ], 
+                                  rows: lineTable.map((linasDatos) {
+                                    return DataRow(
+                                      color: WidgetStateProperty.resolveWith<Color>((states) {
+                                        // Color alterno para las filas
+                                        return (lineTable.indexOf(linasDatos) % 2 == 0)
+                                              ? Colors.blueGrey.shade50
+                                              : Colors.white;
+                                      }),
+                                      cells: [
+                                        DataCell(Text(linasDatos.idLinea, style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
+                                        DataCell(Text(linasDatos.tipo, style: const TextStyle(fontSize: 20.0))),
+                                        DataCell(Text(linasDatos.nombreLinea, style: const TextStyle(fontSize: 20.0))),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  _showEditDialogLinea(linasDatos);
+                                                }, 
+                                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                              ),
+                                              
+                                              IconButton(
+                                                onPressed: () {
+                                                  _showDeleteDialogLinea(linasDatos);
+                                                },
+                                                icon: const Icon(Icons.delete, color: Colors.red)
+                                              )
+                                            ],
+                                          )
+                                        )
+                                      ]
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                             );
-                          }).toList(),
-                        ),
-                      );
-                    }
-                  }
-                ),
-          
-                const SizedBox(height: 20),
-                const Text(
-                  'Tablas de Estaciones del Metro',
-                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-          
-                FutureBuilder<List<Estacion>>(
-                  future: _estacion, 
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }else if (snapshot.hasError) {
-                      return const Center(child: Text('Error al cargar la tabla de Estaciones del metro.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                    } else {
-                      final station = snapshot.data ?? [];
-          
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(label: Text('NO', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Id Linea de metro a la que pertenece', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Estacion', style: TextStyle(fontSize: 23.0))),
-                            DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                          ],
-                          rows: station.map((estacion) {
-                            return DataRow(
-                              cells: [
-                                DataCell(Text(estacion.idEstacion.toString(), style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(estacion.idLinea, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(estacion.nombreEstacion, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          _showEditDialogEstacion(estacion);
-                                        }, 
-                                        icon: const Icon(Icons.edit)
-                                      ),
-                                      
-                                      IconButton(
-                                        onPressed: () {
-                                          _showDeleteDialogEstacion(estacion);
-                                        },
-                                        icon: const Icon(Icons.delete)
-                                      )
-                                    ],
-                                  )
-                                )
-                              ]
+                          }
+                        }
+                      ),
+                      // const SizedBox(height: 20),
+                      const Divider(),
+                            
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Tablas de Estaciones del Metro',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FormBuilderDropdown<String>(
+                              name: 'filtrarEstaciones',
+                              initialValue: selectedFilterEstacion,
+                              style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                              decoration: const InputDecoration(
+                                labelText: 'Filtrar por',
+                                labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                                border: OutlineInputBorder(),
+                              ),
+                              items: [
+                                'No de Estacion',
+                                'Id Linea del metro',
+                                'Nombre de Estacion',
+                              ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                              onChanged: (value) => setState(() {
+                                selectedFilterEstacion = value!;
+                              }),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+
+                          Expanded(
+                            flex: 2,
+                            child: FormBuilderTextField(
+                              name: 'searchEstacion',
+                              controller: searchEstacionController,
+                              style: const TextStyle(fontSize: 20.0),
+                              decoration: InputDecoration( 
+                                labelText: 'Buscar', 
+                                labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: searchEstacionController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: _limpiarBusqueda,
+                                    )
+                                  : null 
+                              ),
+                              onChanged: (value) {
+                                if (value!.isNotEmpty) {
+                                  _filtrarEstacion(value);
+                                } else {
+                                  setState(() { 
+                                    _estacionFiltrada = []; 
+                                  }); 
+                                }
+                              },
+                            )
+                          )                          
+                        ]
+                      ),
+                      const SizedBox(width: 16),
+                      const Divider(),
+                            
+                      FutureBuilder<List<Estacion>>(
+                        future: _estacionData, 
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }else if (snapshot.hasError) {
+                            return const Center(child: Text('Error al cargar la tabla de Estaciones del metro.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                          } else {
+                            final station = _estacionFiltrada.isNotEmpty 
+                                  ? _estacionFiltrada
+                                  : snapshot.data ?? [];
+                            
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                margin: const EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]
+                                ),
+                                child: DataTable(
+                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                  headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
+                                  columns: const [
+                                    DataColumn(label: Text('NO', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Id Linea de metro a la que pertenece', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Estacion', style: TextStyle(fontSize: 23.0))),
+                                    DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                                  ],
+                                  rows: station.map((estacion) {
+                                    return DataRow(
+                                      color: WidgetStateProperty.resolveWith<Color>((states) {
+                                        // Color alterno para las filas
+                                        return (station.indexOf(estacion) % 2 == 0)
+                                              ? Colors.blueGrey.shade50
+                                              : Colors.white;
+                                      }),
+                                      cells: [
+                                        DataCell(Text(estacion.idEstacion.toString(), style: const TextStyle(fontSize: 20.0))),
+                                        DataCell(Text(estacion.idLinea, style: const TextStyle(fontSize: 20.0))),
+                                        DataCell(Text(estacion.nombreEstacion, style: const TextStyle(fontSize: 20.0))),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  _showEditDialogEstacion(estacion);
+                                                }, 
+                                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                              ),
+                                              
+                                              IconButton(
+                                                onPressed: () {
+                                                  _showDeleteDialogEstacion(estacion);
+                                                },
+                                                icon: const Icon(Icons.delete, color: Colors.red)
+                                              )
+                                            ],
+                                          )
+                                        )
+                                      ]
+                                    );
+                                  }).toList(),
+                                ),
+                              )
                             );
-                          }).toList(),
-                        )
-                      );
-                    }
-                  }
+                          }
+                        }
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -308,6 +586,7 @@ class _ModifyTableState extends State<ModifyTable> {
                       hintext: 'ID Linea (ej. LM1 o LM001)',
                       hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: (value) {
@@ -316,7 +595,7 @@ class _ModifyTableState extends State<ModifyTable> {
                       }
 
                       if (!RegExp(r'^(LM|LT)\d{1,3}$').hasMatch(value)){
-                        return 'Por favor ingrese un ID-Empleado valido';
+                        return 'Por favor ingrese un ID-Empleado valido y en mayuscula';
                       }
 
                       return null;
@@ -353,6 +632,7 @@ class _ModifyTableState extends State<ModifyTable> {
                       hintext: 'Linea 1',
                       hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
@@ -380,7 +660,7 @@ class _ModifyTableState extends State<ModifyTable> {
                           contentPadding: EdgeInsets.zero,
                           content: Container(
                             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
-                            child: const Text('El ID de la línea ingresado ya está en uso. Por favor ingrese otro.', style: TextStyle(fontSize: 28.0))
+                            child: Text('El ID: $newIdLinea de la línea ingresado ya está en uso. Por favor ingrese otro.', style: TextStyle(fontSize: 28.0))
                           ),
                           actions: [
                             TextButton(
@@ -525,7 +805,7 @@ class _ModifyTableState extends State<ModifyTable> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar Linea', style: TextStyle(fontSize: 33.0)),
-          content: Text('¿Estás seguro de que deseas eliminar la linea no. ${lineaDelete.idLinea} - ${lineaDelete.nombreLinea}?', style: const TextStyle(fontSize: 30)),
+          content: Text('¿Estás seguro de que deseas eliminar la linea: ${lineaDelete.idLinea} - ${lineaDelete.nombreLinea}?', style: const TextStyle(fontSize: 30)),
           actions: [
             buttonStop(context),
             TextButton(
@@ -540,11 +820,16 @@ class _ModifyTableState extends State<ModifyTable> {
                     // Refrescar la lista de usuarios aquí
                     _refreshLinea();
                     _fetchData();
+                  } else if (response.statusCode == 400) {
+                    final responseBody = jsonDecode(response.body);
+                    _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la Linea: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar la Linea: ${response.body}');
                   }
                 } catch (e) {
                   print('Excepción al eliminar la Linea: $e');
+                  _showErrorDialog(context, 'Error al eliminar la Linea: $e');
                 }
               },
             )
@@ -597,6 +882,7 @@ class _ModifyTableState extends State<ModifyTable> {
                         hintext: '#',
                         hintFrontSize: 30.0,
                         icono: const Icon(Icons.numbers,size: 30.0),
+                        errorSize: 20.0,
                       ),
                       style: const TextStyle(fontSize: 30.0),
                       validator: FormBuilderValidators.numeric(errorText: 'Este campo es requerido')
@@ -622,10 +908,35 @@ class _ModifyTableState extends State<ModifyTable> {
 
                     if (existingStation != null) {
                       // La estación ya existe
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('La estación con ID $newIdEstacion ya existe.'))
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(content: Text('La estación con ID $newIdEstacion ya existe.'))
+                      // );
+                      // return; // Salimos del método si la estación existe
+
+                      showDialog(
+                        context: context, 
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(
+                              'La estación con el no. $newIdEstacion ya existe.', 
+                              style: const TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                            content: Container(
+                              margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
+                              child: Text('El no. $newIdEstacion, ya existe asi que no lo puedes usar para identificar esta estacion. Por favor ingrese otro.', style: const TextStyle(fontSize: 28.0)),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
+                                },
+                                child: const Text('Aceptar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          );
+                        }
                       );
-                      return; // Salimos del método si la estación existe
                     }
 
                     // Crear la estación si la línea existe
@@ -674,6 +985,7 @@ class _ModifyTableState extends State<ModifyTable> {
                     hintext: 'Parada del Metro',
                     hintFrontSize: 30.0,
                     icono: const Icon(Icons.numbers,size: 30.0),
+                    errorSize: 20.0,
                   ),
                   style: const TextStyle(fontSize: 30.0),
                   // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
@@ -810,5 +1122,29 @@ class _ModifyTableState extends State<ModifyTable> {
               Navigator.of(context).pop(); // Cerrar el diálogo si se cancela
             },
           );
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+            child: Text(message, style: const TextStyle(fontSize: 28))
+          ),
+          actions: [ 
+            TextButton( 
+              child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
+              onPressed: () { 
+                Navigator.of(context).pop(); 
+              }, 
+            ), 
+          ],
+        );
+      }
+    );
   }
 }

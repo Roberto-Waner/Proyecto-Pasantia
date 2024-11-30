@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -30,11 +32,11 @@ class PreguntaScreenNavbar extends StatefulWidget {
 class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final _formKey = GlobalKey<FormBuilderState>();
   final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('https://10.0.2.2:7190');
-  late Future<List<Preguntas>> _preguntas;
+  late Future<List<Preguntas>> _preguntasData;
   final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://10.0.2.2:7190');
-  late Future<List<SubPregunta>> _subPreguntas;
+  late Future<List<SubPregunta>> _subPreguntasData;
   final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
-  late Future<List<Sesion>> _sesion;
+  late Future<List<Sesion>> _sesionData;
   String selectedTipRespuestas = 'Respuesta Abierta';
   int _rangoValor = 1; // Valor inicial dentro del rango permitido
   String rango = "1,10"; // Ejemplo de rango
@@ -47,7 +49,22 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   List<Preguntas> _questions = [];
   int? _savedQuestion;
   List<SubPregunta> _subQuestions = [];
-  // String? _savedSubQuestion;
+  //--------------------------------------------------------Filtrar-Preguntas-----------------------------------------------
+  final TextEditingController searchPreguntaController = TextEditingController();
+  List<Preguntas> _preguntaFiltrada = [];
+  List<Preguntas> _todosCampPreguntas = [];
+  String selectedFilterPregunta = 'No de pregunta';
+  //-------------------------------------------------------Filtrar-SubPreguntas---------------------------------------------
+  final TextEditingController searchSubPreguntaController = TextEditingController();
+  List<SubPregunta> _subPreguntaFiltrada = [];
+  List<SubPregunta> _todosCampSubPreguntas = [];
+  String selectedFilterSubPregunta = 'Id de Sub pregunta';
+  //----------------------------------------------------------Filtrar-Sesion------------------------------------------------
+  final TextEditingController searchSesionController = TextEditingController();
+  List<Sesion> _sesionFiltrada = [];
+  List<Sesion> _todosCampSesion = [];
+  String selectedFilterSesion = 'Numero de Sesion';
+  //------------------------------------------------------------------------------------------------------------------------
 
   String numbersToRango(int desde, int hasta) {
     if (hasta == 0) return 'null';
@@ -62,13 +79,17 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   @override
   void initState(){
     super.initState();
-    _preguntas = _apiServicePreguntas.getPreguntas();
-    _subPreguntas = _apiServiceSubPreguntas.getSubPreg();
-    _sesion = _apiServiceSesion.getSesion();
+    _preguntasData = _apiServicePreguntas.getPreguntas();
+    _subPreguntasData = _apiServiceSubPreguntas.getSubPreg();
+    _sesionData = _apiServiceSesion.getSesion();
     _fetchData();
     _fetchDataSubPregu();
     _refreshSesion();
     initializeRango();
+    //-------------------------------------------------
+    _preguntasData = Future.value([]);
+    _subPreguntasData = Future.value([]);
+    _sesionData = Future.value([]);
   }
 
   void initializeRango() {
@@ -78,30 +99,29 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     opcionesRango = [0] + List<int>.generate(hasta - desde + 1, (i) => desde + i);
   }
 
+  // void _refreshPreguntas() {
+  //   setState(() {
+  //     _preguntasData = _apiServicePreguntas.getPreguntas();
+  //   });
+  // }
 
-  void _refreshPreguntas() {
-    setState(() {
-      _preguntas = _apiServicePreguntas.getPreguntas();
-    });
-  }
-
-  void _refreshSubPreguntas() {
-    setState(() {
-      _subPreguntas = _apiServiceSubPreguntas.getSubPreg();
-    });
-  }
-
-  void _refreshSesion() {
-    setState(() {
-      _sesion = _apiServiceSesion.getSesion();
-    });
-  }
+  // void _refreshSubPreguntas() {
+  //   setState(() {
+  //     _subPreguntasData = _apiServiceSubPreguntas.getSubPreg();
+  //   });
+  // }
 
   Future<void> _fetchData() async {
     try{
       List<Preguntas> questions = await _apiServicePreguntas.getPreguntas();
+      final preg = await _apiServicePreguntas.getPreguntas();
 
       setState(() {
+        _preguntaFiltrada = preg;
+        _todosCampPreguntas = preg;
+        _preguntasData = Future.value(preg);
+        //-------------------------------------------------
+
         _questions = questions;
         print('Lineas obtenidas: $_questions');
       });
@@ -110,17 +130,107 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     }
   }
 
+  void _filtrarPreguntas (String query) async {
+    final queryLower = query.toLowerCase();
+    final filtrar = _todosCampPreguntas.where((pg) {
+      switch (selectedFilterPregunta) {
+        case 'No de pregunta':
+          return pg.codPregunta.toString().toLowerCase().contains(queryLower);
+        case 'Pregunta':
+          return pg.pregunta.toLowerCase().contains(queryLower);
+        default:
+          return false;
+      }
+    }).toList();
+
+    setState(() {
+      _preguntaFiltrada = filtrar;
+    });
+  }
+
   Future<void> _fetchDataSubPregu() async {
     try{
       List<SubPregunta>  subPreguntas = await _apiServiceSubPreguntas.getSubPreg();
+      final subPreg = await _apiServiceSubPreguntas.getSubPreg();
 
       setState(() {
+        _subPreguntaFiltrada = subPreg;
+        _todosCampSubPreguntas = subPreg;
+        _subPreguntasData = Future.value(subPreg);
+        //-------------------------------------------------
+
         _subQuestions = subPreguntas;
         print('Lineas obtenidas: $_subQuestions');
       });
     } catch (e) {
       print('Error fetching data: $e');
     }
+  }
+
+  void _filtrarSubPreguntas (String query) async {
+    final queryLower = query.toLowerCase();
+    final filtrar = _todosCampSubPreguntas.where((spg) {
+      switch (selectedFilterSubPregunta) {
+        case 'Id de Sub pregunta':
+          return spg.codSubPregunta.toLowerCase().contains(queryLower);
+        case 'Sup Pregunta':
+          return spg.subPreguntas?.toLowerCase().contains(queryLower) ?? false;
+        default:
+          return false;
+      }
+    }).toList();
+
+    setState(() {
+      _subPreguntaFiltrada = filtrar;
+    });
+  }
+
+  Future<void> _refreshSesion() async {
+    final se = await _apiServiceSesion.getSesion();
+
+    setState(() {
+      _sesionFiltrada = se;
+      _todosCampSesion = se;
+      _sesionData = Future.value(se);
+      //-----------------------------------------
+
+      _sesionData = _apiServiceSesion.getSesion();
+    });
+  }
+
+  void _filtrarSesion (String query) async {
+    final queryLower = query.toLowerCase();
+    final filtrar = _todosCampSesion.where((setion) {
+      switch (selectedFilterSesion) {
+        case 'Numero de Sesion':
+          return setion.idSesion?.toString().toLowerCase().contains(queryLower) ?? false;
+        case 'Tipo de Respuesta':
+          return setion.tipoRespuesta.toLowerCase().contains(queryLower);
+        case 'Tema':
+          return setion.grupoTema?.toLowerCase().contains(queryLower) ?? false;
+        case 'Numero de Pregunta':
+          return setion.codPregunta.toString().toLowerCase().contains(queryLower);
+        case 'No. de Sup Pregunta':
+          return setion.codSubPregunta?.toLowerCase().contains(queryLower) ?? false;
+        default:
+          return false;
+      }
+    }).toList();
+
+    setState(() {
+      _sesionFiltrada = filtrar;
+    });
+  }
+
+  void _limpiarBusqueda() {
+    searchPreguntaController.clear();
+    searchSubPreguntaController.clear();
+    searchSesionController.clear();
+    setState(() {
+      _preguntaFiltrada = _todosCampPreguntas;
+      _subPreguntaFiltrada = _todosCampSubPreguntas;
+      _sesionFiltrada = _todosCampSesion;
+    });
   }
 
   @override
@@ -132,192 +242,483 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         filtrarId: widget.filtrarId,
         filtrarCedula: widget.filtrarCedula,
       ),
-      appBar: AppBar(title: const Text('Sesion de Preguntas')),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Text(
-              'Tablas de Preguntas',
-              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+      appBar: AppBar(
+        title: const Text('Sesion de Preguntas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 30.0),
+            tooltip: 'Recargar',
+            onPressed: () {
+              setState(() {
+                _fetchData();
+                _fetchDataSubPregu();
+                _refreshSesion();
+              });
+            },
+          )
+        ],
+      ),
 
-            FutureBuilder<List<Preguntas>>(
-              future: _preguntas,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }else if(snapshot.hasError) {
-                  return const Center(child: Text('Error al cargar la Sesion de Preguntas.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                }else {
-                  final question = snapshot.data ?? [];
-            
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('No', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                      ],
-                      rows: question.map((ask) {
-                        return DataRow(
-                          cells: [
-                            DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
-                            DataCell(Text(ask.pregunta, style: const TextStyle(fontSize: 20.0))),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      _showEditDialog(ask);
-                                    }, 
-                                    icon: const Icon(Icons.edit)
-                                  ),
-                                  
-                                  IconButton(
-                                    onPressed: () {
-                                      _showDeleteDialog(ask);
-                                    },
-                                    icon: const Icon(Icons.delete)
-                                  )
-                                ],
-                              )
-                            )
-                          ]
+      body: Stack(
+        children: [
+          // Cuerpo principal con las tablas
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tablas de Preguntas',
+                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDropdown<String>(
+                          name: 'filtrarPregunta',
+                          initialValue: selectedFilterPregunta,
+                          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                          decoration: const InputDecoration(
+                            labelText: 'Filtrar por',
+                            labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: OutlineInputBorder(),
+                          ),
+                          items: [
+                            'No de pregunta',
+                            'Pregunta'
+                          ].map((filter) => DropdownMenuItem(
+                                value: filter,
+                                child: Text(filter),
+                              )).toList(),
+                          onChanged: (value) => setState(() {
+                            selectedFilterPregunta = value!;
+                          }),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      Expanded(
+                        flex: 2,
+                        child: FormBuilderTextField(
+                          name: 'searchPregunta',
+                          controller: searchPreguntaController,
+                          style: const TextStyle(fontSize: 20.0),
+                          decoration: InputDecoration( 
+                            labelText: 'Buscar', 
+                            labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: searchPreguntaController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: _limpiarBusqueda,
+                                )
+                              : null 
+                          ),
+                          onChanged: (value) {
+                            if (value!.isNotEmpty) {
+                              _filtrarPreguntas(value);
+                            } else {
+                              setState(() { 
+                                _preguntaFiltrada = []; 
+                              }); 
+                            }
+                          },
+                        )
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                        
+                  FutureBuilder<List<Preguntas>>(
+                    future: _preguntasData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }else if(snapshot.hasError) {
+                        return const Center(child: Text('Error al cargar la Sesion de Preguntas.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                      }else {
+                        final questionTable = _preguntaFiltrada.isNotEmpty 
+                              ? _preguntaFiltrada
+                              : snapshot.data ?? [];
+                  
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                )
+                              ]
+                            ),
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
+                              columns: const [
+                                DataColumn(label: Text('No', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                              ],
+                              rows: questionTable.map((ask) {
+                                return DataRow(
+                                  color: WidgetStateProperty.resolveWith<Color>((states) {
+                                    // Color alterno para las filas
+                                    return (questionTable.indexOf(ask) % 2 == 0)
+                                          ? Colors.blueGrey.shade50
+                                          : Colors.white;
+                                  }),
+                                  cells: [
+                                    DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
+                                    DataCell(Text(ask.pregunta, style: const TextStyle(fontSize: 20.0))),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              _showEditDialog(ask);
+                                            }, 
+                                            icon: const Icon(Icons.edit, color: Colors.blue),
+                                          ),
+                                          
+                                          IconButton(
+                                            onPressed: () {
+                                              _showDeleteDialog(ask);
+                                            },
+                                            icon: const Icon(Icons.delete, color: Colors.red)
+                                          )
+                                        ],
+                                      )
+                                    )
+                                  ]
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         );
-                      }).toList(),
-                    ),
-                  );
-                }
-              }
-            ),
-            
-            const SizedBox(height: 20),
-            const Text(
-              'Tablas de Sub Preguntas',
-              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+                      }
+                    }
+                  ),
+                  const Divider(),
+                  
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Tablas de Sub Preguntas',
+                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
 
-            FutureBuilder<List<SubPregunta>>(
-              future: _subPreguntas,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }else if (snapshot.hasError) {
-                  return const Center(child: Text('Error al cargar la Sesion de los Rango.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                } else {
-                  final subPreg = snapshot.data ?? [];
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDropdown<String>(
+                          name: 'filtrarSubPregunta',
+                          initialValue: selectedFilterSubPregunta,
+                          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                          decoration: const InputDecoration(
+                            labelText: 'Filtrar por',
+                            labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: OutlineInputBorder(),
+                          ),
+                          items: [
+                            'Id de Sub pregunta',
+                            'Sup Pregunta',
+                          ].map((filter) => DropdownMenuItem(
+                                value: filter,
+                                child: Text(filter),
+                              )).toList(),
+                          onChanged: (value) => setState(() {
+                            selectedFilterSubPregunta = value!;
+                          }),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
 
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('NO', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                      ], 
-                      rows: subPreg.map((sub) {
-                        return DataRow(
-                          cells: [
-                            DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
-                            DataCell(sub.subPreguntas != null ? Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      _showEditDialogSubPregunta(sub);
-                                    }, 
-                                    icon: const Icon(Icons.edit)
-                                  ),
-                                  
-                                  IconButton(
-                                    onPressed: () {
-                                      _showDeleteDialogSubPregunta(sub);
-                                    },
-                                    icon: const Icon(Icons.delete)
-                                  )
-                                ],
-                              )
-                            )
-                          ]
+                      Expanded(
+                        flex: 2,
+                        child: FormBuilderTextField(
+                          name: 'searchSubPregunta',
+                          controller: searchSubPreguntaController,
+                          style: const TextStyle(fontSize: 20.0),
+                          decoration: InputDecoration( 
+                            labelText: 'Buscar', 
+                            labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: searchSubPreguntaController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: _limpiarBusqueda,
+                                )
+                              : null 
+                          ),
+                          onChanged: (value) {
+                            if (value!.isNotEmpty) {
+                              _filtrarSubPreguntas(value);
+                            } else {
+                              setState(() { 
+                                _subPreguntaFiltrada = []; 
+                              }); 
+                            }
+                          },
+                        )
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                        
+                  FutureBuilder<List<SubPregunta>>(
+                    future: _subPreguntasData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }else if (snapshot.hasError) {
+                        return const Center(child: Text('Error al cargar la Sesion de los Rango.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                      } else {
+                        final subPregTabla = _subPreguntaFiltrada.isNotEmpty 
+                              ? _subPreguntaFiltrada
+                              : snapshot.data ?? [];
+                        
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                )
+                              ]
+                            ),
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
+                              columns: const [
+                                DataColumn(label: Text('NO', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                              ], 
+                              rows: subPregTabla.map((sub) {
+                                return DataRow(
+                                  color: WidgetStateProperty.resolveWith<Color>((states) {
+                                    // Color alterno para las filas
+                                    return (subPregTabla.indexOf(sub) % 2 == 0)
+                                          ? Colors.blueGrey.shade50
+                                          : Colors.white;
+                                  }),
+                                  cells: [
+                                    DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
+                                    DataCell(sub.subPreguntas != null ? Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              _showEditDialogSubPregunta(sub);
+                                            }, 
+                                            icon: const Icon(Icons.edit, color: Colors.blue),
+                                          ),
+                                          
+                                          IconButton(
+                                            onPressed: () {
+                                              _showDeleteDialogSubPregunta(sub);
+                                            },
+                                            icon: const Icon(Icons.delete, color: Colors.red)
+                                          )
+                                        ],
+                                      )
+                                    )
+                                  ]
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         );
-                      }).toList(),
-                    ),
-                  );
-                }
-              }
-            ),
+                      }
+                    }
+                  ),
+                  const Divider(),
+                        
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Tablas de las Sesiones',
+                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-            const Text(
-              'Tablas de las Sesiones',
-              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDropdown<String>(
+                          name: 'filtrarSesion',
+                          initialValue: selectedFilterSesion,
+                          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                          decoration: const InputDecoration(
+                            labelText: 'Filtrar por',
+                            labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: OutlineInputBorder(),
+                          ),
+                          items: [
+                            'Numero de Sesion',
+                            'Tipo de Respuesta',
+                            'Tema',
+                            'Numero de Pregunta',
+                            'No. de Sup Pregunta'
+                          ].map((filter) => DropdownMenuItem(
+                                value: filter,
+                                child: Text(filter),
+                              )).toList(),
+                          onChanged: (value) => setState(() {
+                            selectedFilterSesion = value!;
+                          }),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
 
-            FutureBuilder<List<Sesion>>(
-              future: _sesion,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }else if (snapshot.hasError) {
-                  return const Center(child: Text('Error al cargar la Sesion.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                } else {
-                  final sesion = snapshot.data ?? [];
-
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('No.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Tema.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Rango determinado.', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                      ], 
-                      rows: sesion.map((section) {
-                        return DataRow(
-                          cells: [
-                            DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
-                            DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
-                            DataCell(section.grupoTema != null ? Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
-                            DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      _showEditDialogSesion(section);
-                                    }, 
-                                    icon: const Icon(Icons.edit)
-                                  ),
-                                  
-                                  IconButton(
-                                    onPressed: () {
-                                      _showDeleteDialogSesion(section);
-                                    },
-                                    icon: const Icon(Icons.delete)
-                                  )
-                                ],
-                              )
-                            )
-                          ]
+                      Expanded(
+                        flex: 2,
+                        child: FormBuilderTextField(
+                          name: 'searchSesion',
+                          controller: searchSesionController,
+                          style: const TextStyle(fontSize: 20.0),
+                          decoration: InputDecoration( 
+                            labelText: 'Buscar', 
+                            labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: searchSesionController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: _limpiarBusqueda,
+                                )
+                              : null 
+                          ),
+                          onChanged: (value) {
+                            if (value!.isNotEmpty) {
+                              _filtrarSesion(value);
+                            } else {
+                              setState(() { 
+                                _sesionFiltrada = []; 
+                              }); 
+                            }
+                          },
+                        )
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                        
+                  FutureBuilder<List<Sesion>>(
+                    future: _sesionData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }else if (snapshot.hasError) {
+                        return const Center(child: Text('Error al cargar la Sesion.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                      } else {
+                        final sesionTable = _sesionFiltrada.isNotEmpty 
+                              ? _sesionFiltrada
+                              : snapshot.data ?? [];
+                        
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                )
+                              ]
+                            ),
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
+                              columns: const [
+                                DataColumn(label: Text('No.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Tema.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Rango determinado.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
+                              ], 
+                              rows: sesionTable.map((section) {
+                                return DataRow(
+                                  color: WidgetStateProperty.resolveWith<Color>((states) {
+                                    // Color alterno para las filas
+                                    return (sesionTable.indexOf(section) % 2 == 0)
+                                          ? Colors.blueGrey.shade50
+                                          : Colors.white;
+                                  }),
+                                  cells: [
+                                    DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
+                                    DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
+                                    DataCell(section.grupoTema != null ? Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                    DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
+                                    DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                    DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              _showEditDialogSesion(section);
+                                            }, 
+                                            icon: const Icon(Icons.edit, color: Colors.blue),
+                                          ),
+                                          
+                                          IconButton(
+                                            onPressed: () {
+                                              _showDeleteDialogSesion(section);
+                                            },
+                                            icon: const Icon(Icons.delete, color: Colors.red)
+                                          )
+                                        ],
+                                      )
+                                    )
+                                  ]
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         );
-                      }).toList(),
-                    ),
-                  );
-                }
-              },
-            )
-          ],
-        ),
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Stack(
         children: [
@@ -426,6 +827,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       hintext: '#',
                       hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: FormBuilderValidators.numeric(errorText: 'Este campo es requerido')
@@ -439,6 +841,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       hintext: '¿Agregar preguntas?',
                       hintFrontSize: 30.0,
                       icono: const Icon(Icons.question_mark_outlined,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
@@ -462,7 +865,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       context: context, 
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('No de pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
+                          title: const Text('Numero de la pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
                           contentPadding: EdgeInsets.zero,
                           content: Container(
                             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -493,7 +896,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 201) {
                       print('La pregunta fue creado con éxito');
                       Navigator.of(context).pop();
-                      _refreshPreguntas();
+                      // _refreshPreguntas();
                       _fetchData();
                     } else {
                       print('Error al crear la pregunta: ${response.body}');
@@ -562,7 +965,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 204) {
                       print('La pregunta fue modificada con éxito');
                       Navigator.of(context).pop();
-                      _refreshPreguntas();
+                      // _refreshPreguntas();
                       _fetchData();
                     } else {
                       print('Error al modificar la pregunta: ${response.body}');
@@ -606,10 +1009,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     print('Pregunta eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
-                    _refreshPreguntas();
+                    // _refreshPreguntas();
                     _fetchData();
+                  } else if (response.statusCode == 400) {
+                    final responseBody = jsonDecode(response.body);
+                    _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la pregunta: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar la Pregunta: ${response.body}');
                   }
                 } catch (e) {
                   print('Excepción al eliminar la pregunta: $e');
@@ -644,7 +1051,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       hintFrontSize: 30.0,
                       labeltext: 'Codigo de Sub - Pregunta',
                       labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers)
+                      icono: const Icon(Icons.numbers),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
@@ -657,7 +1065,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       hintFrontSize: 30.0,
                       labeltext: 'Ingresar la sub-pregunta',
                       labelFrontSize: 30.5,
-                      icono: const Icon(Icons.help_outline_outlined)
+                      icono: const Icon(Icons.help_outline_outlined),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 30.0),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
@@ -712,7 +1121,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 201) {
                       print('Las sub-Preguntas fue creado con éxito');
                       Navigator.of(context).pop();
-                      _refreshSubPreguntas();
+                      // _refreshSubPreguntas();
                       _fetchDataSubPregu();
                     } else {
                       print('Error al crear las sub-Preguntas: ${response.body}');
@@ -791,7 +1200,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 204) {
                       print('La sub-pregunta fue modificada con éxito');
                       Navigator.of(context).pop();
-                      _refreshSubPreguntas();
+                      // _refreshSubPreguntas();
                       _fetchDataSubPregu();
                     } else {
                       print('Error al modificar la sub-pregunta: ${response.body}');
@@ -835,13 +1244,18 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     print('Sub pregunta eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
-                    _refreshSubPreguntas();
+                    // _refreshSubPreguntas();
                     _fetchDataSubPregu();
+                  } else if (response.statusCode == 400) {
+                    final responseBody = jsonDecode(response.body);
+                    _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la sub-pregunta: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar la Sub-Pregunta: ${response.body}');
                   }
                 } catch (e) {
                   print('Excepción al eliminar la sub-pregunta: $e');
+                  _showErrorDialog(context, 'Error al eliminar la Linea: $e');
                 }
               },
             ),
@@ -874,6 +1288,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       // hintext: 'Eliga como se responder esta pregunta',
                       // hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
@@ -960,6 +1375,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       labeltext: 'No. de Pregunta',
                       labelFrontSize: 30.5,
                       icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
                     ),
                     items: _questions.map((preg) {
                       return DropdownMenuItem(
@@ -1336,6 +1752,30 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 }
               },
             )
+          ],
+        );
+      }
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+            child: Text(message, style: const TextStyle(fontSize: 28))
+          ),
+          actions: [ 
+            TextButton( 
+              child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
+              onPressed: () { 
+                Navigator.of(context).pop(); 
+              }, 
+            ), 
           ],
         );
       }

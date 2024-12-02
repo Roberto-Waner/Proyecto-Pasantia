@@ -40,7 +40,7 @@ public partial class Respuesta
 
     [ForeignKey("IdSesion")]
     [InverseProperty("Respuestas")]
-    public virtual Sesion IdSesionNavigation { get; set; } = null!;
+    public virtual Sesion? IdSesionNavigation { get; set; } = null!;
 
     [ForeignKey("IdUsuarios")]
     [InverseProperty("Respuestas")]

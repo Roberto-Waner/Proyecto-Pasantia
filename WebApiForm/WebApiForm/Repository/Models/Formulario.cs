@@ -51,5 +51,5 @@ public partial class Formulario
 
     [ForeignKey("IdUsuarios")]
     [InverseProperty("Formularios")]
-    public virtual RegistroUsuario IdUsuariosNavigation { get; set; } = null!;
+    public virtual RegistroUsuario? IdUsuariosNavigation { get; set; } = null!;
 }

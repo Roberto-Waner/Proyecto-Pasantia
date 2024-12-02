@@ -3,23 +3,33 @@
   "WorkspaceRootPath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/ROBERTO_WANER_RWANERSQLEXPRESS/database_FormOpret/True/SqlTable/dbo.RegistroUsuarios.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\controllers\\registrousuarioscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\controllers\\registrousuarioscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/ROBERTO_WANER_RWANERSQLEXPRESS/database_FormOpret/True/SqlTable/dbo.RegistroUsuarios.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryTriggerFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\repository\\models\\registrousuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\repository\\models\\registrousuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\repository\\formencuestadbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\repository\\formencuestadbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\controllers\\lineascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\controllers\\lineascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|ResultFrame"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryTriggerFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryTriggerFormulario.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|ResultFrame"
     }
   ],
   "DocumentGroupContainers": [
@@ -29,66 +39,65 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SQLQueryTriggerFormulario.sql ",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryTriggerFormulario.sql",
+              "RelativeDocumentMoniker": "..\\Base de Datos\\SQLQueryTriggerFormulario.sql",
+              "ToolTip": "SQLQueryTriggerFormulario.sql ",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-12-02T01:34:44.172Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SQLQueryFormulario.sql ",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\Base de Datos\\SQLQueryFormulario.sql",
+              "RelativeDocumentMoniker": "..\\Base de Datos\\SQLQueryFormulario.sql",
+              "ToolTip": "SQLQueryFormulario.sql ",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-12-02T01:09:12.29Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "RegistroUsuariosController.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RegistroUsuariosController.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Controllers\\RegistroUsuariosController.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RegistroUsuariosController.cs",
+              "RelativeToolTip": "WebApiForm\\Controllers\\RegistroUsuariosController.cs",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAiwE8AAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-02T00:04:19.695Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "dbo.RegistroUsuarios [Datos]",
               "DocumentMoniker": "ViewDataWindow_MSSQL__/ROBERTO_WANER_RWANERSQLEXPRESS/database_FormOpret/True/SqlTable/dbo.RegistroUsuarios.sql",
               "ToolTip": "dbo.RegistroUsuarios [Datos]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2024-11-27T03:23:31.794Z",
+              "WhenOpened": "2024-12-01T20:19:52.733Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Program.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\Program.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Program.cs",
-              "RelativeToolTip": "WebApiForm\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "LineasController.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\LineasController.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Controllers\\LineasController.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\LineasController.cs",
+              "RelativeToolTip": "WebApiForm\\Controllers\\LineasController.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAgwH4AAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T15:28:22.465Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "RegistroUsuariosController.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RegistroUsuariosController.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\Controllers\\RegistroUsuariosController.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RegistroUsuariosController.cs*",
-              "RelativeToolTip": "WebApiForm\\Controllers\\RegistroUsuariosController.cs*",
-              "ViewState": "AgIAAGoAAAAAAAAAAAAAwH8AAABjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T14:59:13.132Z",
+              "WhenOpened": "2024-12-02T00:06:19.324Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "RegistroUsuario.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\Models\\RegistroUsuario.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\Repository\\Models\\RegistroUsuario.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\Models\\RegistroUsuario.cs",
-              "RelativeToolTip": "WebApiForm\\Repository\\Models\\RegistroUsuario.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA2AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T14:56:26.493Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "FormEncuestaDbContext.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormEncuestaDbContext.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\Repository\\FormEncuestaDbContext.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormEncuestaDbContext.cs",
-              "RelativeToolTip": "WebApiForm\\Repository\\FormEncuestaDbContext.cs",
-              "ViewState": "AgIAAFwAAAAAAAAAAAAEwB0AAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-26T14:39:54.137Z"
             }
           ]
         }

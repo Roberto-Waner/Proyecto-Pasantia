@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using WebApiForm.Capa_de_Servicio;
 using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
@@ -136,7 +137,7 @@ namespace WebApiForm.Controllers
                 }
 
                 // Capturar otros errores de base de datos
-                return BadRequest(new { message = "Error al registrar el usuario", details = Db_ex.InnerException?.Message ?? Db_ex.Message });
+                return BadRequest(new { message = "Ocurrio un error al registrar el usuario", details = Db_ex.InnerException?.Message ?? Db_ex.Message });
             }
             catch (Exception ex)
             {
@@ -172,16 +173,32 @@ namespace WebApiForm.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegistroUsuario(string id)
         {
-            var registroUsuario = await _context.RegistroUsuarios.FindAsync(id);
-            if (registroUsuario == null)
+            try
             {
-                return NotFound();
+                var registroUsuario = await _context.RegistroUsuarios.FindAsync(id);
+                if (registroUsuario == null)
+                {
+                    return NotFound();
+                }
+
+                _context.RegistroUsuarios.Remove(registroUsuario);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
+            catch (DbUpdateException dbEx)
+            {
+                if(dbEx.InnerException != null && dbEx.InnerException.Message.Contains("fk_User_Form"))
+                {
+                    return BadRequest(new { message = "No se puede eliminar a este usuario debido a que se están utilizando sus datos en otra tabla." });
+                }
 
-            _context.RegistroUsuarios.Remove(registroUsuario);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return BadRequest(new { message = "Ocurrió un error en la base de datos", details = dbEx.InnerException?.Message ?? dbEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error inesperado", details = ex.Message });
+            }
         }
 
         private bool RegistroUsuarioExists(string id)

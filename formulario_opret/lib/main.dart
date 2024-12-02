@@ -7,7 +7,6 @@ import 'package:formulario_opret/screens/interfaz_Admin/report_Formulario.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/repuesta_resultados_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/Empleado_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
-import 'package:formulario_opret/screens/interfaz_User/form_hechos_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/pregunta_Encuesta_Screen.dart';
 import 'package:formulario_opret/screens/login_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.dart';
@@ -128,13 +127,6 @@ class MyApp extends StatelessWidget {
         ),
 
         'ModifyTable': (_) => ModifyTable(
-          filtrarUsuarioController: filtrarUsuarioController,
-          filtrarEmailController: filtrarEmailController,
-          filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
-        ),
-
-        'FormulariosRegistrados': (_) => FormHechosScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,

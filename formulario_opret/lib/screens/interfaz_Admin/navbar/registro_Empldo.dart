@@ -34,7 +34,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   Usuarios? usuariosFiltrados;
   DateTime? _selectedDate;
   Offset position = const Offset(700, 1150); // Posición inicial del botón
-  String selectedRole = '';
+  String selectedRole = 'Empleado';
 
   @override
   void initState() {
@@ -321,7 +321,33 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               future: _usuariosdata,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting){
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    // child: CircularProgressIndicator()
+                    child: Dialog(
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        width: 200,
+                        height: 220,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                  ),
+                            SizedBox(height: 20),
+                            Text(
+                              /*hasError ? 'Error' : */'Cargando...',
+                              style: TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  );
                 }else if (snapshot.hasError){
                   return Center(child: Text('Error al cargar los datos: ${snapshot.error}'));
                 }else {
@@ -658,7 +684,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                                   passwords: formData['password'], 
                                   fechaCreacion: formData['fechaCreacion'],
                                   // fechaCreacion: DateFormat("yyyy-MM-dd").format(DateTime.now()), // Fecha actual
-                                  rol: formData['rol'], 
+                                  rol: selectedRole, 
                                 );
 
                                 // Llamar al servicio para crear el usuario
@@ -669,6 +695,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
                                   if (response.statusCode == 201) {
                                     Navigator.of(parentContext).pop();
+                                    _showSuccessDialog(context, 'El Usuario fue agregado con éxito');
                                     _refreshUsuarios();
                                   } else if (response.statusCode == 400) {
                                     String errorMessage = responseBody['message'] ?? 'Error desconocido.';
@@ -705,8 +732,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   // Mostrar diálogo para editar un usuario
   void _showEditDialog(Usuarios userUpload) {
     final formKey = GlobalKey<FormBuilderState>(); // Clave para manejar el estado del formulario
-    // final passwordController = TextEditingController();
-    // final confirmPasswordController = TextEditingController();
     
     showDialog(
       context: context,
@@ -812,9 +837,18 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
                   // Actualizar usuario
                   try {
-                    await _apiServiceUser.updateUsuario(userUpload.idUsuarios!, usuarioActualizado);
-                    Navigator.of(context).pop();
-                    _refreshUsuarios();
+                    final response = await _apiServiceUser.updateUsuario(userUpload.idUsuarios!, usuarioActualizado);
+
+                    if(response.statusCode == 204){
+                      Navigator.of(context).pop();
+                      print('El Usuario fue modificada con éxito');
+                      _showSuccessDialog(context, 'El Usuario fue modificada con éxito');
+                      _refreshUsuarios();
+                    } else {
+                      print('Error al modificar el Usuario: ${response.body}');
+                      _showErrorDialog(context, 'Error al actualizar el usuario');
+                    }
+
                   } catch (e) {
                     print('Error al actualizar usuario: $e');
                   }
@@ -848,11 +882,22 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               onPressed: () async {
                 // Eliminar usuario
                 try {
-                  await _apiServiceUser.deleteUsuario(userDelete.idUsuarios!);
-                  Navigator.of(context).pop();
-                  _refreshUsuarios();
+                  final response = await _apiServiceUser.deleteUsuario(userDelete.idUsuarios!);
+
+                  if (response.statusCode == 204) {
+                    Navigator.of(context).pop();
+                    _showSuccessDialog(context, 'El Usuario fue eliminado con éxito');
+                    _refreshUsuarios();
+                  } else if (response.statusCode == 400) {
+                    final responseBody = jsonDecode(response.body);
+                    _showErrorDialog(context, responseBody['message']);
+                  } else {
+                    print('Error al eliminar el Usuarios: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar el Usuarios: ${response.body}');
+                  }
                 } catch (e) {
                   print('Error al eliminar usuario: $e');
+                  _showErrorDialog(context, 'Ocurrió un error inesperado: $e');
                 }
               },
             ),
@@ -884,5 +929,64 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         );
       }
     );
+  }
+
+  // cuadro de acceso exito
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
+                const SizedBox(height: 20),
+                const Text( 
+                  '¡Éxito!', 
+                  style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold), 
+                ),
+                const SizedBox(height: 8.0),
+                Text( 
+                  message, 
+                  style: const TextStyle(fontSize: 25.0), 
+                  textAlign: TextAlign.center, 
+                ), 
+                const SizedBox(height: 24.0),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(), 
+                  child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
+
+    // Hacer que el cuadro de éxito se cierre automáticamente después de 2 segundos
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   // Comprobamos si el widget aún está montado antes de intentar realizar cualquier acción
+    //   if (mounted) {
+    //     Navigator.of(context).pop(); // Cierra el cuadro de éxito solo si el widget está montado
+    //   }
+    // });
   }
 }

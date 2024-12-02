@@ -111,9 +111,14 @@ class ApiServiceUser {
         final response = await service.deleteData('RegistroUsuarios', id).timeout(const Duration(seconds: 30));
         if (response.statusCode == 204) {
           print('Usuario eliminado con éxito');
+          return response;
+        } else if (response.statusCode == 400) {
+          final responseBody = jsonDecode(response.body);
+          print('Error del backend: ${responseBody['message']}');
+          return response;
         } else {
           print('Error al eliminar usuario: ${response.statusCode}');
-          print('Cuerpo de la respuesta: ${response.body}');
+          // print('Cuerpo de la respuesta: ${response.body}');
         }
         return response;
       } catch (e) {

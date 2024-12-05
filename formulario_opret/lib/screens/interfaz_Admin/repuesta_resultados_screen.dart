@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
+import 'package:formulario_opret/screens/interfaz_Admin/graphic/graphic_Respuestas_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/respuestas_services.dart';
 
@@ -48,20 +49,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   }
 
   void _filtrarRespuestas(String query) async {
-    // final respuestas = await _respuestaData;
-    /*
-    final respuestasFiltradasTemp = todasLasRespuestas.where((answer) {
-      final queryLower = query.toLowerCase();
-      return (answer.sp_IdUsuarios?.toLowerCase().contains(queryLower) ?? false) ||
-            (answer.sp_Cedula?.toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_NombreApellido?.toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_Usuarios?.toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_NoEncuesta?.toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_IdSesion?.toString().toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_CodPreguntas?.toString().toLowerCase().contains(queryLower) ?? false) || 
-            (answer.sp_CodSupPreguntas?.toLowerCase().contains(queryLower) ?? false);
-    }).toList();
-    */
+
     final queryLower = query.toLowerCase();
     final respuestasFiltradasTemp = todasLasRespuestas.where((answer) {
       switch (selectedFilter) {
@@ -236,6 +224,36 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
               }
             ),
           ),
+          //boton para mostrar los graficos
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GraphicRespScreen(data: respuestasFiltrados.isNotEmpty ? respuestasFiltrados : todasLasRespuestas),
+                          )
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blue,
+                      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      )
+                    ),
+                    child: const Text('Ver gráfica')
+                  )
+                )
+              ],
+            ),
+          )
         ]
       )
     );

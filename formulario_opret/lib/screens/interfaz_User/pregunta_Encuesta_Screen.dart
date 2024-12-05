@@ -302,7 +302,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       // Determina el tipo de respuesta y muestra el widget adecuado segun el tipo Respuesta de la tabla sesion
                       if (question.sp_TipoRespuesta == 'Respuesta Abierta')
                         FormBuilderTextField(
-                          name: 'respuesta_Abierta',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Escribe tu respuesta',
@@ -317,7 +317,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       
                       if(question.sp_TipoRespuesta == 'Selecionar: Si, No, N/A')
                         FormBuilderDropdown(
-                          name: 'respuesta_SiNoNA',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Selecionar: Si, No, N/A',
@@ -335,7 +335,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Calificar del 1 a 10')
                         FormBuilderDropdown(
-                          name: 'respuesta_Calificacion',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Calific. 1 a 10',
@@ -366,7 +366,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Solo SI o No')
                         FormBuilderDropdown(
-                          name: 'respuesta_Si-No',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Seleciona solo Si o No',
@@ -383,7 +383,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Edad')
                         FormBuilderDropdown(
-                          name: 'respuesta_Edad',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Edad',
@@ -407,7 +407,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Nacionalidad')
                         FormBuilderDropdown(
-                          name: 'respuesta_Nacionalidad',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Nacionalidad',
@@ -425,7 +425,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Título de transporte')
                         FormBuilderDropdown(
-                          name: 'respuesta_Títransporte',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Título de transporte',
@@ -442,7 +442,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Producto utilizado')
                         FormBuilderDropdown(
-                          name: 'respuesta_ProdUtilizado',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Producto utilizado',
@@ -461,7 +461,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Genero')
                         FormBuilderDropdown(
-                          name: 'respuesta_Genero',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Genero',
@@ -478,7 +478,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Frecuencia de viajes por semana')
                         FormBuilderDropdown(
-                          name: 'respuesta_Frecuencia',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Frecuencia de viajes por semana',
@@ -498,7 +498,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 
                       if(question.sp_TipoRespuesta == 'Expectativa del pasajero')
                         FormBuilderDropdown(
-                          name: 'respuesta_Expectativa',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Expectativa del pasajero',
@@ -529,7 +529,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
                       if(question.sp_TipoRespuesta == 'Motivo del viaje')
                         FormBuilderDropdown(
-                          name: 'motivo_viaje',
+                          name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Cual es el motivo del viaje a metro',
@@ -589,15 +589,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       final responseForm = _formKey.currentState!.value;
                       _saveRespuesta(question, responseForm, finalizarSesion: 0);
 
-                      // final nextQuestionIndex = dataQuestion.indexOf(question) + 1;
-                      // if(nextQuestionIndex < dataQuestion.length) {
-                      //   final nextQuestion = dataQuestion[nextQuestionIndex];
-                      //   Navigator.of(context).pop(); // Cierra el diálogo actual
-                      //   WidgetsBinding.instance.addPostFrameCallback((_) {
-                      //     _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
-                      //   });
-                      // }
-
                       // Avanza a la próxima pregunta y actualiza el estado
                       if (!isLastQuestion){
                         Navigator.of(context).pop(); // Cierra el diálogo actual
@@ -647,19 +638,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       final dataAnswer = _formKey.currentState!.value;
 
       // Determinamos el tipo de respuesta ingresada por el usuario
-      final String? respuestaFinal = dataAnswer['respuesta_Abierta'] ??
-                                      dataAnswer['respuesta_SiNoNA'] ??
-                                      dataAnswer['respuesta_Calificacion'] ??
-                                      dataAnswer['respuesta_Si-No'] ??
-                                      dataAnswer['respuesta_Edad'] ??
-                                      dataAnswer['respuesta_Nacionalidad'] ??
-                                      dataAnswer['respuesta_Títransporte'] ??
-                                      dataAnswer['respuesta_ProdUtilizado'] ??
-                                      dataAnswer['respuesta_Genero'] ??
-                                      dataAnswer['respuesta_Frecuencia'] ??
-                                      dataAnswer['respuesta_Expectativa'] ??
-                                      dataAnswer['respuesta_Conclusion'] ??
-                                      dataAnswer['motivo_viaje'];
+      final String? respuestaFinal = dataAnswer['respuesta_selected'];
 
       // Verificamos que exista alguna respuesta válida
       if(respuestaFinal == null || respuestaFinal.isEmpty) {

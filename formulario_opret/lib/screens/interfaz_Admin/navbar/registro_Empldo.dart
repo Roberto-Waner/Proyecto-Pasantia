@@ -907,6 +907,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     );
   }
 
+  // para mostrar los errores
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,

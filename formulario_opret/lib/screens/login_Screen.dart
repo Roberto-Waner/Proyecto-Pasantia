@@ -144,12 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return json.decode(utf8.decode(payload));
   }
 
-  // void _showSnackBar(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
-
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;

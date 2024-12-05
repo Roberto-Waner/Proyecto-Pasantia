@@ -148,7 +148,7 @@ class MyApp extends StatelessWidget {
         )
       },
 
-      initialRoute: 'newuser',
+      initialRoute: 'presentation',
     );
   }
 }

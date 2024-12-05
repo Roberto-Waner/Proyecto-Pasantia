@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -595,7 +594,7 @@ class _ModifyTableState extends State<ModifyTable> {
                       }
 
                       if (!RegExp(r'^(LM|LT)\d{1,3}$').hasMatch(value)){
-                        return 'Por favor ingrese un ID-Empleado valido y en mayuscula';
+                        return 'Por favor ingrese un ID-Linea valido y en mayuscula';
                       }
 
                       return null;
@@ -629,7 +628,7 @@ class _ModifyTableState extends State<ModifyTable> {
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Nombre de Linea',
                       labelFrontSize: 30.5,
-                      hintext: 'Linea 1',
+                      hintext: 'Ej: Linea 1, 2 ...',
                       hintFrontSize: 30.0,
                       icono: const Icon(Icons.numbers,size: 30.0),
                       errorSize: 20.0,
@@ -689,10 +688,12 @@ class _ModifyTableState extends State<ModifyTable> {
                     if(response.statusCode == 201) {
                       print('La linea fue creado con éxito');
                       Navigator.of(context).pop();
+                      _showSuccessDialog(context, 'Linea del metro fue creado con éxito');
                       _refreshLinea();
                       _fetchData();
                     } else {
                       print('Error al crear la linea: ${response.body}');
+                      _showErrorDialog(context, 'Error al crear la linea');
                     }
                   } catch (e) {
                     print('Error al crear la linea: $e');
@@ -781,10 +782,12 @@ class _ModifyTableState extends State<ModifyTable> {
                     if(response.statusCode == 204) {
                       print('La linea fue modificada con éxito');
                       Navigator.of(context).pop();
+                      _showSuccessDialog(context, 'Linea del metro fue modificada con éxito');
                       _refreshLinea();
                       _fetchData();
                     } else {
                       print('Error al modificar la linea: ${response.body}');
+                      _showErrorDialog(context, 'Error al modificar la linea');
                     }
                   } catch (e) {
                     print('Excepción al modificar la linea: $e');
@@ -818,6 +821,7 @@ class _ModifyTableState extends State<ModifyTable> {
                     print('Linea eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
+                    _showSuccessDialog(context, 'Linea del metro fue eliminado con éxito');
                     _refreshLinea();
                     _fetchData();
                   } else if (response.statusCode == 400) {
@@ -863,7 +867,7 @@ class _ModifyTableState extends State<ModifyTable> {
         context: context, 
         builder: (context) {
           return AlertDialog(
-            title: const Text('Agregar una nueva Linea', style: TextStyle(fontSize: 33.0)),
+            title: const Text('Agregar una nueva Estación', style: TextStyle(fontSize: 33.0)),
             contentPadding: EdgeInsets.zero,
             content: Container(
               margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -877,7 +881,7 @@ class _ModifyTableState extends State<ModifyTable> {
                       name: 'No',
                       keyboardType: TextInputType.number,
                       decoration: InputDecorations.inputDecoration(
-                        labeltext: 'Numero de la Estacion',
+                        labeltext: 'Numero de la Estación',
                         labelFrontSize: 30.5,
                         hintext: '#',
                         hintFrontSize: 30.0,
@@ -954,10 +958,12 @@ class _ModifyTableState extends State<ModifyTable> {
                       if(response.statusCode == 201) {
                         print('La estacion fue creado con éxito');
                         Navigator.of(context).pop();
+                        _showSuccessDialog(context, 'La Estación fue creado con éxito');
                         _refreshEstacion();
                         _fetchData();
                       } else {
                         print('Error al crear la estacion: ${response.body}');
+                        _showErrorDialog(context, 'Error al crear la Estación');
                       }
                     } catch (e) {
                       print('Error al crear la estacion: $e');
@@ -980,9 +986,9 @@ class _ModifyTableState extends State<ModifyTable> {
                   name: 'Estacion',
                   // keyboardType: TextInputType.number,
                   decoration: InputDecorations.inputDecoration(
-                    labeltext: 'Nombre de Estacion',
+                    labeltext: 'Nombre de Estación',
                     labelFrontSize: 30.5,
-                    hintext: 'Parada del Metro',
+                    hintext: 'Ingrese la nueva Estación',
                     hintFrontSize: 30.0,
                     icono: const Icon(Icons.numbers,size: 30.0),
                     errorSize: 20.0,
@@ -1023,7 +1029,7 @@ class _ModifyTableState extends State<ModifyTable> {
       context: context, 
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar La Estacion', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Modificar La Estación', style: TextStyle(fontSize: 33.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -1060,12 +1066,14 @@ class _ModifyTableState extends State<ModifyTable> {
                     final response = await ApiServiceEstacion('https://10.0.2.2:7190').putEstacion(estacionUpload.idEstacion, stationUpload);
 
                     if(response.statusCode == 204) {
-                      print('La Estacion fue modificada con éxito');
+                      print('La Estación fue modificada con éxito');
                       Navigator.of(context).pop();
+                      _showSuccessDialog(context, 'La Estación fue modificada con éxito');
                       _refreshEstacion();
                       _fetchData();
                     } else {
                       print('Error al modificar la Estacion: ${response.body}');
+                      _showErrorDialog(context, 'Error al modificar la Estación');
                     }
                   } catch (e) {
                     print('Excepción al modificar la Estacion: $e');
@@ -1085,8 +1093,8 @@ class _ModifyTableState extends State<ModifyTable> {
       context: context, 
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Estacion', style: TextStyle(fontSize: 33.0)),
-          content: Text('¿Estás seguro de que deseas eliminar la sesion no. ${estacionDelete.idEstacion} - ${estacionDelete.nombreEstacion}?', style: const TextStyle(fontSize: 30)),
+          title: const Text('Eliminar Estación', style: TextStyle(fontSize: 33.0)),
+          content: Text('¿Estás seguro de que deseas eliminar la Estación no. ${estacionDelete.idEstacion} - ${estacionDelete.nombreEstacion}?', style: const TextStyle(fontSize: 30)),
           actions: [
             buttonStop(context),
             TextButton(
@@ -1096,13 +1104,15 @@ class _ModifyTableState extends State<ModifyTable> {
                   final response = await ApiServiceEstacion('https://10.0.2.2:7190').deleteEstacion(estacionDelete.idEstacion);
 
                   if (response.statusCode == 204) {
-                    print('Estacion eliminado con éxito');
+                    print('Estación eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
+                    _showSuccessDialog(context, 'La Estación fue agregado con éxito');
                     _refreshEstacion();
                     _fetchData();
                   } else {
                     print('Error al eliminar la Estacion: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar la Estación');
                   }
                 } catch (e) {
                   print('Excepción al eliminar la Estacion: $e');
@@ -1146,5 +1156,64 @@ class _ModifyTableState extends State<ModifyTable> {
         );
       }
     );
+  }
+
+  // cuadro de acceso exito
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
+                const SizedBox(height: 20),
+                const Text( 
+                  '¡Éxito!', 
+                  style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold), 
+                ),
+                const SizedBox(height: 8.0),
+                Text( 
+                  message, 
+                  style: const TextStyle(fontSize: 25.0), 
+                  textAlign: TextAlign.center, 
+                ), 
+                const SizedBox(height: 24.0),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(), 
+                  child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
+
+    // Hacer que el cuadro de éxito se cierre automáticamente después de 2 segundos
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   // Comprobamos si el widget aún está montado antes de intentar realizar cualquier acción
+    //   if (mounted) {
+    //     Navigator.of(context).pop(); // Cierra el cuadro de éxito solo si el widget está montado
+    //   }
+    // });
   }
 }

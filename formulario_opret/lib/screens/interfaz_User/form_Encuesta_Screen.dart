@@ -87,37 +87,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
     horaController.text = currentTime;
   }
 
-  //método se utiliza para filtrar una lista de objetos Estacion basándose en el idLinea seleccionado. 
-  // List<EstacionPorLinea> _filtrarEstaciones(String? idLinea) {
-  //   if (idLinea == null) return [];
-  //   return _estaciones.where((e) => e.nombreLinea == idLinea).toList();
-  // }
-
-  // Future<void> _showDatePicker() async {
-  //   final picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: DateTime.now(), 
-  //     firstDate: DateTime(2024, 9, 1), 
-  //     lastDate: DateTime.now(),
-  //     builder: (BuildContext content, Widget? child) {
-  //       return Theme(
-  //         data: ThemeData.light().copyWith(
-  //           colorScheme: const ColorScheme.light(primary: Colors.green),
-  //           buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-  //         ),
-  //         child: child!,
-  //       );
-  //     }
-  //   );
-
-  //   if (picked != null && picked != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = picked;
-  //       datePicker.text = DateFormat("yyyy-MM-dd").format(_selectedDate!); // Formatea la fecha seleccionada
-  //     });
-  //   }
-  // }
-
   void _registrarFormEncuesta() async {
     if (_formKey.currentState!.saveAndValidate()) {
       final data = _formKey.currentState!.value;
@@ -239,159 +208,191 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
         : SingleChildScrollView(
         child: FormBuilder(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FormBuilderTextField(
-                name: 'idUsuarios',
-                initialValue: widget.filtrarId.text,
-                enabled: false,
-                decoration: InputDecorations.inputDecoration(
-                  labeltext: 'Asignar ID',
-                  labelFrontSize: 25.5, // Tamaño de letra personalizado
-                  hintext: 'USER-000000000',
-                  hintFrontSize: 20.0,
-                  icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
-                ),
-                style: const TextStyle(fontSize: 30.0),
-                onChanged: (val) {
-                  print('Id seleccionada: $val');
-                },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            
+            child: Container(
+              decoration: BoxDecoration( 
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(35), 
+                boxShadow: [ 
+                  BoxShadow( 
+                    color: Colors.black.withOpacity(0.1), 
+                    blurRadius: 10, 
+                    offset: const Offset(0, 5), 
+                  ), 
+                ], 
               ),
-
-              FormBuilderTextField(
-                name: 'cedula',
-                initialValue: widget.filtrarCedula.text,
-                enabled: false,
-                decoration: InputDecorations.inputDecoration(
-                  labeltext: 'Cedula',
-                  labelFrontSize: 25.5,
-                  hintext: '000-0000000-0',
-                  hintFrontSize: 20.0, 
-                  icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
-                ),
-                style: const TextStyle(fontSize: 30.0),
-                // validator: FormBuilderValidators.required(),
-                validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
-                  FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
-                  (value) {
-                    // Expresión regular para validar la cedula
-                    String pattern = r'^\d{3}-\d{7}-\d{1}$';
-                    RegExp regExp = RegExp(pattern);
-
-                    if(!regExp.hasMatch(value ?? '')){
-                      return 'Formato de cédula incorrecto';
-                    }
-                    return null;
-                  },
-                ]),
-                onChanged: (val) {
-                  print('Cedula seleccionada: $val');
-                },                 
-              ),
-
-              FormBuilderTextField(
-                name: 'hora',
-                controller: horaController,
-                decoration: const InputDecoration(
-                  labelText: 'Hora de Encuesta',
-                  labelStyle: TextStyle(fontSize: 25.0),
-                  prefixIcon: Icon(Icons.access_time, size: 30.0)
-                ),
-                style: const TextStyle(fontSize: 30.0),
-                enabled: false,
-              ),
-
-              FormBuilderTextField(
-                name: 'fechaEncuesta',
-                controller: fechaController,
-                decoration: const InputDecoration(
-                  // hintext: 'Hora actual',
-                  // hintFrontSize: 20.0,
-                  labelText: 'Fecha de Encuesta',
-                  labelStyle: TextStyle(fontSize: 25.0),
-                  prefixIcon: Icon(Icons.calendar_month_outlined, size: 30.0)
-                ),
-                style: const TextStyle(fontSize: 30.0),
-                enabled: false
-              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FormBuilderTextField(
+                      name: 'idUsuarios',
+                      initialValue: widget.filtrarId.text,
+                      enabled: false,
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Asignar ID',
+                        labelFrontSize: 25.5, // Tamaño de letra personalizado
+                        hintext: 'USER-000000000',
+                        hintFrontSize: 20.0,
+                        icono: const Icon(Icons.perm_identity_outlined,size: 30.0),
+                      ),
+                      style: const TextStyle(fontSize: 30.0),
+                      onChanged: (val) {
+                        print('Id seleccionada: $val');
+                      },
+                    ),
               
-              FormBuilderDropdown<String>(
-                name: 'linea_metro',
-                validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                decoration: InputDecorations.inputDecoration(
-                  labeltext: 'Linea del metro',
-                  labelFrontSize: 30.0,
-                  hintext: 'Linea 1, 2 ... o Teleferico',
-                  hintFrontSize: 22.0,
-                  icono: const Icon(Icons.people_outline_rounded, size: 30.0),
-                ),
-                initialValue: _selectLineMetro,
-                items: _lineas.map((linea) {
-                  return DropdownMenuItem(
-                    value: linea.idLinea,
-                    child: Text(linea.nombreLinea, style: const TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
-                  );
-                }).toList(),
-                style: const TextStyle(fontSize: 30.0),
-                onChanged: (value) async {
-                  setState(() {
-                    _selectLineMetro = value;
-                    _selectedStation = null; // Reiniciar estación seleccionada al cambiar de línea
-                    print('Línea seleccionada: $_selectLineMetro'); // Depuración
-                  });
-
-                  if (value != null) {
-                    await _fetchEstaciones(value);
-                  }
-                },
-              ),
-              // if (_selectLineMetro != null)
-                FormBuilderDropdown<int>(
-                  name: 'estacion_metro',
-                  style: const TextStyle(fontSize: 30.0),
-                  validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                  decoration: InputDecorations.inputDecoration(
-                    labeltext: 'Estacion del metro - $_selectLineMetro',
-                    labelFrontSize: 30.0,
-                    hintext: '',
-                    icono: const Icon(Icons.train_outlined, size: 30.0),
-                  ),
-                  items: _estaciones.map((estacion) {
-                    return DropdownMenuItem(
-                      value: estacion.idEstacion,
-                      child: Text(estacion.nombreEstacion, style: const TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedStation = value;
-                      print('Estación seleccionada: $_selectedStation'); // Depuración
-                    });
-                  },
-                ),
-
-              ElevatedButton(
-                onPressed: _registrarFormEncuesta, 
+                    const SizedBox(height: 16),
                 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(1, 135, 76, 1), //  se usa para definir el color de fondo del botón.
-                  foregroundColor: const Color.fromARGB(255, 255, 255, 255), // se usa para definir el color del texto y los iconos dentro del botón.
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-
-                child: const Text(
-                  'Iniciar Encuesta',
-                  style: TextStyle(
-                    fontSize: 20, 
-                    fontWeight: FontWeight.bold
-                  )
+                    FormBuilderTextField(
+                      name: 'cedula',
+                      initialValue: widget.filtrarCedula.text,
+                      enabled: false,
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Cedula',
+                        labelFrontSize: 25.5,
+                        hintext: '000-0000000-0',
+                        hintFrontSize: 20.0, 
+                        icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
+                      ),
+                      style: const TextStyle(fontSize: 30.0),
+                      // validator: FormBuilderValidators.required(),
+                      validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
+                        FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
+                        (value) {
+                          // Expresión regular para validar la cedula
+                          String pattern = r'^\d{3}-\d{7}-\d{1}$';
+                          RegExp regExp = RegExp(pattern);
+                
+                          if(!regExp.hasMatch(value ?? '')){
+                            return 'Formato de cédula incorrecto';
+                          }
+                          return null;
+                        },
+                      ]),
+                      onChanged: (val) {
+                        print('Cedula seleccionada: $val');
+                      },                 
+                    ),
+              
+                    const SizedBox(height: 16),
+                
+                    FormBuilderTextField(
+                      name: 'hora',
+                      controller: horaController,
+                      decoration: const InputDecoration(
+                        labelText: 'Hora de Encuesta',
+                        labelStyle: TextStyle(fontSize: 25.0),
+                        prefixIcon: Icon(Icons.access_time, size: 30.0)
+                      ),
+                      style: const TextStyle(fontSize: 30.0),
+                      enabled: false,
+                    ),
+              
+                    const SizedBox(height: 16),
+                
+                    FormBuilderTextField(
+                      name: 'fechaEncuesta',
+                      controller: fechaController,
+                      decoration: const InputDecoration(
+                        // hintext: 'Hora actual',
+                        // hintFrontSize: 20.0,
+                        labelText: 'Fecha de Encuesta',
+                        labelStyle: TextStyle(fontSize: 25.0),
+                        prefixIcon: Icon(Icons.calendar_month_outlined, size: 30.0)
+                      ),
+                      style: const TextStyle(fontSize: 30.0),
+                      enabled: false
+                    ),
+              
+                    const SizedBox(height: 16),
+                    
+                    FormBuilderDropdown<String>(
+                      name: 'linea_metro',
+                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Linea del metro',
+                        labelFrontSize: 30.0,
+                        hintext: 'Linea 1, 2 ... o Teleferico',
+                        hintFrontSize: 22.0,
+                        icono: const Icon(Icons.people_outline_rounded, size: 30.0),
+                      ),
+                      initialValue: _selectLineMetro,
+                      items: _lineas.map((linea) {
+                        return DropdownMenuItem(
+                          value: linea.idLinea,
+                          child: Text(linea.nombreLinea, style: const TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
+                        );
+                      }).toList(),
+                      style: const TextStyle(fontSize: 30.0),
+                      onChanged: (value) async {
+                        setState(() {
+                          _selectLineMetro = value;
+                          _selectedStation = null; // Reiniciar estación seleccionada al cambiar de línea
+                          print('Línea seleccionada: $_selectLineMetro'); // Depuración
+                        });
+                
+                        if (value != null) {
+                          await _fetchEstaciones(value);
+                        }
+                      },
+                    ),
+              
+                    const SizedBox(height: 16),
+              
+                    FormBuilderDropdown<int>(
+                      name: 'estacion_metro',
+                      style: const TextStyle(fontSize: 30.0),
+                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Estacion del metro',
+                        labelFrontSize: 30.0,
+                        hintext: '',
+                        icono: const Icon(Icons.train_outlined, size: 30.0),
+                      ),
+                      items: _estaciones.map((estacion) {
+                        return DropdownMenuItem(
+                          value: estacion.idEstacion,
+                          child: Text(estacion.nombreEstacion, style: const TextStyle(fontSize: 30, color: Color.fromARGB(255, 1, 1, 1))),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStation = value;
+                          print('Estación seleccionada: $_selectedStation'); // Depuración
+                        });
+                      },
+                    ),
+              
+                    const SizedBox(height: 32),
+                
+                    ElevatedButton(
+                      onPressed: _registrarFormEncuesta, 
+                      
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(1, 135, 76, 1), //  se usa para definir el color de fondo del botón.
+                        foregroundColor: const Color.fromARGB(255, 255, 255, 255), // se usa para definir el color del texto y los iconos dentro del botón.
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                
+                      child: const Text(
+                        'Iniciar Encuesta',
+                        style: TextStyle(
+                          fontSize: 20, 
+                          fontWeight: FontWeight.bold
+                        )
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

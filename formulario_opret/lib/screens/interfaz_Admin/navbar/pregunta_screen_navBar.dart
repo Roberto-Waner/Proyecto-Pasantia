@@ -39,13 +39,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   String selectedTipRespuestas = 'Respuesta Abierta';
   // ignore: unused_field
   bool _isLoading = false;
-  // int _rangoValor = 1; // Valor inicial dentro del rango permitido
-  // String rango = "1,10"; // Ejemplo de rango
   final tipoRespuestaController = TextEditingController();
-  // late List<String> rangos;
-  // late int desde;
-  // late int hasta;
-  // late List<int> opcionesRango;
   Offset position = const Offset(700, 1150);
   List<Preguntas> _questions = [];
   int? _savedQuestion;
@@ -670,7 +664,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                 // DataColumn(label: Text('Tema.', style: TextStyle(fontSize: 23.0))),
                                 DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 23.0))),
                                 DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 23.0))),
-                                // DataColumn(label: Text('Rango determinado.', style: TextStyle(fontSize: 23.0))),
+                                DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 23.0))),
                                 DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
                               ], 
                               rows: sesionTable.map((section) {
@@ -687,7 +681,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                     // DataCell(section.grupoTema != null ? Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
                                     DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
                                     DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                    // DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                                    DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
                                     DataCell(
                                       Row(
                                         children: [
@@ -1405,19 +1399,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     },
                     initialValue: 'Respuesta Abierta',
                   ),
-
-                  // FormBuilderTextField(
-                  //   name: 'grupoTema',
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'Tema',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: '(Si lo requiere)',
-                  //     hintFrontSize: 30.0,
-                  //     icono: const Icon(Icons.numbers,size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
-                  // ),
                   const SizedBox(height: 20),
 
                   FormBuilderDropdown<int>(
@@ -1479,41 +1460,33 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     }).toList(),
                     isExpanded: true, // Permite que los ítems se expandan al ancho disponible
                   ),
-                  // const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                  // FormBuilderTextField(
-                  //   name: 'rango',
-                  //   controller: tipoRespuestaController,
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'Determinar el Rango requerido',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: 'Usa el slider para determinar el rango deseado.',
-                  //     hintFrontSize: 20.0,
-                  //     icono: const Icon(Icons.numbers, size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   enabled: false,
-                  // ),
-                  // const SizedBox(height: 20.0),
-                  // const Text(
-                  //   'Selecciona el Rango:',
-                  //   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                  // ),
-                  // Wrap(
-                  //   spacing: 8.0,
-                  //   children: opcionesRango.map((int value) {
-                  //     return ChoiceChip(
-                  //       label: Text(value.toString(), style: const TextStyle(fontSize: 20.0)),
-                  //       selected: _rangoValor == value,
-                  //       onSelected: (bool selected) {
-                  //         setState(() {
-                  //           _rangoValor = selected ? value : _rangoValor;
-                  //           tipoRespuestaController.text = numbersToRango(desde, _rangoValor);
-                  //         });
-                  //       },
-                  //     );
-                  //   }).toList(),
-                  // ),
+                  FormBuilderDropdown(
+                    name: 'nota',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Elige el Requerimiento',
+                      labelFrontSize: 30.5,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
+                    ),
+                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    items: const  [
+                      DropdownMenuItem(
+                          value: 'No se requiere otra cosa mas.',
+                          child: Text('No se requiere nada en la pregunta')
+                      ),
+                      DropdownMenuItem(
+                          value: 'Requiere Justificación',
+                          child: Text('Requiere Justificación')
+                      ),
+                      DropdownMenuItem(
+                          value: 'Requiere Comentarios',
+                          child: Text('Requiere Comentarios')
+                      )
+                    ],
+                    isExpanded: true,
+                  )
                 ] 
               )
             ),
@@ -1529,8 +1502,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     tipoRespuesta: dataSesion['tipoRespuesta'],
                     // grupoTema: dataSesion['grupoTema'],
                     codPregunta: _savedQuestion!,
-                    codSubPregunta: dataSesion['codSubPregunta']
-                    // rango: dataSesion['rango']
+                    codSubPregunta: dataSesion['codSubPregunta'],
+                    rango: dataSesion['nota']
                   );
 
                   print('Resultados ${nuevaSesion}');
@@ -1580,7 +1553,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 // 'grupoTema': sectionUpload.grupoTema,
                 'codPregunta': sectionUpload.codPregunta,
                 'codSubPregunta': sectionUpload.codSubPregunta,
-                // 'rango': sectionUpload.rango
+                'nota': sectionUpload.rango
               },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1658,32 +1631,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     // initialValue: 'Respuesta Abierta',
                   ),
 
-                  // FormBuilderTextField(
-                  //   name: 'grupoTema',
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'Tema',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: ' ',
-                  //     hintFrontSize: 30.0,
-                  //     icono: const Icon(Icons.numbers,size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
-                  // ),
-
-                  // FormBuilderTextField(
-                  //   name: 'codPregunta',
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'No. Pregunta',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: ' ',
-                  //     hintFrontSize: 30.0,
-                  //     icono: const Icon(Icons.numbers,size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
-                  // ),
-
                   FormBuilderDropdown<int>(
                     name: 'codPregunta',
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
@@ -1717,19 +1664,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     isExpanded: true,
                   ),
 
-                  // FormBuilderTextField(
-                  //   name: 'codSubPregunta',
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'Cod. Sub Pregunta',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: 'Ingrese el codigo de la Sub-pregunta',
-                  //     hintFrontSize: 30.0,
-                  //     icono: const Icon(Icons.numbers,size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   // validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
-                  // ),
-
                   FormBuilderDropdown<String>(
                     name: 'codSubPregunta',
                     decoration: InputDecorations.inputDecoration(
@@ -1756,39 +1690,31 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     isExpanded: true, // Permite que los ítems se expandan al ancho disponible
                   ),
 
-                  // FormBuilderTextField(
-                  //   name: 'rango',
-                  //   controller: tipoRespuestaController,
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'Determinar el Rango requerido',
-                  //     labelFrontSize: 30.5,
-                  //     hintext: 'Usa el slider para determinar el rango deseado.',
-                  //     hintFrontSize: 20.0,
-                  //     icono: const Icon(Icons.numbers, size: 30.0),
-                  //   ),
-                  //   style: const TextStyle(fontSize: 30.0),
-                  //   enabled: false,
-                  // ),
-                  // const SizedBox(height: 20.0),
-                  // const Text(
-                  //   'Selecciona el Rango:',
-                  //   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                  // ),
-                  // Wrap(
-                  //   spacing: 8.0,
-                  //   children: opcionesRango.map((int value) {
-                  //     return ChoiceChip(
-                  //       label: Text(value.toString(), style: const TextStyle(fontSize: 20.0)),
-                  //       selected: _rangoValor == value,
-                  //       onSelected: (bool selected) {
-                  //         setState(() {
-                  //           _rangoValor = selected ? value : _rangoValor;
-                  //           tipoRespuestaController.text = numbersToRango(desde, _rangoValor);
-                  //         });
-                  //       },
-                  //     );
-                  //   }).toList(),
-                  // ),
+                  FormBuilderDropdown(
+                    name: 'nota',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Elige el Requerimiento',
+                      labelFrontSize: 30.5,
+                      icono: const Icon(Icons.numbers,size: 30.0),
+                      errorSize: 20.0,
+                    ),
+                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    items: const  [
+                      DropdownMenuItem(
+                          value: 'No se requiere otra cosa mas.',
+                          child: Text('No se requiere nada en la pregunta')
+                      ),
+                      DropdownMenuItem(
+                          value: 'Requiere Justificación',
+                          child: Text('Requiere Justificación')
+                      ),
+                      DropdownMenuItem(
+                          value: 'Requiere Comentarios',
+                          child: Text('Requiere Comentarios')
+                      )
+                    ],
+                    isExpanded: true,
+                  )
                 ],
               )
             ),
@@ -1806,7 +1732,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     // grupoTema: dataSesion['grupoTema'],
                     codPregunta: int.parse(dataSesion['codPregunta'].toString()),
                     codSubPregunta: dataSesion['codSubPregunta'],
-                    // rango: dataSesion['rango']
+                    rango: dataSesion['nota']
                   );
 
                   print('Resultados de sesionUpLoad: $sesionUpLoad');

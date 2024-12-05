@@ -4,9 +4,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
 import 'package:formulario_opret/Controllers/section_Controller.dart';
+import 'package:formulario_opret/data/respuesta_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
+// import 'package:formulario_opret/services/respuestas_services.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 
@@ -32,12 +34,14 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
+  // final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
   final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   List<bool> _isExpandedList = [];
+  final RespuestaCrud _respuestaCrud = RespuestaCrud();
 
   @override
   void initState() {
@@ -93,7 +97,34 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               }),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    // child: CircularProgressIndicator()
+                    child: Dialog(
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        width: 200,
+                        height: 220,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                            ),
+                            
+                            SizedBox(height: 20),
+                            Text(
+                              'Cargando...',
+                              style: TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  );
                 } else if (snapshot.hasError) {
                   return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
                 } else if (dataQuestion.isEmpty) {
@@ -207,18 +238,18 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               const SizedBox(height: 5),
                               if (dataQuestion[index].sp_Rango != null)
                                 RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      const TextSpan(
-                                        text: '- Rango Determinado: \n',
-                                        style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                      ),
-                                      TextSpan(
-                                        text: ('    ${dataQuestion[index].sp_Rango}'),
-                                        style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                      )
-                                    ]
-                                  )
+                                    text: TextSpan(
+                                        children: [
+                                          const TextSpan(
+                                            text: '- Requerimiento: \n',
+                                            style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                          ),
+                                          TextSpan(
+                                            text: ('    ${dataQuestion[index].sp_Rango}'),
+                                            style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                          )
+                                        ]
+                                    )
                                 ),
                               Align(
                                 alignment: Alignment.centerRight,
@@ -250,6 +281,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       builder: (BuildContext context, ) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            final currentIndex = dataQuestion.indexOf(question);
+            final isLastQuestion = currentIndex == dataQuestion.length - 1;
+
+            // Reiniciar el formulario antes de mostrar la nueva pregunta
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _formKey.currentState?.reset();
+            });
+
             return AlertDialog(
               title: Text('Pregunta No: ${question.sp_CodPregunta}. ${question.sp_Pregunta}', style: const TextStyle(fontSize: 30.0)),
               content: Container(
@@ -277,7 +316,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         ),
                       
                       if(question.sp_TipoRespuesta == 'Selecionar: Si, No, N/A')
-                        FormBuilderDropdown<String>(
+                        FormBuilderDropdown(
                           name: 'respuesta_SiNoNA',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
@@ -295,7 +334,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         ),
                 
                       if(question.sp_TipoRespuesta == 'Calificar del 1 a 10')
-                        FormBuilderDropdown<String>(
+                        FormBuilderDropdown(
                           name: 'respuesta_Calificacion',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
@@ -353,7 +392,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             icono: const Icon(Icons.calendar_month_outlined, size: 30.0)
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'Menor 15', child: Text('Menor 10')),
+                            DropdownMenuItem(value: 'Menor 15', child: Text('Menor 15')),
                             DropdownMenuItem(value: '15 - 20', child: Text('15 - 20')),
                             DropdownMenuItem(value: '21 - 25', child: Text('21 - 25')),
                             DropdownMenuItem(value: '26 - 30', child: Text('26 - 30')),
@@ -465,6 +504,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige la Expectativa del pasajero',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
+                              icono: const Icon(Icons.timeline, size: 30.0)
                           ),
                           items: const [
                             DropdownMenuItem(value: 'NADA', child: Text('NADA')),
@@ -544,11 +584,38 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 ),
 
                 TextButton(
-                  onPressed: () {
+                  onPressed: isLastQuestion ? null : () {
                     if (_formKey.currentState?.saveAndValidate() ?? false) {
                       final responseForm = _formKey.currentState!.value;
                       _saveRespuesta(question, responseForm, finalizarSesion: 0);
-                      Navigator.of(context).pop();
+
+                      // final nextQuestionIndex = dataQuestion.indexOf(question) + 1;
+                      // if(nextQuestionIndex < dataQuestion.length) {
+                      //   final nextQuestion = dataQuestion[nextQuestionIndex];
+                      //   Navigator.of(context).pop(); // Cierra el diálogo actual
+                      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //     _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
+                      //   });
+                      // }
+
+                      // Avanza a la próxima pregunta y actualiza el estado
+                      if (!isLastQuestion){
+                        Navigator.of(context).pop(); // Cierra el diálogo actual
+
+                        final nextQuestion = dataQuestion[currentIndex + 1];
+                        // Aquí forzamos una recarga del estado global
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
+                        });
+
+                      } else {
+                        // Manejo del caso cuando ya no hay más preguntas
+                        Future.delayed(const Duration(seconds: 2), () {
+                          Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
+                        });
+
+                        _showSuccessDialog(context, 'Has respondido todas las preguntas.');
+                      }
                     }
                   }, 
                   child: const Text('Proxima Pregunta', style: TextStyle(fontSize: 25.0))
@@ -596,9 +663,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
       // Verificamos que exista alguna respuesta válida
       if(respuestaFinal == null || respuestaFinal.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Por favor, completa la respuesta.'))
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text('Por favor, completa la respuesta.'))
+        // );
+        _showErrorDialog(context, 'Por favor, completa la respuesta.');
         return;
       }
 
@@ -609,20 +677,27 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         respuesta: respuestaFinal, // para recibir diferentes tipos de respuestas
         comentarios: dataAnswer['comentarios'],
         justificacion: dataAnswer['justificacion'],
-        finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con true y false
+        finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con 1 = true y 0 = false
       );
 
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
       try {
-        await _respuestaController.saveRespuesta([nuevaRespuesta]);
+        // await _respuestaController.saveRespuesta([nuevaRespuesta]);
+        // saveRespuesta_Directa([nuevaRespuesta], finalizarSesion);
+        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+
         // await _apiRespuesta.postRespuesta(nuevaRespuesta);
         print('Respuesta guardada localmente');
 
-        ScaffoldMessenger.of(context).showSnackBar( 
-          const SnackBar(content: Text('Respuesta guardada con éxito')) 
-        );
+        if(finalizarSesion == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Respuesta guardada con éxito'))
+          );
+        } else {
+          _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la sesión de pregunta');
+        }
         
       } catch (e) { 
         ScaffoldMessenger.of(context).showSnackBar( 
@@ -635,5 +710,88 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         const SnackBar(content: Text('Por favor, completa todos los campos requeridos.')),
       );
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+            contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+            content: Container(
+                margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+                child: Text(message, style: const TextStyle(fontSize: 28))
+            ),
+            actions: [
+              TextButton(
+                child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  // cuadro de acceso exito
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+              ),
+              child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3)
+                        )
+                      ]
+                  ),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
+                        const SizedBox(height: 20),
+                        const Text(
+                          '¡Éxito!',
+                          style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          message,
+                          style: const TextStyle(fontSize: 25.0),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24.0),
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                        )
+                      ]
+                  )
+              )
+          );
+        }
+    );
+
+    // Hacer que el cuadro de éxito se cierre automáticamente después de 2 segundos
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   // Comprobamos si el widget aún está montado antes de intentar realizar cualquier acción
+    //   if (mounted) {
+    //     Navigator.of(context).pop(); // Cierra el cuadro de éxito solo si el widget está montado
+    //   }
+    // });
   }
 }

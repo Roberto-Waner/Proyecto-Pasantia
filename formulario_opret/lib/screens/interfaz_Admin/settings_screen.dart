@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/modifyTable_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
+import 'package:formulario_opret/screens/interfaz_Admin/perfilUser_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -45,6 +46,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) =>   ModifyTable(
+                  filtrarUsuarioController: widget.filtrarUsuarioController,
+                  filtrarEmailController: widget.filtrarEmailController,
+                  filtrarId: widget.filtrarId,
+                  filtrarCedula: widget.filtrarCedula,
+                ))
+              );
+            }
+          ),
+          ListTile(
+            title: const Text('Perfil del Usuario', style: TextStyle(fontSize: 20.0)),
+            leading: const Icon(Icons.edit_square, size: 30.0),
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>   PerfiluserScreen(
                   filtrarUsuarioController: widget.filtrarUsuarioController,
                   filtrarEmailController: widget.filtrarEmailController,
                   filtrarId: widget.filtrarId,

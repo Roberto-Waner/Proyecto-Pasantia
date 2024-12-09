@@ -35,7 +35,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   void initState() {
     super.initState();
     _respuestaData = Future.value([]);
-    _respuestaData = _apiServiceRespuesta.getRespuestas();
+    // _respuestaData = _apiServiceRespuesta.getRespuestas();
     _loadRespuestas();
   }
 
@@ -210,7 +210,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                         DataColumn(label: Text('Justificacion', style: TextStyle(fontSize: 23.0))),
                       ], 
                       source: RespuestasDataSource(answerData),
-                      rowsPerPage: 11, //numeros de filas
+                      rowsPerPage: 10, //numeros de filas
                       columnSpacing: 30, //espacios entre columnas
                       horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
                       showCheckboxColumn: false, //oculta la columna de checkboxes

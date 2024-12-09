@@ -314,30 +314,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Positioned buttonBack(Size size) {
-  //   return Positioned( //ajuste de ubicacion del icono
-  //     top: size.height * 0.05,
-  //     right: size.width * 0.88,
-  //     child: IconButton(
-  //       icon: Icon(
-  //         Icons.arrow_back_ios_new_rounded,
-  //         size: size.height * 0.05,              
-  //       ), 
-  //       onPressed: () {
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => PresentationScreen(
-  //             filtrarUsuarioController: _filtrarUsuarioController,
-  //             filtrarEmailController: _filtrarEmailController,
-  //             filtrarId: _filtrarId,
-  //             filtrarCedula: _filtrarId,
-  //           ))
-  //         );
-  //       },
-  //     ), 
-  //   );
-  // }
-
   Container ventanalogin(Size size, BuildContext context, Orientation orientation) {
     if(_serviceToken.isLoggedFuncion()){
       return Container();

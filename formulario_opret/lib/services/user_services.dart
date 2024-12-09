@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;

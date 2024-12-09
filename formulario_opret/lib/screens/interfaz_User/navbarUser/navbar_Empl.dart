@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_opret/screens/interfaz_User/Empleado_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
 import 'package:formulario_opret/services/login_services_token.dart';
 // import 'package:formulario_opret/screens/interfaz_User/formEncuesta_screen.dart';
@@ -82,20 +83,27 @@ class _NavbarEmplState extends State<NavbarEmpl> {
               );
             }
           ),
-          // const Divider(),
-          // ListTile(
-          //   leading: const Icon(Icons.account_circle_outlined, size: 30.0),
-          //   title: const Text(
-          //     'Perfile',
-          //     style: TextStyle(fontSize: 20.0),
-          //   ),
-          //   onTap: () {
-          //     // Navigator.push(
-          //     //   context,
-          //     //   MaterialPageRoute(builder: (context) => PagEdit(/*idAdmin: data*/))
-          //     // );
-          //   },
-          // ),
+
+          ListTile(
+            leading: const Icon(Icons.edit_square, size: 30.0),
+            title: const Text(
+              'Perfil',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            onTap: () {
+              Navigator.pop(context); // Cierra el Drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EmpleadoScreens(
+                  filtrarUsuarioController: widget.filtrarUsuarioController,
+                  filtrarEmailController: widget.filtrarEmailController,
+                  filtrarId: widget.filtrarId,
+                  filtrarCedula: widget.filtrarCedula,
+                )),
+              );
+            }
+          ),
+          
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, size: 30.0),

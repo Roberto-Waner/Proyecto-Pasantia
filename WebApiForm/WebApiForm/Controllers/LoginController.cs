@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebApiForm.Capa_de_Servicio.Encrypt;
 using WebApiForm.Middleware;
 using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
@@ -31,7 +32,8 @@ namespace WebApiForm.Controllers
             string user = login.LoginUsuario;
             string pass = login.LoginPasswords;
 
-            RegistroUsuario modelRegUsuario = await _context.RegistroUsuarios.FirstOrDefaultAsync(x => x.Usuario == user && x.Passwords == pass);
+            //RegistroUsuario modelRegUsuario = await _context.RegistroUsuarios.FirstOrDefaultAsync(x => x.Usuario == user && x.Passwords == pass);
+            var modelRegUsuario = await _context.RegistroUsuarios.FirstOrDefaultAsync(x => x.Usuario == user);
 
             if (modelRegUsuario == null)
             {
@@ -43,6 +45,25 @@ namespace WebApiForm.Controllers
                 });
             }
 
+            // Extraer el salt y el hash almacenados
+            var storedPasswordParts = modelRegUsuario.Passwords.Split(':');
+            string salt = storedPasswordParts[0];
+            string storedHash = storedPasswordParts[1];
+
+            // Verificar la contraseña ingresada usando el hash y el salt
+            bool isValid = HashHelper.Verify(pass, storedHash, salt);
+
+            if (!isValid)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Credenciales incorrectas",
+                    result = ""
+                });
+            }
+
+            // Generar el JWT después de la verificación exitosa
             var jwtConfig = _config.GetSection("Jwt").Get<Model_Jwt>();
 
             var claims = new[]

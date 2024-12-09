@@ -38,7 +38,7 @@ public partial class RegistroUsuario
     public string Email { get; set; } = null!;
 
     [Column("passwords")]
-    [StringLength(100)]
+    [StringLength(300)]
     [Unicode(false)]
     public string Passwords { get; set; } = null!;
 

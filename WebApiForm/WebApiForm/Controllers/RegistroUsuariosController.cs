@@ -9,6 +9,7 @@ using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using WebApiForm.Capa_de_Servicio;
+using WebApiForm.Capa_de_Servicio.Encrypt;
 using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
 using WebApiForm.Services.DTO__Data_Transfer_Object_;
@@ -59,7 +60,42 @@ namespace WebApiForm.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(registroUsuario).State = EntityState.Modified;
+            // Recuperar el usuario actual desde la base de datos
+            //var existingUser = await _context.RegistroUsuarios.FindAsync(id);
+            var existingUser = await _context.RegistroUsuarios.AsNoTracking().FirstOrDefaultAsync(x => x.IdUsuarios == id);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+
+            // Si se está intentando cambiar la contraseña
+            if (!string.IsNullOrWhiteSpace(registroUsuario.Passwords))
+            {
+                // Generar un nuevo salt y hash para la nueva contraseña
+                string newSalt = SaltHelper.GenerateSalt(32);
+                string newHashedPassword = HashHelper.Hash(registroUsuario.Passwords, newSalt);
+
+                // Actualizar la contraseña en el registro del usuario
+                existingUser.Passwords = $"{newSalt}:{newHashedPassword}";
+            }
+
+            // Actualizar otros campos
+            existingUser.NombreApellido = registroUsuario.NombreApellido;
+            existingUser.Usuario = registroUsuario.Usuario;
+            existingUser.Email = registroUsuario.Email;
+
+            //var updatedUser = new RegistroUsuario
+            //{
+            //    IdUsuarios = existingUser.IdUsuarios,
+            //    NombreApellido = registroUsuario.NombreApellido,
+            //    Usuario = registroUsuario.Usuario,
+            //    Email = registroUsuario.Email,
+            //    Passwords = string.IsNullOrWhiteSpace(registroUsuario.Passwords)
+            //        ? existingUser.Passwords
+            //        : $"{SaltHelper.GenerateSalt(32)}:{HashHelper.Hash(registroUsuario.Passwords, SaltHelper.GenerateSalt(32))}"
+            //};
+
+            _context.Entry(existingUser).State = EntityState.Modified;
 
             try
             {
@@ -85,8 +121,16 @@ namespace WebApiForm.Controllers
         [HttpPost]
         public async Task<ActionResult<RegistroUsuario>> PostRegistroUsuario(RegistroUsuario registroUsuario)
         {
-            //esto se hace cuando la tabla en la cual se le quiera adaptar un trigger tenga un id de tipo varchar/String
+            // Generar un salt usando la clase SaltHelper
+            string salt = SaltHelper.GenerateSalt(32);
 
+            // Hashear la contraseña con el salt
+            string hashedPassword = HashHelper.Hash(registroUsuario.Passwords, salt);
+
+            // Almacenar el hash (que incluye el salt) en el campo de la contraseña
+            registroUsuario.Passwords = $"{salt}:{hashedPassword}";
+
+            //esto se hace cuando la tabla en la cual se le quiera adaptar un trigger tenga un id de tipo varchar/String
             try
             {
                 // Asignar un valor temporal a IdUsuarios
@@ -146,27 +190,6 @@ namespace WebApiForm.Controllers
                 // Capturar errores generales
                 return StatusCode(500, new { message = "Ocurrió un error inesperado", details = ex.Message });
             }
-
-            /*
-            _context.RegistroUsuarios.Add(registroUsuario);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (RegistroUsuarioExists(registroUsuario.IdUsuarios))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetRegistroUsuario", new { id = registroUsuario.IdUsuarios }, registroUsuario);
-            */
         }
 
         // DELETE: api/RegistroUsuarios/5

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_ObtenerEstacionPorLinea.dart';
 import 'package:formulario_opret/models/formulario_Registro.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
@@ -15,12 +14,12 @@ class FormEncuestaScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const FormEncuestaScreen({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController
   });
@@ -34,8 +33,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://10.0.2.2:7190');
   final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://10.0.2.2:7190');
   final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://10.0.2.2:7190');
-  // final TextEditingController timePicker = TextEditingController();
-  // final TextEditingController datePicker = TextEditingController();
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   String? _selectLineMetro; // Línea seleccionada
   int? _selectedStation; // Estación seleccionada
@@ -100,7 +97,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
 
       FormularioRegistro formEncuesta = FormularioRegistro(
         idUsuarios: data['idUsuarios'],
-        cedula: data['cedula'],
+        // cedula: data['cedula'],
         fecha: currentDate,
         hora: currentTime,
         idEstacion: _selectedStation,
@@ -133,7 +130,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                 filtrarUsuarioController: widget.filtrarUsuarioController,  
                 filtrarEmailController: widget.filtrarEmailController,
                 filtrarId: widget.filtrarId,
-                filtrarCedula: widget.filtrarCedula,
+                // // filtrarCedula: widget.filtrarCedula,
               )
             ),
           );
@@ -145,10 +142,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
           });
 
           _showErrorDialog(context, 'Error al enviar formulario: ${response.reasonPhrase}');
-          // Mostrar mensaje de error
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text('Error al enviar formulario: ${response.reasonPhrase}')),
-          // );
         }
 
       } catch (e) {
@@ -167,7 +160,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
         filtrarUsuarioController: widget.filtrarUsuarioController,  
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
 
       appBar: AppBar(title: const Text('Formulario')),
@@ -206,12 +199,13 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
             )
           )
         : SingleChildScrollView(
-        child: FormBuilder(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(35, 105, 35, 0),
+          child: FormBuilder(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.disabled,
             child: Container(
+              // margin: const EdgeInsets.symmetric(horizontal: 50),
               decoration: BoxDecoration( 
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(35), 
@@ -224,7 +218,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                 ], 
               ),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(60.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -247,36 +241,36 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
               
                     const SizedBox(height: 16),
                 
-                    FormBuilderTextField(
-                      name: 'cedula',
-                      initialValue: widget.filtrarCedula.text,
-                      enabled: false,
-                      decoration: InputDecorations.inputDecoration(
-                        labeltext: 'Cedula',
-                        labelFrontSize: 25.5,
-                        hintext: '000-0000000-0',
-                        hintFrontSize: 20.0, 
-                        icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
-                      ),
-                      style: const TextStyle(fontSize: 30.0),
-                      // validator: FormBuilderValidators.required(),
-                      validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
-                        FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
-                        (value) {
-                          // Expresión regular para validar la cedula
-                          String pattern = r'^\d{3}-\d{7}-\d{1}$';
-                          RegExp regExp = RegExp(pattern);
+                    // FormBuilderTextField(
+                    //   name: 'cedula',
+                    //   initialValue: widget.filtrarCedula.text,
+                    //   enabled: false,
+                    //   decoration: InputDecorations.inputDecoration(
+                    //     labeltext: 'Cedula',
+                    //     labelFrontSize: 25.5,
+                    //     hintext: '000-0000000-0',
+                    //     hintFrontSize: 20.0, 
+                    //     icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
+                    //   ),
+                    //   style: const TextStyle(fontSize: 30.0),
+                    //   // validator: FormBuilderValidators.required(),
+                    //   validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
+                    //     FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
+                    //     (value) {
+                    //       // Expresión regular para validar la cedula
+                    //       String pattern = r'^\d{3}-\d{7}-\d{1}$';
+                    //       RegExp regExp = RegExp(pattern);
                 
-                          if(!regExp.hasMatch(value ?? '')){
-                            return 'Formato de cédula incorrecto';
-                          }
-                          return null;
-                        },
-                      ]),
-                      onChanged: (val) {
-                        print('Cedula seleccionada: $val');
-                      },                 
-                    ),
+                    //       if(!regExp.hasMatch(value ?? '')){
+                    //         return 'Formato de cédula incorrecto';
+                    //       }
+                    //       return null;
+                    //     },
+                    //   ]),
+                    //   onChanged: (val) {
+                    //     print('Cedula seleccionada: $val');
+                    //   },                 
+                    // ),
               
                     const SizedBox(height: 16),
                 
@@ -312,13 +306,20 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                     
                     FormBuilderDropdown<String>(
                       name: 'linea_metro',
-                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      validator: (value) {
+                        if (value == null) {
+                          _showErrorDialog(context, 'Es obligatorio elegir una Linea del metro');
+                          return 'Este campo es requerido';
+                        }
+                        return null;
+                      },
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Linea del metro',
                         labelFrontSize: 30.0,
                         hintext: 'Linea 1, 2 ... o Teleferico',
-                        hintFrontSize: 22.0,
+                        hintFrontSize: 30.0,
                         icono: const Icon(Icons.people_outline_rounded, size: 30.0),
+                        errorSize: 20
                       ),
                       initialValue: _selectLineMetro,
                       items: _lineas.map((linea) {
@@ -346,12 +347,22 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                     FormBuilderDropdown<int>(
                       name: 'estacion_metro',
                       style: const TextStyle(fontSize: 30.0),
-                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      initialValue: _selectedStation,
+                      validator: (value) {
+                        if(value == null) {
+                          _showErrorDialog(context, 'Es obligatorio elegir una Estación del metro');
+                          return 'Este campo es requerido';
+                        }
+
+                        return null;
+                      },
                       decoration: InputDecorations.inputDecoration(
-                        labeltext: 'Estacion del metro',
+                        labeltext: 'Estación del metro',
                         labelFrontSize: 30.0,
-                        hintext: '',
+                        hintext: (_selectedStation).toString(),
+                        hintFrontSize: 30.0,
                         icono: const Icon(Icons.train_outlined, size: 30.0),
+                        errorSize: 20
                       ),
                       items: _estaciones.map((estacion) {
                         return DropdownMenuItem(
@@ -367,7 +378,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                       },
                     ),
               
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 42),
                 
                     ElevatedButton(
                       onPressed: _registrarFormEncuesta, 
@@ -384,7 +395,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                       child: const Text(
                         'Iniciar Encuesta',
                         style: TextStyle(
-                          fontSize: 20, 
+                          fontSize: 30, 
                           fontWeight: FontWeight.bold
                         )
                       ),
@@ -456,30 +467,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
       }
     });
   }
-  
-  /*
-  void _showLoadingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,  // Evita que el usuario cierre el cuadro de carga
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 16.0),
-                Text('Enviando datos...', style: TextStyle(fontSize: 18.0)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-  */
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(

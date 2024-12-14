@@ -10,12 +10,12 @@ class PerfiluserScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const PerfiluserScreen({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -55,7 +55,7 @@ class _PerfiluserScreenState extends State<PerfiluserScreen> {
         filtrarUsuarioController: widget.filtrarUsuarioController,
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
 
       appBar: AppBar( 
@@ -101,7 +101,7 @@ class _PerfiluserScreenState extends State<PerfiluserScreen> {
             return FormBuilder(
               key: formKey,
               initialValue: {
-                'cedula': user.cedula,
+                // 'cedula': user.cedula,
                 'nombre': user.nombreApellido,
                 'usuario': user.usuario1,
                 'email': user.email,
@@ -114,18 +114,18 @@ class _PerfiluserScreenState extends State<PerfiluserScreen> {
                  padding: const EdgeInsets.all(50.0),
                  child: Column(
                   children: [
-                    FormBuilderTextField(
-                      name: 'cedula',
-                      style: const TextStyle(fontSize: 30.0),
-                      enabled: false,
-                      decoration: InputDecorations.inputDecoration(
-                        labeltext: 'Cedula',
-                        labelFrontSize: 30.5,
-                        hintext: '000-0000000-0',
-                        hintFrontSize: 25.0,
-                        icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
-                      ),                    
-                    ),
+                    // FormBuilderTextField(
+                    //   name: 'cedula',
+                    //   style: const TextStyle(fontSize: 30.0),
+                    //   enabled: false,
+                    //   decoration: InputDecorations.inputDecoration(
+                    //     labeltext: 'Cedula',
+                    //     labelFrontSize: 30.5,
+                    //     hintext: '000-0000000-0',
+                    //     hintFrontSize: 25.0,
+                    //     icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
+                    //   ),                    
+                    // ),
             
                     FormBuilderTextField(
                       name: 'nombre',
@@ -296,7 +296,7 @@ class _PerfiluserScreenState extends State<PerfiluserScreen> {
       final upLoadUser = formKey.currentState!.value;
       Usuarios usuarioActualizado = Usuarios(
         idUsuarios: userUpload.idUsuarios,
-        cedula: userUpload.cedula, 
+        // cedula: userUpload.cedula,
         nombreApellido: upLoadUser['nombre'], 
         usuario1: upLoadUser['usuario'], 
         email: upLoadUser['email'], 

@@ -30,14 +30,14 @@ void main() {
   final TextEditingController filtrarUsuarioController = TextEditingController();
   final TextEditingController filtrarEmailController = TextEditingController();
   final TextEditingController filtrarId = TextEditingController();
-  final TextEditingController filtrarCedula = TextEditingController();
+  // final TextEditingController filtrarCedula = TextEditingController();
   final TextEditingController noEncuestaFiltrar = TextEditingController();
 
   runApp(MyApp(
     filtrarUsuarioController: filtrarUsuarioController,
     filtrarEmailController: filtrarEmailController,
     filtrarId: filtrarId,
-    filtrarCedula: filtrarCedula,
+    // filtrarCedula: filtrarCedula,
     noEncuestaFiltrar: noEncuestaFiltrar
   ));
 }
@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
   final TextEditingController noEncuestaFiltrar;
 
   const MyApp({
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
     required this.filtrarId, 
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.noEncuestaFiltrar
   });
 
@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // filtrarCedula: filtrarCedula,
         ),
 
         'login': (_) => const LoginScreen(),
@@ -87,35 +87,35 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula, 
+          // filtrarCedula: filtrarCedula, 
         ),
 
         'newuser': (_) => NewUser(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // filtrarCedula: filtrarCedula,
         ),
 
         'registroEmpleados': (_) => RegistroEmpl(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         ),
 
         'FormularioEncuesta': (_) => FormEncuestaScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         ),
         
         'pregunta': (_) => PreguntaEncuestaScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
           noEncuestaFiltrar: noEncuestaFiltrar,
         ),
 
@@ -123,28 +123,28 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         ),
 
         'ModifyTable': (_) => ModifyTable(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         ),
 
         'respuestaScreen': (_) => RepuestaResultadosScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         ),
 
         'reportForm': (_) => ReportFormulario(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          filtrarCedula: filtrarCedula,
+          // // filtrarCedula: filtrarCedula,
         )
       },
 

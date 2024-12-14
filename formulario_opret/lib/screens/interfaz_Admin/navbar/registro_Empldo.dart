@@ -12,12 +12,12 @@ class RegistroEmpl extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const RegistroEmpl({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -60,12 +60,12 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     final filtrar = usuarios.firstWhere(
       (usuario) => 
         usuario.idUsuarios!.toLowerCase().contains(query.toLowerCase()) ||
-        usuario.cedula.toLowerCase().contains(query.toLowerCase()) ||
+        // usuario.cedula.toLowerCase().contains(query.toLowerCase()) ||
         usuario.usuario1.toLowerCase().contains(query.toLowerCase()) ||
         usuario.nombreApellido.toLowerCase().contains(query.toLowerCase()),
       orElse: () => Usuarios(
         idUsuarios: '',
-        cedula: '',
+        // cedula: '',
         nombreApellido: '',
         usuario1: '',
         email: '',
@@ -119,7 +119,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         filtrarUsuarioController: widget.filtrarUsuarioController,
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
       appBar: AppBar(
         title: const Text('Registro Empleados'),
@@ -258,23 +258,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                         )
                       ),
                       ListTile(
-                        leading: const Icon(Icons.person_pin_circle_outlined, size: 30.0, color: Colors.blue),
-                        title: RichText(
-                          text: TextSpan(
-                            children: [
-                              const TextSpan(
-                                  text: 'Cédula: ', 
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0, color: Colors.white),
-                              ),
-                              TextSpan( 
-                                text: usuariosFiltrados!.cedula, 
-                                style: const TextStyle(fontSize: 28.0, color: Colors.white), 
-                              ),
-                            ]
-                          )
-                        )
-                      ),
-                      ListTile(
                         leading: const Icon(Icons.calendar_month_outlined, size: 30.0, color: Colors.blue),
                         title: RichText(
                           text: TextSpan(
@@ -377,7 +360,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                           headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
                           columns: const [
                             DataColumn(label: Text('ID')),
-                            DataColumn(label: Text('Cedula')),
                             DataColumn(label: Text('Nombre Completo')),
                             DataColumn(label: Text('Usuario')),
                             DataColumn(label: Text('Correo Electronico')),
@@ -395,7 +377,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                               }),
                               cells: [
                                 DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                DataCell(/*usuario.cedula != null ? */Text(usuario.cedula, style: const TextStyle(fontSize: 20.0))/* : const Text('')*/),
                                 DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
                                 DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
                                 DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
@@ -677,7 +658,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
                                 Usuarios nuevoUsuario = Usuarios(
                                   // idUsuarios: newIdUser,
-                                  cedula: formData['cedula'],
+                                  // cedula: formData['cedula'],
                                   nombreApellido: formData['nombre'],
                                   usuario1: formData['usuario'],
                                   email: formData['email'],
@@ -823,7 +804,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   final formData = formKey.currentState!.value;
                   Usuarios usuarioActualizado = Usuarios(
                     idUsuarios: userUpload.idUsuarios, // Mantener el ID original
-                    cedula: userUpload.cedula,
+                    // cedula: userUpload.cedula,
                     nombreApellido: formData['nombreApellido'],
                     usuario1: formData['usuario'],
                     email: formData['email'],

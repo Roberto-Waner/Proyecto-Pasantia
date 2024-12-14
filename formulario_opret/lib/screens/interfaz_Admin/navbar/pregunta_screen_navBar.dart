@@ -14,12 +14,12 @@ class PreguntaScreenNavbar extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const PreguntaScreenNavbar({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -235,10 +235,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         filtrarUsuarioController: widget.filtrarUsuarioController,
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
       appBar: AppBar(
-        title: const Text('Sesion de Preguntas'),
+        title: const Text('Sesión de Preguntas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, size: 30.0),
@@ -631,7 +631,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }else if (snapshot.hasError) {
-                        return const Center(child: Text('Error al cargar la Sesion.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                        return const Center(child: Text('Error al cargar la Sesión.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
                       } else {
                         final sesionTable = _sesionFiltrada.isNotEmpty 
                               ? _sesionFiltrada
@@ -802,6 +802,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showCreateDialog() {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Crear Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -927,6 +928,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showEditDialog(Preguntas questionUpLoad) {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Modificar Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -1005,6 +1007,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showDeleteDialog(Preguntas questionDelete) {
     showDialog(
       context: context,
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -1058,6 +1061,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showCreateDialogSubPregunta() {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Crear Sub-Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -1186,6 +1190,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showEditDialogSubPregunta(SubPregunta subQuestionUpLoad) {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Modificar Sub-Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -1265,6 +1270,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showDeleteDialogSubPregunta(SubPregunta subQuestionDelete) {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar Sub Pregunta', style: TextStyle(fontSize: 33.0)),
@@ -1313,7 +1319,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
   void _showCreateDialogSesion() {
     showDialog(
-      context: context, 
+      context: context,
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Crear Sesion', style: TextStyle(fontSize: 33.0)),
@@ -1333,7 +1340,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       labelFrontSize: 30.5,
                       // hintext: 'Eliga como se responder esta pregunta',
                       // hintFrontSize: 30.0,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      icono: const Icon(Icons.list_alt, size: 30.0),
                       errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
@@ -1384,7 +1391,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                         child: Text('Expectativa del pasajero'),
                       ),
                       DropdownMenuItem(
-                        value: 'Conclusion',
+                        value: 'Conclusión',
                         child: Text('Conclusion'),
                       ),
                       DropdownMenuItem(
@@ -1407,7 +1414,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'No. de Pregunta',
                       labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      icono: const Icon(Icons.question_answer, size: 30.0),
                       errorSize: 20.0,
                     ),
                     items: _questions.map((preg) {
@@ -1442,7 +1449,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       labelFrontSize: 30.5,
                       hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
                       hintFrontSize: 25.0,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      icono: const Icon(Icons.subdirectory_arrow_right, size: 30.0),
                     ),
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
                     items: _subQuestions.map((subPreg) {
@@ -1467,7 +1474,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige el Requerimiento',
                       labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      icono: const Icon(Icons.assignment, size: 30.0),
                       errorSize: 20.0,
                     ),
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
@@ -1477,12 +1484,16 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                           child: Text('No se requiere nada en la pregunta')
                       ),
                       DropdownMenuItem(
-                          value: 'Requiere Justificación',
-                          child: Text('Requiere Justificación')
+                          value: 'Requiere Justificación (Opcional)',
+                          child: Text('Requiere Justificación (Opcional)')
                       ),
                       DropdownMenuItem(
-                          value: 'Requiere Comentarios',
-                          child: Text('Requiere Comentarios')
+                          value: 'Requiere Comentarios (Opcional)',
+                          child: Text('Requiere Comentarios (Opcional)')
+                      ),
+                      DropdownMenuItem(
+                          value: 'En caso de responder (Si) finaliza la encuesta',
+                          child: Text('En caso de responder (Si) finaliza la encuesta')
                       )
                     ],
                     isExpanded: true,
@@ -1540,6 +1551,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showEditDialogSesion(Sesion sectionUpload) {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Modificar La Sesion', style: TextStyle(fontSize: 33.0)),
@@ -1768,6 +1780,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   void _showDeleteDialogSesion(Sesion sectionDelete) {
     showDialog(
       context: context, 
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar Sesion', style: TextStyle(fontSize: 33.0)),

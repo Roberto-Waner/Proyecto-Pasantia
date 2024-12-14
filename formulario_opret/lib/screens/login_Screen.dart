@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _filtrarUsuarioController = TextEditingController();
   final TextEditingController _filtrarEmailController = TextEditingController();
   final TextEditingController _filtrarId = TextEditingController();
-  final TextEditingController _filtrarCedula = TextEditingController();
+  // final TextEditingController _filtrarCedula = TextEditingController();
 
   final ApiServiceToken _serviceToken = ApiServiceToken('https://10.0.2.2:7190',false);
   String myToken ="";
@@ -87,12 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
       String userNameEmpl = decodedToken['usuario'];
       String email = decodedToken['email'];
       String id = decodedToken['id'];
-      String cedula = decodedToken['cedula'];
+      // String cedula = decodedToken['cedula'];
 
       _filtrarUsuarioController.text = userNameEmpl;
       _filtrarEmailController.text = email;
       _filtrarId.text = id;
-      _filtrarCedula.text = cedula;
+      // _filtrarCedula.text = cedula;
 
       if (role == 'Administrador'){
         _showSuccessDialog(context);
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
               filtrarUsuarioController: _filtrarUsuarioController,
               filtrarEmailController: _filtrarEmailController,
               filtrarId: _filtrarId,
-              filtrarCedula: _filtrarCedula
+              // filtrarCedula: _filtrarCedula
             ))
           );
           
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 filtrarUsuarioController: _filtrarUsuarioController,
                 filtrarEmailController: _filtrarEmailController,
                 filtrarId: _filtrarId,
-                filtrarCedula: _filtrarCedula
+                // filtrarCedula: _filtrarCedula
               )
             )
           );
@@ -463,7 +463,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   filtrarUsuarioController: _filtrarUsuarioController,
                   filtrarEmailController: _filtrarEmailController,
                   filtrarId: _filtrarId,
-                  filtrarCedula: _filtrarId,
+                  // filtrarCedula: _filtrarId,
                 ))
               );
             }, 

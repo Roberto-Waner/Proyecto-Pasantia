@@ -19,29 +19,6 @@ class RespuestaController {
       }
     });
   }
-  /*
-  Future<void> saveRespuesta(List<SpInsertarRespuestas> respuesta) async {
-    try{
-      // final remoteResponse = await _apiServiceRespuesta.postRespuesta(respuesta);
-
-      // if(remoteResponse.statusCode == 201) {
-      //   print('Respuesta guardado en servidor');
-      //
-      //   // if(respuesta != null) {
-      //   //   await _respuestaCrud.vaciarTable();
-      //   // }
-      //
-      // } else {
-      //   await _respuestaCrud.insertRespuestas(respuesta);
-      // }
-    } catch (e) {
-      print('Error al enviar respuesta a la api: $e');
-      await _respuestaCrud.insertRespuestas(respuesta);
-      print('Respuesta guardado en base de datos local SQLite con éxito');
-    }
-  }
-
-   */
 
   //para sincronizar los datos de
   Future<void> syncDataResp() async {

@@ -16,7 +16,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
   final TextEditingController noEncuestaFiltrar;
 
   const PreguntaEncuestaScreen({
@@ -25,7 +25,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
     required this.filtrarId,
-    required this.filtrarCedula, 
+    // required this.filtrarCedula, 
   });
 
   @override
@@ -69,7 +69,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         filtrarUsuarioController: widget.filtrarUsuarioController,  
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
 
       appBar: AppBar(
@@ -136,140 +136,199 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               }
             ),
           ),
+          /*
+          Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  // _showAdvertenciaDialog(context, '¿Está seguro de que desea finalizar la sesión de preguntas?');
+                  if (dataQuestion.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('No hay preguntas disponibles para guardar')),
+                    );
+                    return;
+                  }
+
+                  bool allResponsesSaved = true;
+
+                  // Itera sobre todas las preguntas
+                  for (var question in dataQuestion) {
+                    try {
+                      // Llama al método `_saveRespuesta` para cada pregunta
+                      _updateRespuestas(answer, question, finalizarSesion: 1);
+                      
+                    } catch (e) {
+                      allResponsesSaved = false;
+                      print('Error al guardar respuesta para la pregunta ${question.sp_CodPregunta}: $e');
+                    }
+                  }
+
+                  // _respuestaController.syncDataResp();
+
+                  // Muestra un mensaje de éxito o error según el resultado
+                  if (allResponsesSaved) {
+                    _showSuccessDialog(context, 'Todas las respuestas fueron guardadas exitosamente.');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Hubo errores al guardar algunas respuestas')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(1, 135, 76, 1), //  se usa para definir el color de fondo del botón.
+                  foregroundColor: const Color.fromARGB(255, 255, 255, 255), // se usa para definir el color del texto y los iconos dentro del botón.
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: const Text('Enviar Todas las Respuestas', style: TextStyle(fontSize: 26.0)),
+              ),
+            )
+          )
+          */
         ],
       )
     );
   }
 
-  SingleChildScrollView _buildPreguntaList() {
+  Widget _buildPreguntaList() {
     return SingleChildScrollView(
       child: Padding(
-          padding: const EdgeInsets.all(28.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: dataQuestion.length,
-                physics: const NeverScrollableScrollPhysics(), // Evita conflictos de desplazamiento
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isExpandedList[index] = !_isExpandedList[index];
-                      });
-                    },
-                    child: Card(
-                      elevation: 5,//para elevar hacia delante los cuadros de la preguntas
-                      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+        padding: const EdgeInsets.all(28.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: dataQuestion.length,
+              physics: const NeverScrollableScrollPhysics(), // Evita conflictos de desplazamiento
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpandedList[index] = !_isExpandedList[index];
+                    });
+                  },
+                  child: Card(
+                    elevation: 5,//para elevar hacia delante los cuadros de la preguntas
+                    margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: ExpandablePanel(
+                      theme: const ExpandableThemeData(
+                        expandIcon: Icons.arrow_drop_down_circle_outlined, // Ícono para expandir
+                        collapseIcon: Icons.arrow_circle_up_sharp, // Ícono para colapsar
+                        iconSize: 55.0, // Tamaño del ícono predeterminado
+                        iconColor: Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
                       ),
-                      child: ExpandablePanel(
-                        header: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'Numero de la pregunta: ',
-                                  style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                ),
-                                TextSpan(
-                                  text: '${dataQuestion[index].sp_CodPregunta}',
-                                  style: const TextStyle(fontSize: 35.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                )
-                              ]
-                            )
-                          ),
-                        ),
-                        collapsed: Container(), // Puedes añadir contenido para mostrar cuando el panel esté colapsado
-                        expanded: Padding(
-                          padding: const EdgeInsets.only(top: 20.0, bottom: 50.0, left: 45.0, right: 45.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      header: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: RichText(
+                          text: TextSpan(
                             children: [
-                              const SizedBox(height: 10),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    const TextSpan(
-                                      text: 'Respuesta que solo recibe es: \n',
-                                      style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                    ),
-                                    TextSpan(
-                                      text: ('  ${dataQuestion[index].sp_TipoRespuesta}'),
-                                      style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                    )
-                                  ]
-                                )
+                              const TextSpan(
+                                text: 'Numero de la pregunta: ',
+                                style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                               ),
-                              const SizedBox(height: 15),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    const TextSpan(
-                                      text: '- Pregunta: \n',
-                                      style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                    ),
-                                    TextSpan(
-                                      text: ('    ${dataQuestion[index].sp_Pregunta}'),
-                                      style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                    )
-                                  ]
-                                )
-                              ),
-                              const SizedBox(height: 15),
-                              if (dataQuestion[index].sp_SubPregunta != null)
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      const TextSpan(
-                                        text: '-- Sub-Pregunta: \n',
-                                        style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                      ),
-                                      TextSpan(
-                                        text: ('    ${dataQuestion[index].sp_SubPregunta}'),
-                                        style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                      )
-                                    ]
-                                  )
-                                ),
-                              const SizedBox(height: 5),
-                              if (dataQuestion[index].sp_Rango != null)
-                                RichText(
-                                    text: TextSpan(
-                                        children: [
-                                          const TextSpan(
-                                            text: '- Requerimiento: \n',
-                                            style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                          ),
-                                          TextSpan(
-                                            text: ('    ${dataQuestion[index].sp_Rango}'),
-                                            style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                          )
-                                        ]
-                                    )
-                                ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {
-                                    _showPreguntaDialog(dataQuestion[index]); // Muestra el diálogo al hacer clic
-                                  },
-                                  child: const Text('Responder.', style: TextStyle(fontSize: 26.0)),
-                                ),
-                              ),
+                              TextSpan(
+                                text: '${dataQuestion[index].sp_CodPregunta}',
+                                style: const TextStyle(fontSize: 35.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                              )
                             ]
-                          ),
+                          )
+                        ),
+                      ),
+                      collapsed: Container(), // Puedes añadir contenido para mostrar cuando el panel esté colapsado
+                      expanded: Padding(
+                        padding: const EdgeInsets.only(top: 20.0, bottom: 50.0, left: 45.0, right: 45.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: 'Respuesta que solo recibe es: \n',
+                                    style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                  ),
+                                  TextSpan(
+                                    text: ('  ${dataQuestion[index].sp_TipoRespuesta}'),
+                                    style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                  )
+                                ]
+                              )
+                            ),
+                            const SizedBox(height: 15),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: '- Pregunta: \n',
+                                    style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                  ),
+                                  TextSpan(
+                                    text: ('    ${dataQuestion[index].sp_Pregunta}'),
+                                    style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                  )
+                                ]
+                              )
+                            ),
+                            const SizedBox(height: 15),
+                            if (dataQuestion[index].sp_SubPregunta != null)
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    const TextSpan(
+                                      text: '-- Sub-Pregunta: \n',
+                                      style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    ),
+                                    TextSpan(
+                                      text: ('    ${dataQuestion[index].sp_SubPregunta}'),
+                                      style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                    )
+                                  ]
+                                )
+                              ),
+                            const SizedBox(height: 5),
+                            if (dataQuestion[index].sp_Rango != null)
+                              RichText(
+                                  text: TextSpan(
+                                      children: [
+                                        const TextSpan(
+                                          text: '- Requerimiento: \n',
+                                          style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                        ),
+                                        TextSpan(
+                                          text: ('    ${dataQuestion[index].sp_Rango}'),
+                                          style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                        )
+                                      ]
+                                  )
+                              ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  _showPreguntaDialog(dataQuestion[index]); // Muestra el diálogo al hacer clic
+                                },
+                                child: const Text('Responder.', style: TextStyle(fontSize: 26.0)),
+                              ),
+                            ),
+                          ]
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ],
-          )
+                  ),
+                );
+              },
+            ),
+          ],
+        )
       ),
     );
   }
@@ -277,7 +336,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void _showPreguntaDialog(SpPreguntascompleta question) {
 
     showDialog(
-      context: context, 
+      context: context,
+      barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (BuildContext context, ) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -308,11 +368,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Escribe tu respuesta',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.notes, size: 30.0)
+                            icono: const Icon(Icons.notes, size: 30.0),
+                            errorSize: 20
                           ),
-                          // validator: FormBuilderValidators.compose([
-                          //   FormBuilderValidators.required(),
-                          // ]),
+                          validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+
                         ),
                       
                       if(question.sp_TipoRespuesta == 'Selecionar: Si, No, N/A')
@@ -323,7 +383,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Selecionar: Si, No, N/A',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.check_circle, size: 30.0)
+                            icono: const Icon(Icons.check_circle, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Si', child: Text('Si')),
@@ -341,7 +402,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Calific. 1 a 10',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.numbers, size: 30.0)
+                            icono: const Icon(Icons.numbers, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: '1', child: Text('1')),
@@ -355,12 +417,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             DropdownMenuItem(value: '9', child: Text('9')),
                             DropdownMenuItem(value: '10', child: Text('10')),
                           ],
-                          // items: List.generate(10, (index) {
-                          //   return DropdownMenuItem(
-                          //     value: index + 1,
-                          //     child: Text('${index + 1}'),
-                          //   );
-                          // }),
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
                 
@@ -372,7 +428,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Seleciona solo Si o No',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.check, size: 30.0)
+                            icono: const Icon(Icons.check, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Si', child: Text('Si')),
@@ -389,7 +446,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige la Edad',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.calendar_month_outlined, size: 30.0)
+                            icono: const Icon(Icons.calendar_month_outlined, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Menor 15', child: Text('Menor 15')),
@@ -413,7 +471,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige la Nacionalidad',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.boy_rounded, size: 30.0)
+                            icono: const Icon(Icons.boy_rounded, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'DOMINICANO', child: Text('DOMINICANO')),
@@ -431,7 +490,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige el Título de transporte',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.credit_card, size: 30.0)
+                            icono: const Icon(Icons.credit_card, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'TARJETAR REUSABLE (PLASTICO)', child: Text('TARJETAR REUSABLE (PLASTICO)')),
@@ -448,7 +508,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige el Producto utilizado',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.monetization_on_outlined, size: 30.0)
+                            icono: const Icon(Icons.monetization_on_outlined, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'MONEDERO', child: Text('MONEDERO')),
@@ -464,10 +525,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
-                            labeltext: 'Elige el Genero',
+                            labeltext: 'Elige el Género',
                             labelFrontSize: 26.0,
                             hintFrontSize: 26.0,
-                            icono: const Icon(Icons.wc_rounded, size: 30.0)
+                            icono: const Icon(Icons.wc_rounded, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Masculino', child: Text('Masculino')),
@@ -484,7 +546,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige la Frecuencia de viajes por semana',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.airplanemode_active, size: 30.0)
+                            icono: const Icon(Icons.airplanemode_active, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: '0 - 4', child: Text('0 - 4')),
@@ -504,7 +567,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Elige la Expectativa del pasajero',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                              icono: const Icon(Icons.timeline, size: 30.0)
+                              icono: const Icon(Icons.timeline, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'NADA', child: Text('NADA')),
@@ -520,7 +584,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           name: 'respuesta_Conclusion',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
-                            labeltext: 'Escribe la Conclusion (Opcional)',
+                            labeltext: 'Escribe la Conclusión (Opcional)',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.notes, size: 30.0)
@@ -535,7 +599,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             labeltext: 'Cual es el motivo del viaje a metro',
                             labelFrontSize: 20.0,
                             hintFrontSize: 20.0,
-                            icono: const Icon(Icons.airplanemode_active, size: 30.0)
+                            icono: const Icon(Icons.airplanemode_active, size: 30.0),
+                              errorSize: 20
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Trabajo', child: Text('Trabajo')),
@@ -631,7 +696,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
-  // Guardar respuesta en la API
+  // Guardar respuesta en la cache y API
   void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, {int finalizarSesion = 0}) async {
     // Verificamos si el formulario es válido antes de guardar
     if (_formKey.currentState!.saveAndValidate()){
@@ -642,9 +707,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
       // Verificamos que exista alguna respuesta válida
       if(respuestaFinal == null || respuestaFinal.isEmpty) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Por favor, completa la respuesta.'))
-        // );
         _showErrorDialog(context, 'Por favor, completa la respuesta.');
         return;
       }
@@ -675,7 +737,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               const SnackBar(content: Text('Respuesta guardada con éxito'))
           );
         } else {
-          _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la sesión de pregunta');
+          _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la sesión de pregunta.');
         }
         
       } catch (e) { 
@@ -690,6 +752,35 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       );
     }
   }
+
+  /*
+  void _updateRespuestas(SpInsertarRespuestas answer, SpPreguntascompleta question, {int finalizarSesion = 1}) async {
+    if (_formKey.currentState!.saveAndValidate()) {
+      final dataAnswer = _formKey.currentState!.value;
+
+      // Creamos el objeto `Respuesta` con los datos recopilados
+      SpInsertarRespuestas actualizarRespuesta = SpInsertarRespuestas(
+          idUsuarios: widget.filtrarId.text, // ID del usuario extraido del token
+          idSesion: question.sp_CodPregunta!, //  sp_CodPregunta estraido del modelo SpPreguntascompleta que hace referencia a un stored procedure
+          respuesta: answer.respuesta, // para recibir diferentes tipos de respuestas
+          comentarios: null,
+          justificacion: null,
+          finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con 1 = true y 0 = false
+      );
+
+      // Imprimir los datos a enviar para depuración
+      print('Datos de la respuesta: ${actualizarRespuesta.toJson()}');
+
+      try{
+        await _respuestaCrud.actualizarCrud([actualizarRespuesta], widget.filtrarId.text);
+        print('finalizarSesion actualizado con éxito');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e, actualización local fallida')),
+        );
+      }
+    }
+  }*/
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
@@ -754,9 +845,42 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24.0),
-                        ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                // backgroundColor: const Color.fromARGB(255, 200, 234, 220), //  se usa para definir el color de fondo del botón.
+                                // foregroundColor: const Color.fromARGB(255, 134, 130, 218), // se usa para definir el color del texto y los iconos dentro del botón.
+                                padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: const Text('Continuar', style: TextStyle(fontSize: 25.0, color: Colors.blue)),
+                            ),
+                            // const SizedBox(height: 20.0),
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     // Navigator.of(context).pop();
+                            //     Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(builder: (context) => FormEncuestaScreen(
+                            //         filtrarUsuarioController: widget.filtrarUsuarioController,
+                            //         filtrarEmailController: widget.filtrarEmailController,
+                            //         filtrarId: widget.filtrarId,
+                            //       )),
+                            //     );
+                            //   },
+                            //   style: ElevatedButton.styleFrom(
+                            //     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                            //     shape: RoundedRectangleBorder(
+                            //       borderRadius: BorderRadius.circular(50),
+                            //     ),
+                            //   ),
+                            //   child: const Text('No continuar', style: TextStyle(fontSize: 25.0, color: Colors.red)),
+                            // )
+                          ],
                         )
                       ]
                   )
@@ -773,4 +897,66 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     //   }
     // });
   }
+  
+  /*void _showAdvertenciaDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row( 
+            children: [ 
+              Icon( 
+                Icons.warning, 
+                color: Colors.yellow[700], 
+                size: 50, // Tamaño grande para el ícono de exclamación 
+              ), 
+              const SizedBox(width: 10), 
+              const Expanded( 
+                child: Text( "Advertencia", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)), 
+              ), 
+            ], 
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            margin: const EdgeInsets.fromLTRB(70, 20, 70, 50), 
+            child: Text(message, style: const TextStyle(fontSize: 28)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();  // Cierra el diálogo sin realizar acciones
+              },
+              child: const Text("Cancelar", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.red)),
+            ),
+            TextButton(
+              onPressed: () async  {
+                Navigator.of(context).pop();  // Cierra el diálogo
+                final responseForm = _formKey.currentState!.value;
+                bool allSuccess = true;
+                SpPreguntascompleta? question;
+
+                _saveRespuesta(question!, responseForm, finalizarSesion: 1);
+
+                List<SpInsertarRespuestas> respuestasPendientes = await _respuestaCrud.getAnswerCrud();
+
+                if (respuestasPendientes.isNotEmpty) {
+                  await _respuestaController.syncDataResp();
+                  allSuccess = true;
+                } else {
+                  allSuccess = false;
+                }
+
+                if(allSuccess) {
+                  _showSuccessDialog(context, "Respuestas fue enviado");
+                } else {
+                  _showErrorDialog(context, "Error al sincronizar respuestas");
+                }
+              },
+              child: const Text("Confirmar", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
+            ),
+          ],
+        );
+      },
+    );
+  }*/
 }

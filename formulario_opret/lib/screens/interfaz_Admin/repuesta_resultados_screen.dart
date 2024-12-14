@@ -9,12 +9,12 @@ class RepuestaResultadosScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const RepuestaResultadosScreen({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -55,8 +55,8 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
       switch (selectedFilter) {
         case 'ID del Usuario':
           return answer.sp_IdUsuarios?.toLowerCase().contains(queryLower) ?? false;
-        case 'Cedula de Identidad':
-          return answer.sp_Cedula?.toLowerCase().contains(queryLower) ?? false;
+        // case 'Cedula de Identidad':
+        //   return answer.sp_Cedula?.toLowerCase().contains(queryLower) ?? false;
         case 'Usuarios':
           return answer.sp_Usuarios?.toLowerCase().contains(queryLower) ?? false;
         case 'Nombre y Apellido':
@@ -93,7 +93,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
         filtrarUsuarioController: widget.filtrarUsuarioController,
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
 
       appBar: AppBar(
@@ -129,7 +129,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                     ),
                     items: [
                       'ID del Usuario', 
-                      'Cedula de Identidad', 
+                      // 'Cedula de Identidad',
                       'Usuarios', 
                       'Nombre y Apellido', 
                       'Numero de Encuesta',
@@ -196,7 +196,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                       header: const Text('Reporte de las Respuesta'),
                       columns: const [
                         DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Cedula de Identida', style: TextStyle(fontSize: 23.0))),
+                        // DataColumn(label: Text('Cedula de Identida', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('No. Encuesta', style: TextStyle(fontSize: 23.0))),
@@ -272,7 +272,7 @@ class RespuestasDataSource extends DataTableSource {
       index: index,
       cells: [
         DataCell(answer.sp_IdUsuarios != null ? Text(answer.sp_IdUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-        DataCell(answer.sp_Cedula != null ? Text(answer.sp_Cedula!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        // DataCell(answer.sp_Cedula != null ? Text(answer.sp_Cedula!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
         DataCell(answer.sp_NombreApellido != null ? Text(answer.sp_NombreApellido!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
         DataCell(answer.sp_Usuarios != null ? Text(answer.sp_Usuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
         DataCell(answer.sp_NoEncuesta != null ? Text(answer.sp_NoEncuesta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),

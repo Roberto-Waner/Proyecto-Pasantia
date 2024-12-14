@@ -8,12 +8,12 @@ class ReportFormulario extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const ReportFormulario({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -53,8 +53,8 @@ class _ReportFormularioState extends State<ReportFormulario> {
       switch (selectedFilter) {
         case 'ID del Usuario':
           return formulario.sp_IdUsuarios?.toLowerCase().contains(queryLower) ?? false;
-        case 'Cedula de Identidad':
-          return formulario.sp_Cedula?.toLowerCase().contains(queryLower) ?? false;
+        // case 'Cedula de Identidad':
+        //   return formulario.sp_Cedula?.toLowerCase().contains(queryLower) ?? false;
         case 'Usuarios':
           return formulario.sp_Usuarios?.toLowerCase().contains(queryLower) ?? false;
         case 'Nombre y Apellido':
@@ -87,7 +87,7 @@ class _ReportFormularioState extends State<ReportFormulario> {
         filtrarUsuarioController: widget.filtrarUsuarioController,
         filtrarEmailController: widget.filtrarEmailController,
         filtrarId: widget.filtrarId,
-        filtrarCedula: widget.filtrarCedula,
+        // // filtrarCedula: widget.filtrarCedula,
       ),
 
       appBar: AppBar(
@@ -123,7 +123,7 @@ class _ReportFormularioState extends State<ReportFormulario> {
                     ),
                     items: [
                       'ID del Usuario', 
-                      'Cedula de Identidad', 
+                      // 'Cedula de Identidad', 
                       'Usuarios', 
                       'Nombre y Apellido', 
                       'Linea', 
@@ -188,7 +188,7 @@ class _ReportFormularioState extends State<ReportFormulario> {
                       header: const Text('Reporte de Registros de los Usuarios antes de la Encuesta'),
                       columns: const [
                         DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Cedula de Identidad', style: TextStyle(fontSize: 23.0))),
+                        // DataColumn(label: Text('Cedula de Identidad', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
                         DataColumn(label: Text('Fecha de form. Realizado', style: TextStyle(fontSize: 23.0))),
@@ -229,7 +229,7 @@ class FormularioDataSource extends DataTableSource {
       index: index,
       cells: [
         DataCell(Text(form.sp_IdUsuarios!, style: const TextStyle(fontSize: 20.0))),
-        DataCell(Text(form.sp_Cedula!, style: const TextStyle(fontSize: 20.0))),
+        // DataCell(Text(form.sp_Cedula!, style: const TextStyle(fontSize: 20.0))),
         DataCell(Text(form.sp_Usuarios!, style: const TextStyle(fontSize: 20.0))),
         DataCell(Text(form.sp_NombreApellido!, style: const TextStyle(fontSize: 20.0))),
         DataCell(Text(form.sp_FechaEncuesta!, style: const TextStyle(fontSize: 20.0))),

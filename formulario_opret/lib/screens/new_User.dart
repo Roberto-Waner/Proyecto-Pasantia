@@ -15,12 +15,12 @@ class NewUser extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  final TextEditingController filtrarCedula;
+  // final TextEditingController filtrarCedula;
 
   const NewUser({
     super.key,
     required this.filtrarId,
-    required this.filtrarCedula,
+    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -70,7 +70,7 @@ class _NewUserState extends State<NewUser> {
 
       final user = Usuarios(
         // idUsuarios:  data['idUsuario'],
-        cedula: data['cedula'],
+        // cedula: data['cedula'],
         nombreApellido: nombreCompleto, // Concatenación de nombre y apellido
         usuario1: data['nombreUsuario'],
         email: data['email'],
@@ -140,7 +140,7 @@ class _NewUserState extends State<NewUser> {
                 filtrarUsuarioController: widget.filtrarUsuarioController,  
                 filtrarEmailController: widget.filtrarEmailController,
                 filtrarId: widget.filtrarId,
-                filtrarCedula: widget.filtrarCedula, 
+                // filtrarCedula: widget.filtrarCedula,
               )),
             ); // Cierra el cuadro de éxito solo si el widget está montado
           }
@@ -154,15 +154,6 @@ class _NewUserState extends State<NewUser> {
       _obscureText = !_obscureText;
     });
   }
-
-  // void simulateError() {
-  //   // Simula un error después de 3 segundos
-  //   Future.delayed(const Duration(seconds: 3), () {
-  //     setState(() {
-  //       hasError = false; // Activa el estado de error
-  //     });
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -309,33 +300,33 @@ class _NewUserState extends State<NewUser> {
                               ],
                             ),
                                     
-                            const SizedBox(height: 30),
-                            FormBuilderTextField( //Cedula
-                              name: 'cedula',
-                              keyboardType: TextInputType.number,
-                              autocorrect: true,
-                              decoration: InputDecorations.inputDecoration(
-                                hintext: '000-0000000-0',
-                                hintFrontSize: 22.0,
-                                labeltext: 'Cedula de identidad',
-                                labelFrontSize: 35.0,
-                                icono: const Icon(Icons.perm_identity_rounded, size: 30.0),
-                                errorSize: 20
-                              ),
-                              style: const TextStyle(fontSize: 30.0),
-                              validator: (value) {
-                                String pattern = r'^\d{3}-\d{7}-\d{1}$';
-                                RegExp regExp = RegExp(pattern);
-                                if(value == null || value.isEmpty){
-                                  return 'Por favor ingrese su cédula';
-                                }
+                            // const SizedBox(height: 30),
+                            // FormBuilderTextField( //Cedula
+                            //   name: 'cedula',
+                            //   keyboardType: TextInputType.number,
+                            //   autocorrect: true,
+                            //   decoration: InputDecorations.inputDecoration(
+                            //     hintext: '000-0000000-0',
+                            //     hintFrontSize: 22.0,
+                            //     labeltext: 'Cedula de identidad',
+                            //     labelFrontSize: 35.0,
+                            //     icono: const Icon(Icons.perm_identity_rounded, size: 30.0),
+                            //     errorSize: 20
+                            //   ),
+                            //   style: const TextStyle(fontSize: 30.0),
+                            //   validator: (value) {
+                            //     String pattern = r'^\d{3}-\d{7}-\d{1}$';
+                            //     RegExp regExp = RegExp(pattern);
+                            //     if(value == null || value.isEmpty){
+                            //       return 'Por favor ingrese su cédula';
+                            //     }
                                     
-                                if(!regExp.hasMatch(value)){
-                                  return 'Formato de cédula incorrecto';
-                                }
-                                return null;
-                              },
-                            ),
+                            //     if(!regExp.hasMatch(value)){
+                            //       return 'Formato de cédula incorrecto';
+                            //     }
+                            //     return null;
+                            //   },
+                            // ),
                             
                             const SizedBox(height: 30),
                             FormBuilderTextField( //Correo
@@ -498,7 +489,7 @@ class _NewUserState extends State<NewUser> {
                                           filtrarUsuarioController: widget.filtrarUsuarioController,  
                                           filtrarEmailController: widget.filtrarEmailController,
                                           filtrarId: widget.filtrarId,
-                                          filtrarCedula: widget.filtrarCedula, 
+                                          // filtrarCedula: widget.filtrarCedula, 
                                         )),
                                       );
                                     }, 
@@ -650,43 +641,6 @@ class _NewUserState extends State<NewUser> {
       ),
     );
   }
-
-  // Positioned goBdfack(Size size, BuildContext context) {
-  //   return Positioned( // ajuste de ubicación del icono y texto
-  //     // top: size.height * 0.05,
-  //     // left: size.width * 0.05,
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => PresentationScreen(
-  //             filtrarUsuarioController: widget.filtrarUsuarioController,  
-  //             filtrarEmailController: widget.filtrarEmailController,
-  //             filtrarId: widget.filtrarId,
-  //             filtrarCedula: widget.filtrarCedula, 
-  //           )),
-  //         );
-  //       },
-  //       child: Row(
-  //         mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el espacio
-  //         children: [
-  //           Icon(
-  //             Icons.arrow_back_ios_new_rounded,
-  //             size: size.height * 0.03,
-  //           ),
-  //           const SizedBox(width: 5), // Espacio entre el ícono y el texto
-  //           Text(
-  //             'Volver',
-  //             style: TextStyle(
-  //               fontSize: size.height * 0.038, // Ajusta el tamaño del texto según sea necesario
-  //               color: const Color.fromARGB(255, 26, 26, 26),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Future<void> _showDatePicker() async {
     final picked = await showDatePicker(

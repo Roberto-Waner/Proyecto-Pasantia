@@ -14,12 +14,10 @@ class PreguntaScreenNavbar extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  // final TextEditingController filtrarCedula;
 
   const PreguntaScreenNavbar({
     super.key,
     required this.filtrarId,
-    // required this.filtrarCedula,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
   });
@@ -37,8 +35,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
   late Future<List<Sesion>> _sesionData;
   String selectedTipRespuestas = 'Respuesta Abierta';
-  // ignore: unused_field
-  bool _isLoading = false;
   final tipoRespuestaController = TextEditingController();
   Offset position = const Offset(700, 1150);
   List<Preguntas> _questions = [];
@@ -61,16 +57,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   String selectedFilterSesion = 'Numero de Sesion';
   //------------------------------------------------------------------------------------------------------------------------
 
-  // String numbersToRango(int desde, int hasta) {
-  //   if (hasta == 0) return 'null';
-    
-  //   String result = '';
-  //   for (var i = desde; i <= hasta; i++) {
-  //     result += '|$i| ';
-  //   }
-  //   return result.trim();
-  // }
-
   @override
   void initState(){
     super.initState();
@@ -86,25 +72,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     _subPreguntasData = Future.value([]);
     _sesionData = Future.value([]);
   }
-
-  // void initializeRango() {
-  //   rangos = rango.split(','); // Dividir el rango en una lista
-  //   desde = int.parse(rangos[0].trim());
-  //   hasta = int.parse(rangos[1].trim());
-  //   opcionesRango = [0] + List<int>.generate(hasta - desde + 1, (i) => desde + i);
-  // }
-
-  // void _refreshPreguntas() {
-  //   setState(() {
-  //     _preguntasData = _apiServicePreguntas.getPreguntas();
-  //   });
-  // }
-
-  // void _refreshSubPreguntas() {
-  //   setState(() {
-  //     _subPreguntasData = _apiServiceSubPreguntas.getSubPreg();
-  //   });
-  // }
 
   Future<void> _fetchData() async {
     try{
@@ -201,8 +168,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           return setion.idSesion?.toString().toLowerCase().contains(queryLower) ?? false;
         case 'Tipo de Respuesta':
           return setion.tipoRespuesta.toLowerCase().contains(queryLower);
-        case 'Tema':
-          return setion.grupoTema?.toLowerCase().contains(queryLower) ?? false;
+        // case 'Tema':
+        //   return setion.grupoTema?.toLowerCase().contains(queryLower) ?? false;
         case 'Numero de Pregunta':
           return setion.codPregunta.toString().toLowerCase().contains(queryLower);
         case 'No. de Sup Pregunta':
@@ -275,6 +242,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       Expanded(
                         child: FormBuilderDropdown<String>(
                           name: 'filtrarPregunta',
+                          menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                           initialValue: selectedFilterPregunta,
                           style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: const InputDecoration(
@@ -342,66 +310,37 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               ? _preguntaFiltrada
                               : snapshot.data ?? [];
                   
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Container(
-                            margin: const EdgeInsets.all(16.0),
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: DataTable(
-                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
-                              columns: const [
-                                DataColumn(label: Text('No', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                              ],
-                              rows: questionTable.map((ask) {
-                                return DataRow(
-                                  color: WidgetStateProperty.resolveWith<Color>((states) {
-                                    // Color alterno para las filas
-                                    return (questionTable.indexOf(ask) % 2 == 0)
-                                          ? Colors.blueGrey.shade50
-                                          : Colors.white;
-                                  }),
-                                  cells: [
-                                    DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
-                                    DataCell(Text(ask.pregunta, style: const TextStyle(fontSize: 20.0))),
-                                    DataCell(
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              _showEditDialog(ask);
-                                            }, 
-                                            icon: const Icon(Icons.edit, color: Colors.blue),
-                                          ),
-                                          
-                                          IconButton(
-                                            onPressed: () {
-                                              _showDeleteDialog(ask);
-                                            },
-                                            icon: const Icon(Icons.delete, color: Colors.red)
-                                          )
-                                        ],
-                                      )
-                                    )
-                                  ]
-                                );
-                              }).toList(),
-                            ),
+                        return Container(
+                          margin: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(7.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          ),
+                          child: PaginatedDataTable(
+                            columns: const [
+                              DataColumn(label: Text('No', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold)))
+                            ],
+                            source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog),
+                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                            rowsPerPage: 10, //numeros de filas
+                            columnSpacing: 30, //espacios entre columnas
+                            horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                            showCheckboxColumn: false, //oculta la columna de checkboxes
+                            dataRowMinHeight: 60.0,  // Altura mínima de fila
+                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                            showFirstLastButtons: true,
                           ),
                         );
                       }
@@ -421,6 +360,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       Expanded(
                         child: FormBuilderDropdown<String>(
                           name: 'filtrarSubPregunta',
+                          menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                           initialValue: selectedFilterSubPregunta,
                           style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: const InputDecoration(
@@ -488,66 +428,37 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               ? _subPreguntaFiltrada
                               : snapshot.data ?? [];
                         
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Container(
-                            margin: const EdgeInsets.all(16.0),
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: DataTable(
-                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
-                              columns: const [
-                                DataColumn(label: Text('NO', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                              ], 
-                              rows: subPregTabla.map((sub) {
-                                return DataRow(
-                                  color: WidgetStateProperty.resolveWith<Color>((states) {
-                                    // Color alterno para las filas
-                                    return (subPregTabla.indexOf(sub) % 2 == 0)
-                                          ? Colors.blueGrey.shade50
-                                          : Colors.white;
-                                  }),
-                                  cells: [
-                                    DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
-                                    DataCell(sub.subPreguntas != null ? Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                    DataCell(
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              _showEditDialogSubPregunta(sub);
-                                            }, 
-                                            icon: const Icon(Icons.edit, color: Colors.blue),
-                                          ),
-                                          
-                                          IconButton(
-                                            onPressed: () {
-                                              _showDeleteDialogSubPregunta(sub);
-                                            },
-                                            icon: const Icon(Icons.delete, color: Colors.red)
-                                          )
-                                        ],
-                                      )
-                                    )
-                                  ]
-                                );
-                              }).toList(),
-                            ),
+                        return Container(
+                          margin: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(7.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          ),
+                          child: PaginatedDataTable(
+                            columns: const [
+                              DataColumn(label: Text('NO', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                            ], 
+                            source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta),
+                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                            rowsPerPage: 7, //numeros de filas
+                            columnSpacing: 50, //espacios entre columnas
+                            horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                            showCheckboxColumn: false, //oculta la columna de checkboxes
+                            dataRowMinHeight: 60.0,  // Altura mínima de fila
+                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                            showFirstLastButtons: true,
                           ),
                         );
                       }
@@ -557,7 +468,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                         
                   const SizedBox(height: 20),
                   const Text(
-                    'Tablas de las Sesiones',
+                    'Tablas administrativa para gestionar las preguntas',
                     style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
@@ -567,6 +478,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       Expanded(
                         child: FormBuilderDropdown<String>(
                           name: 'filtrarSesion',
+                          menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                           initialValue: selectedFilterSesion,
                           style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: const InputDecoration(
@@ -577,7 +489,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                           items: [
                             'Numero de Sesion',
                             'Tipo de Respuesta',
-                            'Tema',
                             'Numero de Pregunta',
                             'No. de Sup Pregunta'
                           ].map((filter) => DropdownMenuItem(
@@ -637,74 +548,40 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               ? _sesionFiltrada
                               : snapshot.data ?? [];
                         
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Container(
-                            margin: const EdgeInsets.all(16.0),
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: DataTable(
-                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                              headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
-                              columns: const [
-                                DataColumn(label: Text('No.', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 23.0))),
-                                // DataColumn(label: Text('Tema.', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 23.0))),
-                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 23.0)))
-                              ], 
-                              rows: sesionTable.map((section) {
-                                return DataRow(
-                                  color: WidgetStateProperty.resolveWith<Color>((states) {
-                                    // Color alterno para las filas
-                                    return (sesionTable.indexOf(section) % 2 == 0)
-                                          ? Colors.blueGrey.shade50
-                                          : Colors.white;
-                                  }),
-                                  cells: [
-                                    DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
-                                    DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
-                                    // DataCell(section.grupoTema != null ? Text(section.grupoTema!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                    DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
-                                    DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                    DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                    DataCell(
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              _showEditDialogSesion(section);
-                                            }, 
-                                            icon: const Icon(Icons.edit, color: Colors.blue),
-                                          ),
-                                          
-                                          IconButton(
-                                            onPressed: () {
-                                              _showDeleteDialogSesion(section);
-                                            },
-                                            icon: const Icon(Icons.delete, color: Colors.red)
-                                          )
-                                        ],
-                                      )
-                                    )
-                                  ]
-                                );
-                              }).toList(),
-                            ),
+                        return Container(
+                          margin: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(7.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          ),
+                          child: PaginatedDataTable(
+                            columns: const [
+                              DataColumn(label: Text('No. de Sesión', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                            ],
+                            source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion),
+                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                            rowsPerPage: 10, //numeros de filas
+                            columnSpacing: 50, //espacios entre columnas
+                            horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                            showCheckboxColumn: false, //oculta la columna de checkboxes
+                            dataRowMinHeight: 60.0,  // Altura mínima de fila
+                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                            showFirstLastButtons: true,
                           ),
                         );
                       }
@@ -791,7 +668,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           child: const Icon(Icons.add, size: 20),
           backgroundColor: const Color.fromARGB(255, 125, 240, 119),
           foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-          label: 'Agregar Sesion',
+          label: 'Agregar Sesión',
           labelStyle: const TextStyle(fontSize: 20.0),
           onTap: () => _showCreateDialogSesion()
         ),
@@ -819,7 +696,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'noPregunta',
                     keyboardType: TextInputType.number,
                     decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Numero de la Pregunta',
+                      labeltext: 'Número de la Pregunta',
                       labelFrontSize: 30.5,
                       hintext: '#',
                       hintFrontSize: 30.0,
@@ -862,7 +739,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       context: context, 
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('Numero de la pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
+                          title: const Text('Número de la pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
                           contentPadding: EdgeInsets.zero,
                           content: Container(
                             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -887,16 +764,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     pregunta: dataPreg['pregunta'],
                   ); // Para verificar el valor antes de la asignación
 
-                  setState(() {
-                    _isLoading = true; // Mostrar el cuadro de carga
-                  });
-
                   try{
                     final response = await ApiServicePreguntas('https://10.0.2.2:7190').postPreguntas(nuevaPregunta);
-
-                    setState(() {
-                      _isLoading = false; // Ocultar el cuadro de carga
-                    });
 
                     if(response.statusCode == 201) {
                       print('La pregunta fue creado con éxito');
@@ -905,9 +774,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       // Future.delayed(const Duration(seconds: 2), () { Navigator.of(context).pop(); });
                       _fetchData();
                     } else {
-                      setState(() {
-                        _isLoading = false; // Ocultar el cuadro de carga
-                      });
                       print('Error al crear la pregunta: ${response.body}');
                       _showErrorDialog(context, 'Error al crear la pregunta.');
                       Future.delayed(const Duration(seconds: 2), () { Navigator.of(context).pop(); });
@@ -970,11 +836,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     pregunta: formData['pregunta'],
                   );
 
-                  setState(() {
-                    _isLoading = true; // Mostrar el cuadro de carga
-                    // hasError = false;
-                  });
-
                   try{
                     final response = await ApiServicePreguntas('https://10.0.2.2:7190')
                       .putPreguntas(questionUpLoad.codPregunta, askUpLoad);
@@ -985,9 +846,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       _showSuccessDialog(context, 'La pregunta fue actualizado con éxito');
                       _fetchData();
                     } else {
-                      setState(() {
-                        _isLoading = false; // Ocultar el cuadro de carga
-                      });
                       print('Error al modificar la pregunta: ${response.body}');
                       _showErrorDialog(context, 'Error al modificar la pregunta');
                     }
@@ -1012,7 +870,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         return AlertDialog(
           title: const Text('Eliminar Pregunta', style: TextStyle(fontSize: 33.0)),
           contentPadding: const EdgeInsets.fromLTRB(70, 30, 70, 50),
-          content: Text('¿Estás seguro de que deseas eliminar la pregunta numero: ${questionDelete.codPregunta}?', style: const TextStyle(fontSize: 30)),
+          content: Text('¿Estás seguro de que deseas eliminar la pregunta número: ${questionDelete.codPregunta}?', style: const TextStyle(fontSize: 30)),
           actions: [
             TextButton(
               child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
@@ -1023,10 +881,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             TextButton(
               child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                setState(() {
-                  _isLoading = true; // Mostrar el cuadro de carga
-                  // hasError = false;
-                });
                 // Llamar al servicio de eliminación
                 try {
                   final response = await ApiServicePreguntas('https://10.0.2.2:7190')
@@ -1038,9 +892,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     _showSuccessDialog(context, 'La pregunta fue eliminado con éxito');
                     _fetchData();
                   } else if (response.statusCode == 400) {
-                    setState(() {
-                      _isLoading = false; // Ocultar el cuadro de carga
-                    });
                     final responseBody = jsonDecode(response.body);
                     _showErrorDialog(context, responseBody['message']);
                   } else {
@@ -1120,7 +971,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       context: context, 
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('No de la sub-pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
+                          title: const Text('No. de la sub-pregunta ya existente', style: TextStyle(fontSize: 33.0, fontWeight: FontWeight.bold)),
                           contentPadding: EdgeInsets.zero,
                           content: Container(
                             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -1145,11 +996,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     subPreguntas: dataSebPreg['subPreguntas']
                   );
 
-                  setState(() {
-                    _isLoading = true; // Mostrar el cuadro de carga
-                    // hasError = false;
-                  });
-
                   try{
                     final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190').postSubPreg(nuevaSubPregunta);
 
@@ -1159,9 +1005,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       _showSuccessDialog(context, 'Las sub-Preguntas fue creado con éxito');
                       _fetchDataSubPregu();
                     } else {
-                      setState(() {
-                        _isLoading = false; // Ocultar el cuadro de carga
-                      });
                       print('Error al crear las sub-Preguntas: ${response.body}');
                       _showErrorDialog(context, 'Error al crear las sub-Preguntas.');
                     }
@@ -1233,11 +1076,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     subPreguntas: dataSebPreg['subPreguntas']
                   );
 
-                  setState(() {
-                    _isLoading = true; // Mostrar el cuadro de carga
-                    // hasError = false;
-                  });
-
                   try{
                     final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
                       .putSubPreg(subQuestionUpLoad.codSubPregunta, nuevaSubPregunta);
@@ -1248,9 +1086,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       _showSuccessDialog(context, 'Las sub-Preguntas fue actulaiza con éxito');
                       _fetchDataSubPregu();
                     } else {
-                      setState(() {
-                        _isLoading = false; // Ocultar el cuadro de carga
-                      });
                       print('Error al modificar la sub-pregunta: ${response.body}');
                       _showErrorDialog(context, 'Error al modificar la sub-pregunta');
                     }
@@ -1286,7 +1121,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             TextButton(
               child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                setState(() {_isLoading = true;}); // Mostrar el cuadro de carga
                 // Llamar al servicio de eliminación
                 try {
                   final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
@@ -1298,7 +1132,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     _showSuccessDialog(context, 'Las sub-Preguntas fue creado con éxito');
                     _fetchDataSubPregu();
                   } else if (response.statusCode == 400) {
-                    setState(() {_isLoading = false;}); // Mostrar el cuadro de carga
                     final responseBody = jsonDecode(response.body);
                     _showErrorDialog(context, responseBody['message']);
                   } else {
@@ -1323,7 +1156,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear Sesion', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Crear Sesión', style: TextStyle(fontSize: 33.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
@@ -1333,8 +1166,80 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  FormBuilderDropdown<int>(
+                    name: 'codPregunta',
+                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Pregunta',
+                      labelFrontSize: 30.5,
+                      hintext: 'Elegir la Pregunta',
+                      hintFrontSize: 25.0,
+                      icono: const Icon(Icons.question_answer, size: 30.0),
+                      errorSize: 20.0,
+                    ),
+                    items: _questions.map((preg) {
+                      return DropdownMenuItem(
+                        value: preg.codPregunta,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                preg.pregunta, 
+                                overflow: TextOverflow.ellipsis, // Maneja texto muy largo
+                                maxLines: 2, // Limita el texto a 2 líneas
+                              )
+                            ),
+                            const SizedBox(width: 20),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _savedQuestion = value!;
+                        print('Pregunta seleccionada: $_savedQuestion');
+                      });
+                    },
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                    isExpanded: true,
+                    // dropdownColor: Colors.grey[200], // Cambiar el color del fondo
+                    iconEnabledColor: Colors.blue, // Color del icono desplegable
+                    menuMaxHeight: 300.0, // Altura máxima del cuadro desplegable
+                  ),
+                  const SizedBox(height: 20),
+
+                  FormBuilderDropdown(
+                    name: 'codSubPregunta',
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'Sub Pregunta',
+                      labelFrontSize: 30.5,
+                      hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
+                      hintFrontSize: 25.0,
+                      icono: const Icon(Icons.subdirectory_arrow_right, size: 30.0),
+                    ),
+                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    items: _subQuestions.map((subPreg) {
+                      return DropdownMenuItem(
+                        value: subPreg.codSubPregunta,
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                subPreg.subPreguntas!, overflow: TextOverflow.clip)
+                            ),
+                          ],
+                        )
+                      );
+                    }).toList(),
+                    isExpanded: true, // Permite que los ítems se expandan al ancho disponible
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                  ),
+                  const SizedBox(height: 20),
+
                   FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige Tipo de Respuesta',
                       labelFrontSize: 30.5,
@@ -1343,7 +1248,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       icono: const Icon(Icons.list_alt, size: 30.0),
                       errorSize: 20.0,
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    style: const TextStyle(fontSize: 25.0, color: Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                     items: const [
                       DropdownMenuItem(
@@ -1379,8 +1284,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                         child: Text('Producto utilizado'),
                       ),
                       DropdownMenuItem(
-                        value: 'Genero',
-                        child: Text('Genero'),
+                        value: 'Género',
+                        child: Text('Género'),
                       ),
                       DropdownMenuItem(
                         value: 'Frecuencia de viajes por semana',
@@ -1408,76 +1313,16 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   ),
                   const SizedBox(height: 20),
 
-                  FormBuilderDropdown<int>(
-                    name: 'codPregunta',
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'No. de Pregunta',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.question_answer, size: 30.0),
-                      errorSize: 20.0,
-                    ),
-                    items: _questions.map((preg) {
-                      return DropdownMenuItem(
-                        value: preg.codPregunta,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              child: Text(preg.pregunta, overflow: TextOverflow.clip)
-                            ),
-                            const SizedBox(width: 20),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _savedQuestion = value!;
-                        print('Pregunta seleccionada: $_savedQuestion');
-                      });
-                    },
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                    isExpanded: true,
-                  ),
-                  const SizedBox(height: 20),
-
-                  FormBuilderDropdown(
-                    name: 'codSubPregunta',
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Cod. Sub Pregunta',
-                      labelFrontSize: 30.5,
-                      hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
-                      hintFrontSize: 25.0,
-                      icono: const Icon(Icons.subdirectory_arrow_right, size: 30.0),
-                    ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    items: _subQuestions.map((subPreg) {
-                      return DropdownMenuItem(
-                        value: subPreg.codSubPregunta,
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                subPreg.subPreguntas!, overflow: TextOverflow.clip)
-                            ),
-                          ],
-                        )
-                      );
-                    }).toList(),
-                    isExpanded: true, // Permite que los ítems se expandan al ancho disponible
-                  ),
-                  const SizedBox(height: 20),
-
                   FormBuilderDropdown(
                     name: 'nota',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige el Requerimiento',
                       labelFrontSize: 30.5,
                       icono: const Icon(Icons.assignment, size: 30.0),
                       errorSize: 20.0,
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    style: const TextStyle(fontSize: 25.0, color: Color.fromARGB(255, 1, 1, 1)),
                     items: const  [
                       DropdownMenuItem(
                           value: 'No se requiere otra cosa mas.',
@@ -1519,8 +1364,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                   print('Resultados ${nuevaSesion}');
 
-                  setState(() {_isLoading = true;}); // Mostrar el cuadro de carga
-
                   try{
                     final response = await ApiServiceSesion('https://10.0.2.2:7190').postSesion(nuevaSesion);
 
@@ -1531,7 +1374,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       _refreshSesion();
                       
                     } else {
-                      setState(() {_isLoading = false;}); // Mostrar el cuadro de carga
                       print('Error al crear la Sesion: ${response.body}');
                       _showErrorDialog(context, 'Error al crear la Sesion.');
                     }
@@ -1554,7 +1396,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar La Sesion', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Modificar La Sesión', style: TextStyle(fontSize: 33.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -1572,6 +1414,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 children: [
                   FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige Tipo de Respuesta',
                       labelFrontSize: 30.5,
@@ -1615,8 +1458,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                         child: Text('Producto utilizado'),
                       ),
                       DropdownMenuItem(
-                        value: 'Genero',
-                        child: Text('Genero'),
+                        value: 'Género',
+                        child: Text('Género'),
                       ),
                       DropdownMenuItem(
                         value: 'Frecuencia de viajes por semana',
@@ -1645,6 +1488,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                   FormBuilderDropdown<int>(
                     name: 'codPregunta',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'No. de Pregunta',
@@ -1678,6 +1522,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                   FormBuilderDropdown<String>(
                     name: 'codSubPregunta',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Cod. Sub Pregunta',
                       labelFrontSize: 30.5,
@@ -1704,6 +1549,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                   FormBuilderDropdown(
                     name: 'nota',
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige el Requerimiento',
                       labelFrontSize: 30.5,
@@ -1748,7 +1594,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   print('Resultados de sesionUpLoad: $sesionUpLoad');
-                  setState(() {_isLoading = true;}); // Mostrar el cuadro de carga
 
                   try{
                     final response = await ApiServiceSesion('https://10.0.2.2:7190')
@@ -1760,7 +1605,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       _showSuccessDialog(context, 'La Sesion fue modificada con éxito');
                       _refreshSesion();
                     } else {
-                      setState(() {_isLoading = false;}); // Mostrar el cuadro de carga
                       print('Error al modificar la Sesion: ${response.body}');
                       _showErrorDialog(context, 'Error al modificar la Sesion');
                     }
@@ -1783,7 +1627,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Sesion', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Eliminar Sesión', style: TextStyle(fontSize: 33.0)),
           content: Text('¿Estás seguro de que deseas eliminar la sesion no. ${sectionDelete.idSesion}?', style: const TextStyle(fontSize: 30)),
           actions: [
             TextButton(
@@ -1795,7 +1639,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             TextButton(
               child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
               onPressed: () async {
-                setState(() {_isLoading = true;}); // Mostrar el cuadro de carga
                 try{
                   final response = await ApiServiceSesion('https://10.0.2.2:7190').deleteSesion(sectionDelete.idSesion!);
 
@@ -1803,12 +1646,11 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     print('Sesion eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
-                    _showSuccessDialog(context, 'La Sesion fue eliminado con éxito');
+                    _showSuccessDialog(context, 'La Sesión fue eliminado con éxito');
                     _refreshSesion();
                   } else {
-                    setState(() {_isLoading = false;}); // Mostrar el cuadro de carga
-                    print('Error al eliminar la sesion: ${response.body}');
-                    _showErrorDialog(context, 'Error al eliminar la sesion');
+                    print('Error al eliminar la sesión: ${response.body}');
+                    _showErrorDialog(context, 'Error al eliminar la sesión');
                   }
                 } catch (e) {
                   print('Excepción al eliminar la sesion: $e');
@@ -1894,13 +1736,182 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         );
       }
     );
-
-    // Hacer que el cuadro de éxito se cierre automáticamente después de 2 segundos
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   // Comprobamos si el widget aún está montado antes de intentar realizar cualquier acción
-    //   if (mounted) {
-    //     Navigator.of(context).pop(); // Cierra el cuadro de éxito solo si el widget está montado
-    //   }
-    // });
   }
+}
+
+class _PreguntasDataSource extends DataTableSource {
+  final List<Preguntas> preguntasData;
+  final Function(Preguntas) onEdit;
+  final Function(Preguntas) onDelete;
+
+  _PreguntasDataSource(this.preguntasData, this.onEdit, this.onDelete);
+
+  @override
+  DataRow getRow(int index) {
+    if (index >= preguntasData.length) return const DataRow(cells: []);
+
+    final ask = preguntasData[index];
+
+    return DataRow(
+      color: WidgetStateProperty.resolveWith<Color>((states) {
+        // Color alterno para las filas
+        return (preguntasData.indexOf(ask) % 2 == 0)
+              ? Colors.blueGrey.shade50
+              : Colors.white;
+      }),
+      cells: [
+        DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
+        DataCell(Text(ask.pregunta, style: const TextStyle(fontSize: 20.0))),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  // _showEditDialog(ask);
+                  onEdit(ask);
+                }, 
+                icon: const Icon(Icons.edit, color: Colors.blue),
+              ),
+              
+              IconButton(
+                onPressed: () {
+                  // _showDeleteDialog(ask);
+                  onDelete(ask);
+                },
+                icon: const Icon(Icons.delete, color: Colors.red)
+              )
+            ],
+          )
+        )
+      ]
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => preguntasData.length;
+
+  @override
+  int get selectedRowCount => 0;
+}
+
+class _SubPreguntasDataSource extends DataTableSource {
+  final List<SubPregunta> _subPreguntasData;
+  final Function(SubPregunta) onEdit;
+  final Function(SubPregunta) onDelete;
+
+  _SubPreguntasDataSource(this._subPreguntasData, this.onEdit, this.onDelete);
+
+  @override
+  DataRow getRow(int index) {
+    if (index >= _subPreguntasData.length) return const DataRow(cells: []);
+
+    final sub = _subPreguntasData[index];
+
+    return DataRow(
+      color: WidgetStateProperty.resolveWith<Color>((states) {
+        // Color alterno para las filas
+        return (_subPreguntasData.indexOf(sub) % 2 == 0)
+              ? Colors.blueGrey.shade50
+              : Colors.white;
+      }),
+      cells: [
+        DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
+        DataCell(sub.subPreguntas != null ? Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  // _showEditDialogSubPregunta(sub);
+                  onEdit(sub);
+                }, 
+                icon: const Icon(Icons.edit, color: Colors.blue),
+              ),
+              
+              IconButton(
+                onPressed: () {
+                  // _showDeleteDialogSubPregunta(sub);
+                  onDelete(sub);
+                },
+                icon: const Icon(Icons.delete, color: Colors.red)
+              )
+            ],
+          )
+        )
+      ]
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => _subPreguntasData.length;
+
+  @override
+  int get selectedRowCount => 0;
+}
+
+class _SesionDataSource extends DataTableSource {
+  final List<Sesion> _sesionData;
+  final Function(Sesion) onEdit;
+  final Function(Sesion) onDelete;
+
+  _SesionDataSource(this._sesionData, this.onEdit, this.onDelete);
+
+  @override
+  DataRow getRow(int index) {
+    if (index >= _sesionData.length) return const DataRow(cells: []);
+
+    final section = _sesionData[index];
+
+    return DataRow(
+      color: WidgetStateProperty.resolveWith<Color>((states) {
+        // Color alterno para las filas
+        return (_sesionData.indexOf(section) % 2 == 0)
+              ? Colors.blueGrey.shade50
+              : Colors.white;
+      }),
+      cells: [
+        DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
+        DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  // _showEditDialogSesion(section);
+                  onEdit(section);
+                }, 
+                icon: const Icon(Icons.edit, color: Colors.blue),
+              ),
+              
+              IconButton(
+                onPressed: () {
+                  // _showDeleteDialogSesion(section);
+                  onDelete(section);
+                },
+                icon: const Icon(Icons.delete, color: Colors.red)
+              )
+            ],
+          )
+        )
+      ]
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => _sesionData.length;
+
+  @override
+  int get selectedRowCount => 0;
 }

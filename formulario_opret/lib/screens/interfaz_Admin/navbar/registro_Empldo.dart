@@ -337,74 +337,101 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   final usuariostabla = snapshot.data ?? [];
             
                   return SingleChildScrollView(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal, // Permitir scroll horizontal
-                      child: Container(
-                        margin: const EdgeInsets.all(16.0),
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            )
-                          ]
-                        ),
-                        child: DataTable(
-                          headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                          headingTextStyle: const TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold), // Texto de encabezado,
-                          columns: const [
-                            DataColumn(label: Text('ID')),
-                            DataColumn(label: Text('Nombre Completo')),
-                            DataColumn(label: Text('Usuario')),
-                            DataColumn(label: Text('Correo Electronico')),
-                            DataColumn(label: Text('Fecha de Creacion')),
-                            DataColumn(label: Text('Rol')),
-                            DataColumn(label: Text('Accion'))
-                          ], 
-                          rows: usuariostabla.map((usuario){
-                            return DataRow(
-                              color: WidgetStateProperty.resolveWith<Color>((states) {
-                                // Color alterno para las filas
-                                return (usuariostabla.indexOf(usuario) % 2 == 0)
-                                      ? Colors.blueGrey.shade50
-                                      : Colors.white;
-                              }),
-                              cells: [
-                                DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                                DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.blue),  
-                                        onPressed: (){
-                                          _showEditDialog(usuario);
-                                        },
-                                      ),
-                        
-                                      IconButton(
-                                        onPressed: () {
-                                          _showDeleteDialog(usuario);
-                                        }, 
-                                        icon: const Icon(Icons.delete, color: Colors.red)
-                                      )
-                                    ],
-                                  )
-                                )
-                              ]
-                            );
-                          }).toList(),
-                        ),
+                    child: Container(
+                      margin: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(2.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                        borderRadius: BorderRadius.circular(10.0),
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                        //     spreadRadius: 5,
+                        //     blurRadius: 7,
+                        //     offset: const Offset(0, 3),
+                        //   )
+                        // ]
+                      ),
+                      child: PaginatedDataTable(
+                        // header: const Text('Lista de Usuarios'),
+                        // scrollDirection: Axis.horizontal, // Permitir scroll horizontal
+                        // child: Container(
+                          // margin: const EdgeInsets.all(16.0),
+                          // padding: const EdgeInsets.all(10.0),
+                          // decoration: BoxDecoration(
+                          //   color: Colors.white,
+                          //   border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                          //   borderRadius: BorderRadius.circular(10.0),
+                          //   boxShadow: [
+                          //     BoxShadow(
+                          //       color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                          //       spreadRadius: 5,
+                          //       blurRadius: 7,
+                          //       offset: const Offset(0, 3),
+                          //     )
+                          //   ]
+                          // ),
+                          // child: DataTable(
+                            
+                            
+                            columns: const [
+                              DataColumn(label: Text('ID', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Usuario', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Rol', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                            ],
+                            source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog),
+                            rowsPerPage: 11, //numeros de filas
+                            columnSpacing: 30, //espacios entre columnas
+                            horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                            showCheckboxColumn: false, //oculta la columna de checkboxes
+                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                            dataRowMinHeight: 60.0,  // Altura mínima de fila
+                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                            showFirstLastButtons: true,
+                            // rows: usuariostabla.map((usuario){
+                            //   return DataRow(
+                            //     color: WidgetStateProperty.resolveWith<Color>((states) {
+                            //       // Color alterno para las filas
+                            //       return (usuariostabla.indexOf(usuario) % 2 == 0)
+                            //             ? Colors.blueGrey.shade50
+                            //             : Colors.white;
+                            //     }),
+                            //     cells: [
+                            //       DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+                            //       DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
+                            //       DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
+                            //       DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
+                            //       DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
+                            //       DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
+                            //       DataCell(
+                            //         Row(
+                            //           children: [
+                            //             IconButton(
+                            //               icon: const Icon(Icons.edit, color: Colors.blue),  
+                            //               onPressed: (){
+                            //                 _showEditDialog(usuario);
+                            //               },
+                            //             ),
+                          
+                            //             IconButton(
+                            //               onPressed: () {
+                            //                 _showDeleteDialog(usuario);
+                            //               }, 
+                            //               icon: const Icon(Icons.delete, color: Colors.red)
+                            //             )
+                            //           ],
+                            //         )
+                            //       )
+                            //     ]
+                            //   );
+                            // }).toList(),
+                          // ),
+                        // ),
                       ),
                     ),
                   );
@@ -972,3 +999,59 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     // });
   }
 }
+
+class _UsuariosDataSource extends DataTableSource {
+  final List<Usuarios> usuarios;
+  final Function(Usuarios) onEdit;
+  final Function(Usuarios) onDelete;
+
+  _UsuariosDataSource(this.usuarios, this.onEdit, this.onDelete);
+
+  @override
+  DataRow getRow(int index) {
+    if (index >= usuarios.length) return const DataRow(cells: []);
+
+    final usuario = usuarios[index];
+
+    return DataRow(
+      cells: [
+        DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.blue),  
+                onPressed: (){
+                  // _showEditDialog(usuario);
+                  onEdit(usuario);
+                },
+              ),
+
+              IconButton(
+                onPressed: () {
+                  // _showDeleteDialog(usuario);
+                  onDelete(usuario);
+                }, 
+                icon: const Icon(Icons.delete, color: Colors.red)
+              )
+            ],
+          )
+        )
+      ]
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => usuarios.length;
+
+  @override
+  int get selectedRowCount => 0;
+} 

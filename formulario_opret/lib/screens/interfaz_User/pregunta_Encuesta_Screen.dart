@@ -136,59 +136,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               }
             ),
           ),
-          /*
-          Padding(
-            padding: const EdgeInsets.all(28.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  // _showAdvertenciaDialog(context, '¿Está seguro de que desea finalizar la sesión de preguntas?');
-                  if (dataQuestion.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('No hay preguntas disponibles para guardar')),
-                    );
-                    return;
-                  }
-
-                  bool allResponsesSaved = true;
-
-                  // Itera sobre todas las preguntas
-                  for (var question in dataQuestion) {
-                    try {
-                      // Llama al método `_saveRespuesta` para cada pregunta
-                      _updateRespuestas(answer, question, finalizarSesion: 1);
-                      
-                    } catch (e) {
-                      allResponsesSaved = false;
-                      print('Error al guardar respuesta para la pregunta ${question.sp_CodPregunta}: $e');
-                    }
-                  }
-
-                  // _respuestaController.syncDataResp();
-
-                  // Muestra un mensaje de éxito o error según el resultado
-                  if (allResponsesSaved) {
-                    _showSuccessDialog(context, 'Todas las respuestas fueron guardadas exitosamente.');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Hubo errores al guardar algunas respuestas')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(1, 135, 76, 1), //  se usa para definir el color de fondo del botón.
-                  foregroundColor: const Color.fromARGB(255, 255, 255, 255), // se usa para definir el color del texto y los iconos dentro del botón.
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-                child: const Text('Enviar Todas las Respuestas', style: TextStyle(fontSize: 26.0)),
-              ),
-            )
-          )
-          */
         ],
       )
     );
@@ -231,7 +178,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           text: TextSpan(
                             children: [
                               const TextSpan(
-                                text: 'Numero de la pregunta: ',
+                                text: 'Número de la pregunta: ',
                                 style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                               ),
                               TextSpan(
@@ -300,7 +247,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                   text: TextSpan(
                                       children: [
                                         const TextSpan(
-                                          text: '- Requerimiento: \n',
+                                          text: '--- Requerimiento: \n',
                                           style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                         ),
                                         TextSpan(
@@ -397,6 +344,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Calificar del 1 a 10')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0, // Altura máxima del cuadro desplegable
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Calific. 1 a 10',
@@ -441,6 +389,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Edad')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Edad',
@@ -503,6 +452,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Producto utilizado')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Producto utilizado',
@@ -541,6 +491,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Frecuencia de viajes por semana')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Frecuencia de viajes por semana',
@@ -562,6 +513,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Expectativa del pasajero')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Expectativa del pasajero',
@@ -594,6 +546,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Motivo del viaje')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
+                          menuMaxHeight: 200.0,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Cual es el motivo del viaje a metro',

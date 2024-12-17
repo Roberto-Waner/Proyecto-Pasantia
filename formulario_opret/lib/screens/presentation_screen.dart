@@ -173,7 +173,7 @@ class _PresentationScreenState extends State<PresentationScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Iniciar Sesión',
+                              'Iniciar Sección',
                               style: TextStyle(
                                 fontSize: 35,
                                 color: Colors.black,

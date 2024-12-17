@@ -35,6 +35,9 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   DateTime? _selectedDate;
   Offset position = const Offset(700, 1150); // Posición inicial del botón
   String selectedRole = 'Empleado';
+  int _paginaActual = 0; // Página actual del PaginatedDataTable
+  final int _filasPorPagina = 10; // Filas mostradas por página
+  int? _selectedRowIndex; // Índice de la fila seleccionada
 
   @override
   void initState() {
@@ -84,6 +87,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     searchController.clear();
     setState(() { 
       usuariosFiltrados = null; 
+      _selectedRowIndex = null; // Reinicia el índice seleccionado
     }); 
   }
 
@@ -112,6 +116,56 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     }
   }
 
+  void _ubicarUsuarios(String? idUsuario, String? nombre, String? user) async {
+    try {
+      // Obtener la lista de usuarios
+      final usuarios = await _usuariosdata;
+
+      // Verificar si los datos de entrada son nulos o vacíos
+      if ((idUsuario == null || idUsuario.isEmpty) &&
+          (nombre == null || nombre.isEmpty) &&
+          (user == null || user.isEmpty)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor, ingresa un criterio de búsqueda válido')),
+        );
+        return;
+      }
+
+      // Buscar el índice del usuario en la lista
+      final index = usuarios.indexWhere((usuario) =>
+          (idUsuario != null && usuario.idUsuarios!.trim().toLowerCase() == idUsuario.toLowerCase()) ||
+          (nombre != null && usuario.nombreApellido.trim().toLowerCase() == nombre.toLowerCase()) ||
+          (user != null && usuario.usuario1.trim().toLowerCase() == user.toLowerCase()));
+
+      if (index != -1) {
+        // Calcular página correspondiente
+        final pagina = index ~/ _filasPorPagina;
+
+        // Usuario encontrado: calcular la página y redirigir
+        setState(() {
+          // _paginaActual = index ~/ _filasPorPagina;
+          _paginaActual = pagina; // Cambiar a la página del usuario
+          _selectedRowIndex = index; // Seleccionar la fila del usuario
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuario ubicado en la página ${_paginaActual + 1}')),
+        );
+      } else {
+        // Usuario no encontrado
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuario no encontrado en la tabla')),
+        );
+      }
+    } catch (e) {
+      // Manejo de errores
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ocurrió un error al buscar el usuario')),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +176,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         // // filtrarCedula: widget.filtrarCedula,
       ),
       appBar: AppBar(
-        title: const Text('Registro Empleados'),
+        title: const Text('Registro de Usuarios'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, size: 30.0),
@@ -290,6 +344,20 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                             ]
                           )
                         )
+                      ),
+                      const SizedBox(height: 20.0),
+                      TextButton(
+                        onPressed: () => _ubicarUsuarios(usuariosFiltrados?.idUsuarios, usuariosFiltrados?.nombreApellido, usuariosFiltrados?.usuario1),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        child: const Text(
+                          'Ubicar en tabla',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )
                       )
                     ],
                   ),
@@ -344,94 +412,43 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                         color: Colors.white,
                         border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
                         borderRadius: BorderRadius.circular(10.0),
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                        //     spreadRadius: 5,
-                        //     blurRadius: 7,
-                        //     offset: const Offset(0, 3),
-                        //   )
-                        // ]
                       ),
-                      child: PaginatedDataTable(
-                        // header: const Text('Lista de Usuarios'),
-                        // scrollDirection: Axis.horizontal, // Permitir scroll horizontal
-                        // child: Container(
-                          // margin: const EdgeInsets.all(16.0),
-                          // padding: const EdgeInsets.all(10.0),
-                          // decoration: BoxDecoration(
-                          //   color: Colors.white,
-                          //   border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                          //   borderRadius: BorderRadius.circular(10.0),
-                          //   boxShadow: [
-                          //     BoxShadow(
-                          //       color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                          //       spreadRadius: 5,
-                          //       blurRadius: 7,
-                          //       offset: const Offset(0, 3),
-                          //     )
-                          //   ]
-                          // ),
-                          // child: DataTable(
-                            
-                            
-                            columns: const [
-                              DataColumn(label: Text('ID', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Usuario', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Rol', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
-                            ],
-                            source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog),
-                            rowsPerPage: 11, //numeros de filas
-                            columnSpacing: 30, //espacios entre columnas
-                            horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                            showCheckboxColumn: false, //oculta la columna de checkboxes
-                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                            dataRowMinHeight: 60.0,  // Altura mínima de fila
-                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                            showFirstLastButtons: true,
-                            // rows: usuariostabla.map((usuario){
-                            //   return DataRow(
-                            //     color: WidgetStateProperty.resolveWith<Color>((states) {
-                            //       // Color alterno para las filas
-                            //       return (usuariostabla.indexOf(usuario) % 2 == 0)
-                            //             ? Colors.blueGrey.shade50
-                            //             : Colors.white;
-                            //     }),
-                            //     cells: [
-                            //       DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-                            //       DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),
-                            //       DataCell(Text(usuario.usuario1, style: const TextStyle(fontSize: 20.0))),
-                            //       DataCell(Text(usuario.email, style: const TextStyle(fontSize: 20.0))),
-                            //       DataCell(Text(usuario.fechaCreacion, style: const TextStyle(fontSize: 20.0))),
-                            //       DataCell(Text(usuario.rol, style: const TextStyle(fontSize: 20.0))),
-                            //       DataCell(
-                            //         Row(
-                            //           children: [
-                            //             IconButton(
-                            //               icon: const Icon(Icons.edit, color: Colors.blue),  
-                            //               onPressed: (){
-                            //                 _showEditDialog(usuario);
-                            //               },
-                            //             ),
-                          
-                            //             IconButton(
-                            //               onPressed: () {
-                            //                 _showDeleteDialog(usuario);
-                            //               }, 
-                            //               icon: const Icon(Icons.delete, color: Colors.red)
-                            //             )
-                            //           ],
-                            //         )
-                            //       )
-                            //     ]
-                            //   );
-                            // }).toList(),
-                          // ),
-                        // ),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          textTheme: Theme.of(context).textTheme.copyWith(
+                            bodySmall: const TextStyle(
+                              fontSize: 20,           // Ajusta el tamaño del número
+                              color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                              fontWeight: FontWeight.bold, // Hace el texto más visible
+                            ),
+                          ),
+                        ),
+                        child: PaginatedDataTable(
+                          columns: const [
+                            DataColumn(label: Text('ID', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Usuario', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Rol', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                          ],
+                          source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog, _selectedRowIndex),
+                          rowsPerPage: _filasPorPagina, //numeros de filas
+                          columnSpacing: 30, //espacios entre columnas
+                          horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                          showCheckboxColumn: false, //oculta la columna de checkboxes
+                          headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                          dataRowMinHeight: 60.0,  // Altura mínima de fila
+                          dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                          showFirstLastButtons: true,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _paginaActual = index ~/ _filasPorPagina;
+                            });
+                          },
+                          initialFirstRowIndex: _paginaActual * _filasPorPagina,
+                        ),
                       ),
                     ),
                   );
@@ -524,34 +541,35 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                 // width: 600,
                 child: FormBuilder(
                   key: formKey,
+                  autovalidateMode: AutovalidateMode.disabled,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [              
-                      FormBuilderTextField(
-                        name: 'cedula',
-                        style: const TextStyle(fontSize: 30.0),
-                        decoration: InputDecorations.inputDecoration(
-                          labeltext: 'Cedula',
-                          labelFrontSize: 30.5,
-                          hintext: '000-0000000-0',
-                          hintFrontSize: 25.0,
-                          icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
-                        ),
-                        // validator: FormBuilderValidators.required(),
-                        validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
-                          FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
-                          (value) {
-                            // Expresión regular para validar la cedula
-                            String pattern = r'^\d{3}-\d{7}-\d{1}$';
-                            RegExp regExp = RegExp(pattern);
+                      // FormBuilderTextField(
+                      //   name: 'cedula',
+                      //   style: const TextStyle(fontSize: 30.0),
+                      //   decoration: InputDecorations.inputDecoration(
+                      //     labeltext: 'Cedula',
+                      //     labelFrontSize: 30.5,
+                      //     hintext: '000-0000000-0',
+                      //     hintFrontSize: 25.0,
+                      //     icono: const Icon(Icons.person_pin_circle_outlined, size: 30.0),
+                      //   ),
+                      //   // validator: FormBuilderValidators.required(),
+                      //   validator: FormBuilderValidators.compose([ //Combina varios validadores. En este caso, se utiliza el validador requerido y una función personalizada para la expresión regular.
+                      //     FormBuilderValidators.required(errorText: 'Debe de ingresar la cedula'), //Valida que el campo no esté vacío y muestra el mensaje 'El correo es obligatorio' si no se ingresa ningún valor.
+                      //     (value) {
+                      //       // Expresión regular para validar la cedula
+                      //       String pattern = r'^\d{3}-\d{7}-\d{1}$';
+                      //       RegExp regExp = RegExp(pattern);
               
-                            if(!regExp.hasMatch(value ?? '')){
-                              return 'Formato de cédula incorrecto';
-                            }
-                            return null;
-                          },
-                        ]),                    
-                      ),
+                      //       if(!regExp.hasMatch(value ?? '')){
+                      //         return 'Formato de cédula incorrecto';
+                      //       }
+                      //       return null;
+                      //     },
+                      //   ]),                    
+                      // ),
               
                       FormBuilderTextField(
                         name: 'nombre',
@@ -754,6 +772,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               width: 600,
               child: FormBuilder(
                 key: formKey,
+                autovalidateMode: AutovalidateMode.disabled,
                 initialValue: { //la funicion de "initialValue" es firtral de manera automatica los datos de los diferentes campos de la base de datos
                   'nombreApellido': userUpload.nombreApellido,
                   'usuario': userUpload.usuario1,
@@ -766,50 +785,121 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   children: [
                     FormBuilderTextField(
                       name: 'nombreApellido',
+                      enabled: userUpload.rol != "Administrador",
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Nombre Completo',
                         labelFrontSize: 30.5,
                         hintext: 'Nombre y Apellido',
                         hintFrontSize: 15.0,
                         icono: const Icon(Icons.person, size: 30.0),
+                        errorSize: 20
                       ),
                       style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
-                      validator: FormBuilderValidators.required(),
+                      // validator: FormBuilderValidators.required(),
+                      validator: (value) {
+                        if (userUpload.rol == "Administrador") {
+                          return 'No puedes cambiar los datos de un Administrador';
+                        }
+
+                        if (value!.isEmpty) {
+                          return 'Este campo es requerido';
+                        }
+
+                        return null;
+                      },
                     ),
               
                     FormBuilderTextField(
                       name: 'usuario',
+                      enabled: userUpload.rol != "Administrador",
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Usuario',
-                        labelFrontSize: 15.5,
+                        labelFrontSize: 30.5,
                         hintext: 'MetroSantDom123',
                         hintFrontSize: 20.0,
                         icono: const Icon(Icons.account_circle, size: 30.0),
+                        errorSize: 20
                       ),
                       style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
-                      validator: FormBuilderValidators.required(),
+                      // validator: FormBuilderValidators.required(),
+                      validator: (value) {
+                        if (userUpload.rol == "Administrador") {
+                          return 'No puedes cambiar los datos de un Administrador';
+                        }
+
+                        if (value!.isEmpty) {
+                          return 'Este campo es requerido';
+                        }
+
+                        return null;
+                      },
                     ),
               
                     FormBuilderTextField(
                       name: 'email',
+                      enabled: userUpload.rol != "Administrador",
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Email',
-                        labelFrontSize: 15.5,
+                        labelFrontSize: 30.5,
                         hintext: 'ejemplo20##@gmail.com',
                         hintFrontSize: 20.0,
                         icono: const Icon(Icons.alternate_email_rounded, size: 30.0),
+                        errorSize: 20
                       ),
                       // validator: FormBuilderValidators.required(),
                       style: const TextStyle(fontSize: 23.5), // Cambiar tamaño de letra del texto filtrado
                       validator: (value){
                         // expresion regular
+                        if (userUpload.rol == "Administrador") {
+                          return 'No puedes cambiar los datos de un Administrador';
+                        }
+
+                        if (value!.isEmpty) {
+                          return 'Este campo es requerido';
+                        }
+
                         String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
                         RegExp regExp = RegExp(pattern);
-                        return regExp.hasMatch(value ?? '')
-                          ? null
-                          : 'Ingrese un correo electronico valido';
+                        if (!regExp.hasMatch(value)) { 
+                          return 'Ingrese un correo electrónico válido'; 
+                        }
+                        return null;
+                        // return regExp.hasMatch(value ?? '')
+                        //   ? null
+                        //   : 'Ingrese un correo electronico valido';
                       },
-                    )
+                    ),
+
+                    FormBuilderTextField(
+                      name: 'password',
+                      autocorrect: false,
+                      obscureText: false,
+                      enabled: userUpload.rol != "Administrador",
+                      style: const TextStyle(fontSize: 30.0),
+                      // controller: passwordController,
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Contraseña',
+                        labelFrontSize: 30.5,
+                        hintext: '******',
+                        hintFrontSize: 25.0,
+                        icono: const Icon(Icons.lock_clock_outlined, size: 30.0),
+                        errorSize: 20
+                      ),
+                      // validator: FormBuilderValidators.required(),
+                      validator: (value) {
+                        if(value == null || value.isEmpty){
+                          // return 'Por favor ingrese la nueva contraseña';
+                          _showErrorDialog(context, 'Debe de introducir la contraseña, para confirmar los cambio');
+                        }
+            
+                        if(value!.length < 6){
+                          // return 'La contraseña debe tener al menos 6 caracteres';
+                          _showErrorDialog(context, 'La contraseña debe tener al menos 6 caracteres');                                   
+                        }
+            
+                        return null;
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -823,8 +913,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               },
             ),
             TextButton(
-              child: const Text('Actualizar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-              onPressed: () async {
+              onPressed: userUpload.rol == "Administrador" ? null : () async {
                 // Llamar al método de actualización y refrescar la lista
                 if(formKey.currentState!.saveAndValidate()){
                   // Obtener los valores del formulario
@@ -862,6 +951,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                   }
                 }
               },
+              child: const Text('Actualizar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -1004,8 +1094,9 @@ class _UsuariosDataSource extends DataTableSource {
   final List<Usuarios> usuarios;
   final Function(Usuarios) onEdit;
   final Function(Usuarios) onDelete;
+  final int? selectedRowIndex;
 
-  _UsuariosDataSource(this.usuarios, this.onEdit, this.onDelete);
+  _UsuariosDataSource(this.usuarios, this.onEdit, this.onDelete, this.selectedRowIndex);
 
   @override
   DataRow getRow(int index) {
@@ -1014,6 +1105,15 @@ class _UsuariosDataSource extends DataTableSource {
     final usuario = usuarios[index];
 
     return DataRow(
+      selected: selectedRowIndex == index, // Resaltar si es la fila seleccionada
+      color: WidgetStateProperty.resolveWith<Color?>(
+        (Set<WidgetState> states) {
+          if (selectedRowIndex == index) {
+            return const Color.fromARGB(255, 231, 193, 7).withOpacity(0.3); // Color de resaltado
+          }
+          return null; // Fondo por defecto
+        },
+      ),
       cells: [
         DataCell(usuario.idUsuarios != null ? Text(usuario.idUsuarios!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
         DataCell(Text(usuario.nombreApellido, style: const TextStyle(fontSize: 20.0))),

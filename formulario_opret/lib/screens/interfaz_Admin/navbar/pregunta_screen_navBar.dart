@@ -54,7 +54,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final TextEditingController searchSesionController = TextEditingController();
   List<Sesion> _sesionFiltrada = [];
   List<Sesion> _todosCampSesion = [];
-  String selectedFilterSesion = 'Numero de Sesion';
+  String selectedFilterSesion = 'Numero de Seccion';
   //------------------------------------------------------------------------------------------------------------------------
 
   @override
@@ -164,7 +164,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     final queryLower = query.toLowerCase();
     final filtrar = _todosCampSesion.where((setion) {
       switch (selectedFilterSesion) {
-        case 'Numero de Sesion':
+        case 'Numero de Seccion':
           return setion.idSesion?.toString().toLowerCase().contains(queryLower) ?? false;
         case 'Tipo de Respuesta':
           return setion.tipoRespuesta.toLowerCase().contains(queryLower);
@@ -205,7 +205,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         // // filtrarCedula: widget.filtrarCedula,
       ),
       appBar: AppBar(
-        title: const Text('Sesión de Preguntas'),
+        title: const Text('Sección de Preguntas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, size: 30.0),
@@ -326,21 +326,32 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               )
                             ]
                           ),
-                          child: PaginatedDataTable(
-                            columns: const [
-                              DataColumn(label: Text('No', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold)))
-                            ],
-                            source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog),
-                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                            rowsPerPage: 10, //numeros de filas
-                            columnSpacing: 30, //espacios entre columnas
-                            horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                            showCheckboxColumn: false, //oculta la columna de checkboxes
-                            dataRowMinHeight: 60.0,  // Altura mínima de fila
-                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                            showFirstLastButtons: true,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textTheme: Theme.of(context).textTheme.copyWith(
+                                bodySmall: const TextStyle(
+                                  fontSize: 20,           // Ajusta el tamaño del número
+                                  color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                  fontWeight: FontWeight.bold, // Hace el texto más visible
+                                ),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              columns: const [
+                                DataColumn(label: Text('No', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold)))
+                              ],
+                              source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog),
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              rowsPerPage: 10, //numeros de filas
+                              columnSpacing: 50, //espacios entre columnas
+                              horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                              showCheckboxColumn: false, //oculta la columna de checkboxes
+                              dataRowMinHeight: 60.0,  // Altura mínima de fila
+                              dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                              showFirstLastButtons: true,
+                            ),
                           ),
                         );
                       }
@@ -422,7 +433,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }else if (snapshot.hasError) {
-                        return const Center(child: Text('Error al cargar la Sesion de los Rango.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                        return const Center(child: Text('Error al cargar la Sub - Preguntas.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
                       } else {
                         final subPregTabla = _subPreguntaFiltrada.isNotEmpty 
                               ? _subPreguntaFiltrada
@@ -444,21 +455,32 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               )
                             ]
                           ),
-                          child: PaginatedDataTable(
-                            columns: const [
-                              DataColumn(label: Text('NO', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
-                            ], 
-                            source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta),
-                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                            rowsPerPage: 7, //numeros de filas
-                            columnSpacing: 50, //espacios entre columnas
-                            horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
-                            showCheckboxColumn: false, //oculta la columna de checkboxes
-                            dataRowMinHeight: 60.0,  // Altura mínima de fila
-                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                            showFirstLastButtons: true,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textTheme: Theme.of(context).textTheme.copyWith(
+                                bodySmall: const TextStyle(
+                                  fontSize: 20,           // Ajusta el tamaño del número
+                                  color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                  fontWeight: FontWeight.bold, // Hace el texto más visible
+                                ),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              columns: const [
+                                DataColumn(label: Text('NO', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Acción', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                              ], 
+                              source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta),
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              rowsPerPage: 7, //numeros de filas
+                              columnSpacing: 50, //espacios entre columnas
+                              horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                              showCheckboxColumn: false, //oculta la columna de checkboxes
+                              dataRowMinHeight: 60.0,  // Altura mínima de fila
+                              dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                              showFirstLastButtons: true,
+                            ),
                           ),
                         );
                       }
@@ -487,7 +509,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                             border: OutlineInputBorder(),
                           ),
                           items: [
-                            'Numero de Sesion',
+                            'Numero de Seccion',
                             'Tipo de Respuesta',
                             'Numero de Pregunta',
                             'No. de Sup Pregunta'
@@ -542,7 +564,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }else if (snapshot.hasError) {
-                        return const Center(child: Text('Error al cargar la Sesión.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
+                        return const Center(child: Text('Error al cargar la Sección.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
                       } else {
                         final sesionTable = _sesionFiltrada.isNotEmpty 
                               ? _sesionFiltrada
@@ -564,24 +586,35 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                               )
                             ]
                           ),
-                          child: PaginatedDataTable(
-                            columns: const [
-                              DataColumn(label: Text('No. de Sesión', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
-                            ],
-                            source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion),
-                            headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                            rowsPerPage: 10, //numeros de filas
-                            columnSpacing: 50, //espacios entre columnas
-                            horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
-                            showCheckboxColumn: false, //oculta la columna de checkboxes
-                            dataRowMinHeight: 60.0,  // Altura mínima de fila
-                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                            showFirstLastButtons: true,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textTheme: Theme.of(context).textTheme.copyWith(
+                                bodySmall: const TextStyle(
+                                  fontSize: 20,           // Ajusta el tamaño del número
+                                  color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                  fontWeight: FontWeight.bold, // Hace el texto más visible
+                                ),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              columns: const [
+                                DataColumn(label: Text('No. de Sección', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
+                                DataColumn(label: Text('Acción', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
+                              ],
+                              source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion),
+                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                              rowsPerPage: 10, //numeros de filas
+                              columnSpacing: 50, //espacios entre columnas
+                              horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                              showCheckboxColumn: false, //oculta la columna de checkboxes
+                              dataRowMinHeight: 60.0,  // Altura mínima de fila
+                              dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                              showFirstLastButtons: true,
+                            ),
                           ),
                         );
                       }
@@ -668,7 +701,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           child: const Icon(Icons.add, size: 20),
           backgroundColor: const Color.fromARGB(255, 125, 240, 119),
           foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-          label: 'Agregar Sesión',
+          label: 'Agregar Sección',
           labelStyle: const TextStyle(fontSize: 20.0),
           onTap: () => _showCreateDialogSesion()
         ),
@@ -1156,7 +1189,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear Sesión', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Crear Sección', style: TextStyle(fontSize: 33.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
@@ -1370,12 +1403,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 201) {
                       print('La Sesion fue creado con éxito');
                       Navigator.of(context).pop();
-                      _showSuccessDialog(context, 'La Sesion fue creado con éxito');
+                      _showSuccessDialog(context, 'La Sección fue creado con éxito');
                       _refreshSesion();
                       
                     } else {
                       print('Error al crear la Sesion: ${response.body}');
-                      _showErrorDialog(context, 'Error al crear la Sesion.');
+                      _showErrorDialog(context, 'Error al crear la Sección.');
                     }
                   } catch (e) {
                     print('Excepción al crear la Sesion: $e');
@@ -1396,7 +1429,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar La Sesión', style: TextStyle(fontSize: 33.0)),
+          title: const Text('Modificar La Sección', style: TextStyle(fontSize: 33.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
@@ -1563,12 +1596,16 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                           child: Text('No se requiere nada en la pregunta')
                       ),
                       DropdownMenuItem(
-                          value: 'Requiere Justificación',
-                          child: Text('Requiere Justificación')
+                          value: 'Requiere Justificación (Opcional)',
+                          child: Text('Requiere Justificación (Opcional)')
                       ),
                       DropdownMenuItem(
-                          value: 'Requiere Comentarios',
-                          child: Text('Requiere Comentarios')
+                          value: 'Requiere Comentarios (Opcional)',
+                          child: Text('Requiere Comentarios (Opcional)')
+                      ),
+                      DropdownMenuItem(
+                          value: 'En caso de responder (Si) finaliza la encuesta',
+                          child: Text('En caso de responder (Si) finaliza la encuesta')
                       )
                     ],
                     isExpanded: true,
@@ -1602,11 +1639,11 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 204) {
                       print('La Sesion fue modificada con éxito');
                       Navigator.of(context).pop();
-                      _showSuccessDialog(context, 'La Sesion fue modificada con éxito');
+                      _showSuccessDialog(context, 'La Sección fue modificada con éxito');
                       _refreshSesion();
                     } else {
                       print('Error al modificar la Sesion: ${response.body}');
-                      _showErrorDialog(context, 'Error al modificar la Sesion');
+                      _showErrorDialog(context, 'Error al modificar la Sección');
                     }
                   } catch (e) {
                     print('Excepción al modificar la Sesion: $e');
@@ -1627,8 +1664,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Sesión', style: TextStyle(fontSize: 33.0)),
-          content: Text('¿Estás seguro de que deseas eliminar la sesion no. ${sectionDelete.idSesion}?', style: const TextStyle(fontSize: 30)),
+          title: const Text('Eliminar Sección', style: TextStyle(fontSize: 33.0)),
+          content: Text('¿Estás seguro de que deseas eliminar la sección no. ${sectionDelete.idSesion}?', style: const TextStyle(fontSize: 30)),
           actions: [
             TextButton(
               child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
@@ -1646,10 +1683,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     print('Sesion eliminado con éxito');
                     Navigator.of(context).pop(); // Cerrar el diálogo después de la eliminación
                     // Refrescar la lista de usuarios aquí
-                    _showSuccessDialog(context, 'La Sesión fue eliminado con éxito');
+                    _showSuccessDialog(context, 'La Sección fue eliminado con éxito');
                     _refreshSesion();
                   } else {
-                    print('Error al eliminar la sesión: ${response.body}');
+                    print('Error al eliminar la sección: ${response.body}');
                     _showErrorDialog(context, 'Error al eliminar la sesión');
                   }
                 } catch (e) {
@@ -1761,7 +1798,12 @@ class _PreguntasDataSource extends DataTableSource {
       }),
       cells: [
         DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
-        DataCell(Text(ask.pregunta, style: const TextStyle(fontSize: 20.0))),
+        DataCell(
+          Container(
+            constraints: const BoxConstraints(maxWidth: 420, minWidth: 420), // Ancho fijo para la celda
+            child: Text(ask.pregunta, style: const TextStyle(fontSize: 20.0), softWrap: true)
+          )
+        ),
         DataCell(
           Row(
             children: [
@@ -1819,7 +1861,10 @@ class _SubPreguntasDataSource extends DataTableSource {
       }),
       cells: [
         DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
-        DataCell(sub.subPreguntas != null ? Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(sub.subPreguntas != null ? Container(
+          constraints: const BoxConstraints(maxWidth: 420, minWidth: 420),
+          child: Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0), softWrap: true)
+        ) : const Text('')),
         DataCell(
           Row(
             children: [

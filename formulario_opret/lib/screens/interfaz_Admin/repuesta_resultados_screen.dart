@@ -63,7 +63,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
           return answer.sp_NombreApellido?.toLowerCase().contains(queryLower) ?? false;
         case 'Numero de Encuesta':
           return answer.sp_NoEncuesta?.toLowerCase().contains(queryLower) ?? false;
-        case 'Numero de Sesion':
+        case 'Numero de Seccion':
           return answer.sp_IdSesion?.toString().toLowerCase().contains(queryLower) ?? false;
         case 'Numero de Pregunta':
           return answer.sp_CodPreguntas?.toString().toLowerCase().contains(queryLower) ?? false;
@@ -133,7 +133,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                       'Usuarios', 
                       'Nombre y Apellido', 
                       'Numero de Encuesta',
-                      'Numero de Sesion',
+                      'Numero de Seccion',
                       'Numero de Pregunta',
                       'Numero de Sub-Pregunta'
                     ].map((filter) => DropdownMenuItem(
@@ -192,32 +192,43 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                       : snapshot.data ?? [];
 
                   return SingleChildScrollView(
-                    child: PaginatedDataTable(
-                      header: const Text('Reporte de las Respuesta'),
-                      columns: const [
-                        DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
-                        // DataColumn(label: Text('Cedula de Identida', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('No. Encuesta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Numero de Sesion', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Numero de Pregunta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Pregunta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Numero de Sub-Pregunta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Sub-Pregunta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Respuesta', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Comentarios', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Justificacion', style: TextStyle(fontSize: 23.0))),
-                      ], 
-                      source: RespuestasDataSource(answerData),
-                      rowsPerPage: 10, //numeros de filas
-                      columnSpacing: 30, //espacios entre columnas
-                      horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                      showCheckboxColumn: false, //oculta la columna de checkboxes
-                      headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
-                      dataRowMinHeight: 60.0,  // Altura mínima de fila
-                      dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                      showFirstLastButtons: true,     
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        textTheme: Theme.of(context).textTheme.copyWith(
+                          bodySmall: const TextStyle(
+                            fontSize: 20,           // Ajusta el tamaño del número
+                            color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                            fontWeight: FontWeight.bold, // Hace el texto más visible
+                          ),
+                        ),
+                      ),
+                      child: PaginatedDataTable(
+                        header: const Text('Reporte de las Respuesta'),
+                        columns: const [
+                          DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
+                          // DataColumn(label: Text('Cedula de Identida', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('No. Encuesta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Número de Sección', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Número de Pregunta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Pregunta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Número de Sub-Pregunta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Sub-Pregunta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Respuesta', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Comentarios', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Justificacion', style: TextStyle(fontSize: 23.0))),
+                        ], 
+                        source: RespuestasDataSource(answerData),
+                        rowsPerPage: 10, //numeros de filas
+                        columnSpacing: 30, //espacios entre columnas
+                        horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                        showCheckboxColumn: false, //oculta la columna de checkboxes
+                        headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
+                        dataRowMinHeight: 60.0,  // Altura mínima de fila
+                        dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                        showFirstLastButtons: true,     
+                      ),
                     ),
                   );
                 }

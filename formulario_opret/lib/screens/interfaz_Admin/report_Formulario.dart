@@ -177,34 +177,45 @@ class _ReportFormularioState extends State<ReportFormulario> {
                 if (snapshot.connectionState == ConnectionState.waiting){
                   return const Center(child: CircularProgressIndicator());
                 }else if (snapshot.hasError){
-                  return Center(child: Text('Error al cargar los datos: ${snapshot.error}'));
+                  return Center(child: Text('Error al cargar los datos: ${snapshot.error}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
                 } else {
                   final formularioData = formFiltrados.isNotEmpty
                         ? formFiltrados
                         : snapshot.data ?? [];
 
                   return SingleChildScrollView(
-                    child: PaginatedDataTable(
-                      header: const Text('Reporte de Registros de los Usuarios antes de la Encuesta'),
-                      columns: const [
-                        DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
-                        // DataColumn(label: Text('Cedula de Identidad', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Fecha de form. Realizado', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Hora', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Linea de metro', style: TextStyle(fontSize: 23.0))),
-                        DataColumn(label: Text('Estacion de metro', style: TextStyle(fontSize: 23.0))),
-                      ],
-                      source: FormularioDataSource(formularioData),
-                      rowsPerPage: 11, //numeros de filas
-                      columnSpacing: 30, //espacios entre columnas
-                      horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                      showCheckboxColumn: false, //oculta la columna de checkboxes
-                      headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
-                      dataRowMinHeight: 60.0,  // Altura mínima de fila
-                      dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                      showFirstLastButtons: true,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        textTheme: Theme.of(context).textTheme.copyWith(
+                          bodySmall: const TextStyle(
+                            fontSize: 20,           // Ajusta el tamaño del número
+                            color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                            fontWeight: FontWeight.bold, // Hace el texto más visible
+                          ),
+                        ),
+                      ),
+                      child: PaginatedDataTable(
+                        header: const Text('Reporte de Registros de los Usuarios antes de la Encuesta'),
+                        columns: const [
+                          DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: 23.0))),
+                          // DataColumn(label: Text('Cedula de Identidad', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Fecha de form. Realizado', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Hora', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Linea de metro', style: TextStyle(fontSize: 23.0))),
+                          DataColumn(label: Text('Estacion de metro', style: TextStyle(fontSize: 23.0))),
+                        ],
+                        source: FormularioDataSource(formularioData),
+                        rowsPerPage: 11, //numeros de filas
+                        columnSpacing: 30, //espacios entre columnas
+                        horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                        showCheckboxColumn: false, //oculta la columna de checkboxes
+                        headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
+                        dataRowMinHeight: 60.0,  // Altura mínima de fila
+                        dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                        showFirstLastButtons: true,
+                      ),
                     ),
                   );
                 }

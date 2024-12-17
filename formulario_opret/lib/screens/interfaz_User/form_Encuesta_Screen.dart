@@ -329,6 +329,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                         );
                       }).toList(),
                       style: const TextStyle(fontSize: 30.0),
+                      menuMaxHeight: 250.0, // Altura máxima del cuadro desplegable
                       onChanged: (value) async {
                         setState(() {
                           _selectLineMetro = value;
@@ -348,6 +349,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                       name: 'estacion_metro',
                       style: const TextStyle(fontSize: 30.0),
                       initialValue: _selectedStation,
+                      menuMaxHeight: 250.0, // Altura máxima del cuadro desplegable
                       validator: (value) {
                         if(value == null) {
                           _showErrorDialog(context, 'Es obligatorio elegir una Estación del metro');

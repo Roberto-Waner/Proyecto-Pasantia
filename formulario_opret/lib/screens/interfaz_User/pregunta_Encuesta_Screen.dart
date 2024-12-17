@@ -470,7 +470,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
                 
-                      if(question.sp_TipoRespuesta == 'Genero')
+                      if(question.sp_TipoRespuesta == 'Género')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
@@ -531,7 +531,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
                 
-                      if(question.sp_TipoRespuesta == 'Conclusion')
+                      if(question.sp_TipoRespuesta == 'Conclusión')
                         FormBuilderTextField(
                           name: 'respuesta_Conclusion',
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),

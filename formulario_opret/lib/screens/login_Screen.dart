@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8.0),
                 const Text( 
-                  'Ha iniciado Sesión', 
+                  'Ha iniciado Sección', 
                   style: TextStyle(fontSize: 18.0), 
                   textAlign: TextAlign.center, 
                 ), 
@@ -346,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 100),
                       logoInsideLogin(size),
                       const SizedBox(height: 30),
-                      const Text('Inicio Sesion', style: TextStyle(fontSize: 54)),
+                      const Text('Inicio Sección', style: TextStyle(fontSize: 54)),
                       const SizedBox(height: 30),
                       _loginForm(size),
                       const SizedBox(height: 50),

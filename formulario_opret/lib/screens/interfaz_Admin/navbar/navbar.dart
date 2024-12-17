@@ -71,7 +71,7 @@ class _NavbarState extends State<Navbar> {
           ListTile(
             leading: const Icon(Icons.poll_outlined, size: 30.0),
             title: const Text(
-              'Sesión de Pregunta Encuesta',
+              'Sección de Pregunta Encuesta',
               style: TextStyle(fontSize: 20.0),
             ),
             onTap: () {
@@ -90,7 +90,7 @@ class _NavbarState extends State<Navbar> {
           ListTile(
             leading: const Icon(Icons.app_registration, size: 30.0),
             title: const Text(
-              'Registro de Empleados',
+              'Registro de Usuarios',
               style: TextStyle(fontSize: 20.0),
             ),
             onTap: () {

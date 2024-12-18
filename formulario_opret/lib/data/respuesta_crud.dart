@@ -23,39 +23,16 @@ class RespuestaCrud {
     print('Respuestas guardadas en la base de datos local SQLite con éxito');
   }
 
-  // Método para actualizar el campo finalizarSesion de múltiples respuestas usando el modelo
-  /*
-  Future<void> actualizarCrud(List<SpInsertarRespuestas> respuetas, String id) async {
+  Future<void> actualizarCrud(String idUsuarios) async {
     final db = await _databaseHelper.database;
 
-    // Usamos un batch para realizar múltiples actualizaciones en una sola transacción
-    Batch batch = db.batch();
-    for (var answer in respuetas) {
-      batch.update(
-        'localRespuestas',
-        answer.toJson(),
-        where: 'idUsuarios = ?',
-        whereArgs: [id]
-      );
-    }
-
-    await batch.commit(noResult: true);
-    print('Campo finalizarSesion actualizado en la base de datos local SQLite con éxito');
-  }*/
-
-  Future<void> actualizarCrud(List<SpInsertarRespuestas> respuestas, String id) async {
-    final db = await _databaseHelper.database;
-
-    // Usamos un batch para realizar múltiples actualizaciones en una sola transacción
-    Batch batch = db.batch();
-    for (var respuesta in respuestas) {
-      batch.update(
-          'localRespuestas',
-          {'finalizarSesion': respuesta.finalizarSesion}, // Solo actualizamos el campo finalizarSesion
-          where: 'idUsuarios = ?',
-          whereArgs: [id], // Usamos idUsuarios e idSesion para identificar la fila a actualizar
-      );
-    }
+    await db.update(
+      'localRespuestas',
+      {'finalizarSesion': 1},
+      where: 'idUsuarios = ?',
+      whereArgs: [idUsuarios],
+    );
+    print('Campo finalizarSesion actualizado a 1 para idUsuarios: $idUsuarios');
   }
 
   Future<List<SpInsertarRespuestas>> getAnswerCrud() async {
@@ -213,4 +190,40 @@ class RespuestaCrud {
       where: 'idSesion = ?',
       whereArgs: [id]
     );
+  }*/
+
+// Método para actualizar el campo finalizarSesion de múltiples respuestas usando el modelo
+/*
+  Future<void> actualizarCrud(List<SpInsertarRespuestas> respuetas, String id) async {
+    final db = await _databaseHelper.database;
+
+    // Usamos un batch para realizar múltiples actualizaciones en una sola transacción
+    Batch batch = db.batch();
+    for (var answer in respuetas) {
+      batch.update(
+        'localRespuestas',
+        answer.toJson(),
+        where: 'idUsuarios = ?',
+        whereArgs: [id]
+      );
+    }
+
+    await batch.commit(noResult: true);
+    print('Campo finalizarSesion actualizado en la base de datos local SQLite con éxito');
+  }*/
+
+/*
+  Future<void> actualizarCrud(List<SpInsertarRespuestas> respuestas, String id) async {
+    final db = await _databaseHelper.database;
+
+    // Usamos un batch para realizar múltiples actualizaciones en una sola transacción
+    Batch batch = db.batch();
+    for (var respuesta in respuestas) {
+      batch.update(
+          'localRespuestas',
+          {'finalizarSesion': respuesta.finalizarSesion}, // Solo actualizamos el campo finalizarSesion
+          where: 'idUsuarios = ?',
+          whereArgs: [id], // Usamos idUsuarios e idSesion para identificar la fila a actualizar
+      );
+    }
   }*/

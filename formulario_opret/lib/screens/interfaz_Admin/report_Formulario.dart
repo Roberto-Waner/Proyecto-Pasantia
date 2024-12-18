@@ -33,7 +33,7 @@ class _ReportFormularioState extends State<ReportFormulario> {
   @override
   void initState() {
     super.initState();
-    _formRegistroData = Future.value([]);
+    // _formRegistroData = Future.value([]);
     _formRegistroData = _apiServiceFormRegistro.getFormRegistro();
     _refreshFormularios();
   }

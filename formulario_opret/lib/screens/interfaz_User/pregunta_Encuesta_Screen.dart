@@ -40,8 +40,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
+  // final List<GlobalKey<FormBuilderState>> formKeys = [];
+  // final _formKey2 = GlobalKey<FormBuilderState>();
   List<bool> _isExpandedList = [];
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
+  // late SpPreguntascompleta preg;
 
   @override
   void initState() {
@@ -136,6 +139,30 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               }
             ),
           ),
+          /*
+          Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.saveAndValidate()) {
+
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
+                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: const Text('Enviar Todas las Respuestas', style: TextStyle(fontSize: 26.0)),
+              ),
+            ),
+          )
+          */
         ],
       )
     );
@@ -291,6 +318,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
             final currentIndex = dataQuestion.indexOf(question);
             final isLastQuestion = currentIndex == dataQuestion.length - 1;
 
+            // Crear un nuevo GlobalKey para cada pregunta
+            // GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+            // formKeys.add(_formKey); // Guarda la clave en la lista
+
             // Reiniciar el formulario antes de mostrar la nueva pregunta
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _formKey.currentState?.reset();
@@ -303,23 +334,43 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 width: 1500,
                 child: FormBuilder(
                   key: _formKey,
+                  initialValue: {
+                    'requerimientos': question.sp_Rango
+                  },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if(question.sp_Rango == 'En caso de responder (Si) finaliza la encuesta' ||
+                          question.sp_Rango == 'No se requiere otra cosa mas.' ||
+                          question.sp_Rango == 'Requiere Justificación (Opcional)' ||
+                          question.sp_Rango == 'Requiere Comentarios (Opcional)')
+                        FormBuilderTextField(
+                          name: 'requerimientos',
+                          enabled: false,
+                          maxLines: null, // Esto permite que el campo se expanda a medida que se ingresa texto
+                          style: const TextStyle(fontSize: 26/*, color: Color.fromARGB(255, 1, 1, 1)*/),
+                          decoration: InputDecorations.inputDecoration(
+                            labeltext: 'Requerimientos',
+                            labelFrontSize: 27.0,
+                            // hintFrontSize: 27.0,
+                            icono: const Icon(Icons.notes, size: 30.0),
+                          ),
+                        ),
+
                       // Determina el tipo de respuesta y muestra el widget adecuado segun el tipo Respuesta de la tabla sesion
                       if (question.sp_TipoRespuesta == 'Respuesta Abierta')
                         FormBuilderTextField(
                           name: 'respuesta_selected',
+                          maxLines: null,
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Escribe tu respuesta',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.notes, size: 30.0),
                             errorSize: 20
                           ),
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-
                         ),
                       
                       if(question.sp_TipoRespuesta == 'Selecionar: Si, No, N/A')
@@ -328,7 +379,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Selecionar: Si, No, N/A',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.check_circle, size: 30.0),
                               errorSize: 20
@@ -348,7 +399,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Calific. 1 a 10',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.numbers, size: 30.0),
                               errorSize: 20
@@ -374,7 +425,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Seleciona solo Si o No',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.check, size: 30.0),
                               errorSize: 20
@@ -393,7 +444,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Edad',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.calendar_month_outlined, size: 30.0),
                               errorSize: 20
@@ -418,7 +469,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Nacionalidad',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.boy_rounded, size: 30.0),
                               errorSize: 20
@@ -437,7 +488,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Título de transporte',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.credit_card, size: 30.0),
                               errorSize: 20
@@ -456,7 +507,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Producto utilizado',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.monetization_on_outlined, size: 30.0),
                               errorSize: 20
@@ -495,7 +546,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Frecuencia de viajes por semana',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.airplanemode_active, size: 30.0),
                               errorSize: 20
@@ -517,7 +568,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Expectativa del pasajero',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                               icono: const Icon(Icons.timeline, size: 30.0),
                               errorSize: 20
@@ -537,10 +588,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Escribe la Conclusión (Opcional)',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.notes, size: 30.0)
-                          )
+                          ),
+                          maxLines: null,
                         ),
 
                       if(question.sp_TipoRespuesta == 'Motivo del viaje')
@@ -550,7 +602,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Cual es el motivo del viaje a metro',
-                            labelFrontSize: 20.0,
+                            labelFrontSize: 27.0,
                             hintFrontSize: 20.0,
                             icono: const Icon(Icons.airplanemode_active, size: 30.0),
                               errorSize: 20
@@ -565,17 +617,18 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                      
+
                       FormBuilderTextField(
                         name: 'comentarios',
                         style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                         decoration: InputDecorations.inputDecoration(
-                          labeltext: 'Escribe tu comentarios aqui. (Opcional)',
-                          labelFrontSize: 20.0,
+                          labeltext: 'Agregar comentarios (Opcional)',
+                          labelFrontSize: 27.0,
                           hintext: ' ',
                           hintFrontSize: 20.0,
                           icono: const Icon(Icons.notes, size: 30.0)
                         ),
+                        maxLines: null,
                       ),
 
                       FormBuilderTextField(
@@ -583,11 +636,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
                         decoration: InputDecorations.inputDecoration(
                           labeltext: 'Justifique su respuesta (Opcional)',
-                          labelFrontSize: 20.0,
+                          labelFrontSize: 27.0,
                           hintext: ' ',
                           hintFrontSize: 20.0,
                           icono: const Icon(Icons.notes, size: 30.0)
                         ),
+                        maxLines: null,
                       ),
                     ],
                   )
@@ -651,6 +705,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
   // Guardar respuesta en la cache y API
   void _saveRespuesta(SpPreguntascompleta question, Map<String, dynamic> responseForm, {int finalizarSesion = 0}) async {
+    // Crear un nuevo GlobalKey para cada pregunta
+    // GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+    // formKeys.add(_formKey); // Guarda la clave en la lista
+
     // Verificamos si el formulario es válido antes de guardar
     if (_formKey.currentState!.saveAndValidate()){
       final dataAnswer = _formKey.currentState!.value;

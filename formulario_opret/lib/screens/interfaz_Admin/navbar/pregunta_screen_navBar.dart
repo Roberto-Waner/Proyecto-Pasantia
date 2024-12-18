@@ -68,9 +68,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     _refreshSesion();
     // initializeRango();
     //-------------------------------------------------
-    _preguntasData = Future.value([]);
-    _subPreguntasData = Future.value([]);
-    _sesionData = Future.value([]);
+    // _preguntasData = Future.value([]);
+    // _subPreguntasData = Future.value([]);
+    // _sesionData = Future.value([]);
   }
 
   Future<void> _fetchData() async {

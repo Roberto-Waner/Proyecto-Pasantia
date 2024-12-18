@@ -34,7 +34,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   @override
   void initState() {
     super.initState();
-    _respuestaData = Future.value([]);
+    // _respuestaData = Future.value([]);
     // _respuestaData = _apiServiceRespuesta.getRespuestas();
     _loadRespuestas();
   }

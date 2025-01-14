@@ -36,6 +36,9 @@ public partial class Sesion
     [Unicode(false)]
     public string? Rango { get; set; }
 
+    [Column("estado")]
+    public bool Estado { get; set; }
+
     [ForeignKey("CodPregunta")]
     [InverseProperty("Sesions")]
     public virtual Pregunta? CodPreguntaNavigation { get; set; } = null!;

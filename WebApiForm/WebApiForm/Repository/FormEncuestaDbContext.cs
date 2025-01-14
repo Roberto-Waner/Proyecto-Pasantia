@@ -39,12 +39,6 @@ public partial class FormEncuestaDbContext : DbContext
 
     public DbSet<EstacionPorLinea> EstacionPorLineas { get; set; }
 
-    //public DbSet<ObtenerEmpleados> FiltrarUsuarios { get; set; } //no esta en uso actualmente
-
-    //public DbSet<FiltrarRespuestas_Dto> FiltrarRespuestasDtos { get; set; }
-
-    //public DbSet<FiltrarFormularios_Dto> filtrarFormulariosDtos { get; set; }
-
     public DbSet<ObtenerForm_Dto> obtenerFormDtos { get; set; }
 
     public DbSet<ObtenerRespuestas_Dto> obtenerRespuestasDtos { get; set; }
@@ -56,7 +50,7 @@ public partial class FormEncuestaDbContext : DbContext
     {
         modelBuilder.Entity<Estacion>(entity =>
         {
-            entity.HasKey(e => e.IdEstacion).HasName("PK__Estacion__1F3B45EBAEDC364A");
+            entity.HasKey(e => e.IdEstacion).HasName("PK__Estacion__1F3B45EB0B6C2E44");
 
             entity.Property(e => e.IdEstacion).ValueGeneratedNever();
 
@@ -67,7 +61,7 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<Formulario>(entity =>
         {
-            entity.HasKey(e => e.IdentifacadorForm).HasName("PK__Formular__6CDA1CA2297646DD");
+            entity.HasKey(e => e.IdentifacadorForm).HasName("PK__Formular__6CDA1CA2B18434A8");
 
             entity.HasOne(d => d.IdEstacionNavigation).WithMany(p => p.Formularios).HasConstraintName("fk_Formulario_Estacion");
 
@@ -80,26 +74,26 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<Linea>(entity =>
         {
-            entity.HasKey(e => e.IdLinea).HasName("PK__Linea__E346BA1903503E96");
+            entity.HasKey(e => e.IdLinea).HasName("PK__Linea__E346BA199780FE6E");
         });
 
         modelBuilder.Entity<Pregunta>(entity =>
         {
-            entity.HasKey(e => e.CodPregunta).HasName("PK__Pregunta__9277FCFEA889D975");
+            entity.HasKey(e => e.CodPregunta).HasName("PK__Pregunta__9277FCFE6ABE70E8");
 
             entity.Property(e => e.CodPregunta).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<RegistroUsuario>(entity =>
         {
-            entity.HasKey(e => e.IdUsuarios).HasName("PK__Registro__854B73B3E3501785");
+            entity.HasKey(e => e.IdUsuarios).HasName("PK__Registro__854B73B3C110A7C4");
 
             entity.ToTable(tb => tb.HasTrigger("trg_Increment_Usuarios"));
         });
 
         modelBuilder.Entity<Respuesta>(entity =>
         {
-            entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C87CC83D9");
+            entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C29C85BCD");
 
             entity.HasOne(d => d.IdSesionNavigation).WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -112,7 +106,7 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<Sesion>(entity =>
         {
-            entity.HasKey(e => e.IdSesion).HasName("PK__Sesion__8D3F9DFE2D1CD128");
+            entity.HasKey(e => e.IdSesion).HasName("PK__Sesion__8D3F9DFED1B0301D");
 
             entity.ToTable("Sesion", tb => tb.HasTrigger("trg_increment_Sesion"));
 
@@ -127,14 +121,11 @@ public partial class FormEncuestaDbContext : DbContext
 
         modelBuilder.Entity<SubPregunta>(entity =>
         {
-            entity.HasKey(e => e.CodSubPregunta).HasName("PK__SubPregu__B4EDE11C216D97A1");
+            entity.HasKey(e => e.CodSubPregunta).HasName("PK__SubPregu__B4EDE11CDD6397F2");
         });
 
         modelBuilder.Entity<PreguntaCompleta>().HasNoKey();
         modelBuilder.Entity<EstacionPorLinea>().HasNoKey();
-        //modelBuilder.Entity<ObtenerEmpleados>().HasNoKey(); //no esta en uso actualmente
-        //modelBuilder.Entity<FiltrarRespuestas_Dto>().HasNoKey();
-        //modelBuilder.Entity<FiltrarFormularios_Dto>().HasNoKey();
         modelBuilder.Entity<ObtenerForm_Dto>().HasNoKey();
         modelBuilder.Entity<ObtenerRespuestas_Dto>().HasNoKey();
 
@@ -154,11 +145,6 @@ public partial class FormEncuestaDbContext : DbContext
         return await this.EstacionPorLineas.FromSqlRaw("EXEC sp_ObternerEstacionesPorLinea @idLinea = {0}", idLinea).ToListAsync();
     }
 
-    //public async Task<List<ObtenerEmpleados>> ObtenerEmpleadosAsync()
-    //{
-    //    return await this.FiltrarUsuarios.FromSqlRaw("EXEC sp_ObtenerEmpleados").ToListAsync();
-    //}
-
     public async Task<List<ObtenerForm_Dto>> ObtenerFormularioAsync()
     {
         return await this.obtenerFormDtos.FromSqlRaw("EXEC sp_ObtenerForm_Linea_Estacion").ToListAsync();
@@ -169,7 +155,7 @@ public partial class FormEncuestaDbContext : DbContext
         return await this.obtenerRespuestasDtos.FromSqlRaw("EXEC sp_ObtenerRespuestas").ToListAsync();
     }
 
-    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync( //no esta en uso actualmente
+    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync(
         "EXEC sp_InsertarRespuesta " +
             "@idUsuarios = {0}," +
             "@idSesion = {1}, " +
@@ -184,19 +170,4 @@ public partial class FormEncuestaDbContext : DbContext
         respuesta_Dto.Justificacion,
         respuesta_Dto.FinalizarSesion
     );
-
-    //public async Task<List<FiltrarRespuestas_Dto>> FiltrarRespuestaAsync(FiltrarRespuestas_Dto filtrarResp)
-    //{
-    //    return await this.FiltrarRespuestasDtos.FromSqlRaw(
-    //            "EXEC sp_filtrar_Respuesta @id_usuarios = {0}, @no_encuesta = {1}, @id_sesion = {2}",
-    //            filtrarResp.IdUsuarios, filtrarResp.NoEncuesta, filtrarResp.IdSesion
-    //        ).ToListAsync();
-    //}
-
-    //public async Task<List<FiltrarFormularios_Dto>> FiltrarFormularioAsync(string filtrarFormulario) //no esta en uso actualmente
-    //{
-    //    return await this.filtrarFormulariosDtos
-    //        .FromSqlRaw("EXEC sp_FiltrarFormulario @Filtro = {0}", filtrarFormulario)
-    //        .ToListAsync();
-    //}
 }

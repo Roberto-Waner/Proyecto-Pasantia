@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
+using WebApiForm.Repository;
 
 namespace WebApiForm.Controllers
 {
@@ -96,9 +91,9 @@ namespace WebApiForm.Controllers
 
                 return CreatedAtAction("GetSesion", new { id = sesion.IdSesion }, sesion);
             }
-            catch (Exception ex) 
-            { 
-                return BadRequest(new { message = "Error al crear la Sesion", details = ex.Message }); 
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al crear la Sesion", details = ex.Message });
             }
         }
 

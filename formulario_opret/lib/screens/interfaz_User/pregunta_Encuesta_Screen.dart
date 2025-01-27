@@ -1,6 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
 import 'package:formulario_opret/Controllers/section_Controller.dart';
@@ -8,7 +9,6 @@ import 'package:formulario_opret/data/respuesta_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
-import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 
@@ -33,7 +33,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
+  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('http://wepapi.somee.com');
   final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
@@ -65,115 +65,130 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     }
   }
 
+  //En caso de ser un table
+  bool isTablet(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTabletWidth = size.width > 600;
+    final isTabletHeight = size.height > 800;
+    return isTabletWidth && isTabletHeight;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isTabletDevice = isTablet(context);
+
     return PopScope(
       canPop: true,
-      child: Scaffold(
-        drawer: NavbarEmpl(
-          filtrarUsuarioController: widget.filtrarUsuarioController,  
-          filtrarEmailController: widget.filtrarEmailController,
-          filtrarId: widget.filtrarId,
-          // // filtrarCedula: widget.filtrarCedula,
-        ),
-      
-        appBar: AppBar(
-          title: const Text('Preguntas de Encuesta'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 30.0),
-              tooltip: 'Recargar',
-              onPressed: () {
-                setState(() {
-                  _refreshPreguntas();
-                });
-              },
-            )
-          ],
-        ),
-      
-        body:Column(
-          children: [
-            Expanded(
-              child: FutureBuilder(
-                future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
-                  print('Error al cargar desde la API, cargando desde SQLite: $e');
-                  return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
-                }),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      // child: CircularProgressIndicator()
-                      child: Dialog(
-                        backgroundColor: Colors.transparent,
-                        child: Container(
-                          width: 200,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(100),
+      child: ScreenUtilInit(
+        designSize: const Size(360, 740),
+        builder: (context, child) => Scaffold(
+          // drawer: NavbarEmpl(
+          //   filtrarUsuarioController: widget.filtrarUsuarioController,
+          //   filtrarEmailController: widget.filtrarEmailController,
+          //   filtrarId: widget.filtrarId,
+          //   // // filtrarCedula: widget.filtrarCedula,
+          // ),
+
+          appBar: AppBar(
+            title: const Text('Preguntas de Encuesta'),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.refresh, size: isTabletDevice ? 15.sp : 15.sp),
+                tooltip: 'Recargar',
+                onPressed: () {
+                  setState(() {
+                    _refreshPreguntas();
+                  });
+                },
+              )
+            ],
+          ),
+
+          body:Column(
+            children: [
+              Expanded(
+                child: FutureBuilder(
+                  future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
+                    print('Error al cargar desde la API, cargando desde SQLite: $e');
+                    return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
+                  }),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        // child: CircularProgressIndicator()
+                        child: Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: Container(
+                            width: 200,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                ),
+
+                                SizedBox(height: 20),
+                                Text(
+                                  'Cargando...',
+                                  style: TextStyle(color: Colors.white, fontSize: 20),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                              ),
-                              
-                              SizedBox(height: 20),
-                              Text(
-                                'Cargando...',
-                                style: TextStyle(color: Colors.white, fontSize: 20),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    );
-                  } else if (snapshot.hasError) {
-                    return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
-                  } else if (dataQuestion.isEmpty) {
-                    // WidgetsBinding.instance.addPostFrameCallback((_) {
-                    //   _showErrorDialog(context, "Los sentimos en estos momentos no hay Preguntas de Encuestas disponibles por ahora.");
-                    // });
-                    return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
-                  } else {
-                    // dataQuestion = snapshot.data!;
-                    return _buildPreguntaList(); // Construye la lista de preguntas si hay datos
+                        )
+                      );
+                    } else if (snapshot.hasError) {
+                      print('Error al cargar los datos: ${snapshot.error}');
+                      return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
+                    } else if (dataQuestion.isEmpty) {
+                      // WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //   _showErrorDialog(context, "Los sentimos en estos momentos no hay Preguntas de Encuestas disponibles por ahora.");
+                      // });
+                      return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
+                    } else {
+                      // dataQuestion = snapshot.data!;
+                      return _buildPreguntaList(); // Construye la lista de preguntas si hay datos
+                    }
                   }
-                }
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(28.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FormEncuestaScreen(
-                        filtrarUsuarioController: widget.filtrarUsuarioController,
-                        filtrarEmailController: widget.filtrarEmailController,
-                        filtrarId: widget.filtrarId,
-                        // // filtrarCedula: widget.filtrarCedula,
-                      )),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
-                    foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: const Text('Regresar al formulario.', style: TextStyle(fontSize: 26.0)),
                 ),
               ),
-            )
-          ],
-        )
+              Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () { 
+                      _showWarning(context, 'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla.');
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => FormEncuestaScreen(
+                      //     filtrarUsuarioController: widget.filtrarUsuarioController,
+                      //     filtrarEmailController: widget.filtrarEmailController,
+                      //     filtrarId: widget.filtrarId,
+                      //     // // filtrarCedula: widget.filtrarCedula,
+                      //   )),
+                      // );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
+                      foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    child: Text('Regresar al formulario.', style: TextStyle(fontSize: isTabletDevice ? 13.sp : 18.sp))
+                  ),
+                ),
+              )
+            ],
+          )
+        ),
       ),
     );
   }
@@ -181,6 +196,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   Widget _buildPreguntaList() {
     //filtrar las preguntas segun el estado sea igual a true
     final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == true).toList();
+    final isTabletDevice = isTablet(context);
 
     return SingleChildScrollView(
       child: Padding(
@@ -206,24 +222,24 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: ExpandablePanel(
-                      theme: const ExpandableThemeData(
+                      theme: ExpandableThemeData(
                         expandIcon: Icons.arrow_drop_down_circle_outlined, // Ícono para expandir
                         collapseIcon: Icons.arrow_circle_up_sharp, // Ícono para colapsar
-                        iconSize: 55.0, // Tamaño del ícono predeterminado
-                        iconColor: Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
+                        iconSize: isTabletDevice ? 50 : 45.0, // Tamaño del ícono predeterminado
+                        iconColor: const Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
                       ),
                       header: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: RichText(
                           text: TextSpan(
                             children: [
-                              const TextSpan(
+                              TextSpan(
                                 text: 'Número de la pregunta: ',
-                                style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 18.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                               ),
                               TextSpan(
                                 text: '${filteredQuestions[index].sp_noIdentifEncuesta}',
-                                style: const TextStyle(fontSize: 35.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                               )
                             ]
                           )
@@ -239,13 +255,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             RichText(
                               text: TextSpan(
                                 children: [
-                                  const TextSpan(
+                                  TextSpan(
                                     text: 'Respuesta que solo recibe es: \n',
-                                    style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                   ),
                                   TextSpan(
                                     text: ('  ${filteredQuestions[index].sp_TipoRespuesta}'),
-                                    style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                   )
                                 ]
                               )
@@ -254,13 +270,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             RichText(
                               text: TextSpan(
                                 children: [
-                                  const TextSpan(
+                                  TextSpan(
                                     text: '- Pregunta: \n',
-                                    style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                   ),
                                   TextSpan(
                                     text: ('    ${filteredQuestions[index].sp_Pregunta}'),
-                                    style: const TextStyle(fontSize: 28.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                   )
                                 ]
                               )
@@ -270,13 +286,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               RichText(
                                 text: TextSpan(
                                   children: [
-                                    const TextSpan(
+                                    TextSpan(
                                       text: '-- Sub-Pregunta: \n',
-                                      style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                     ),
                                     TextSpan(
                                       text: ('    ${filteredQuestions[index].sp_SubPregunta}'),
-                                      style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
                                   ]
                                 )
@@ -286,13 +302,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               RichText(
                                   text: TextSpan(
                                       children: [
-                                        const TextSpan(
+                                        TextSpan(
                                           text: '--- Requerimiento: \n',
-                                          style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                          style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                         ),
                                         TextSpan(
                                           text: ('    ${filteredQuestions[index].sp_Rango}'),
-                                          style: const TextStyle(fontSize: 26.0, color: Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                         )
                                       ]
                                   )
@@ -303,7 +319,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 onPressed: () {
                                   _showPreguntaDialog(filteredQuestions[index]); // Muestra el diálogo al hacer clic
                                 },
-                                child: const Text('Responder.', style: TextStyle(fontSize: 26.0)),
+                                child: Text('Responder.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 17.sp))
                               ),
                             ),
                           ]
@@ -321,6 +337,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   void _showPreguntaDialog(SpPreguntascompleta question) {
+    final isTabletDevice = isTablet(context);
 
     showDialog(
       context: context,
@@ -338,10 +355,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
             String? selectedAnswer = '';
 
             return AlertDialog(
-              title: Text('Pregunta No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: const TextStyle(fontSize: 30.0)),
+              title: Text('No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp)),
               content: Container(
-                margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
-                width: 1500,
+                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),  // Aplica margen
+                // width: 1500,
+                padding: EdgeInsets.zero,
                 child: FormBuilder(
                   key: _formKey,
                   initialValue: {
@@ -361,13 +379,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             child: FormBuilderTextField(
                               name: 'respuesta_selected',
                               maxLines: null,
-                              style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                               decoration: InputDecorations.inputDecoration(
                                 labeltext: 'Escribe tu respuesta',
-                                labelFrontSize: 27.0,
-                                hintFrontSize: 20.0,
+                                labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                                hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
                                 icono: const Icon(Icons.notes, size: 30.0),
-                                errorSize: 20
+                                errorSize: isTabletDevice ? 10.sp : 10.sp,
                               ),
                               validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                             ),
@@ -377,13 +395,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Seleccionar: Si, No, N/A')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Seleccionar: Si, No, N/A',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
                             icono: const Icon(Icons.check_circle, size: 30.0),
-                              errorSize: 20
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Si', child: Text('Si')),
@@ -397,13 +415,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0, // Altura máxima del cuadro desplegable
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Calific. 1 a 10',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
                             icono: const Icon(Icons.numbers, size: 30.0),
-                              errorSize: 20
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: '1', child: Text('1')),
@@ -423,13 +441,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Solo SI o No')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Seleciona solo Si o No',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.check, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.check, size: isTabletDevice ? 15.sp : 15.sp),
+                            errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Si', child: Text('Si')),
@@ -447,13 +465,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0,
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Edad',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.calendar_month_outlined, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 15.sp : 15.sp),
+                            errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Menor 15', child: Text('Menor 15')),
@@ -472,13 +490,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Nacionalidad')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Nacionalidad',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.boy_rounded, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.boy_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'DOMINICANO', child: Text('DOMINICANO')),
@@ -491,13 +509,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Título de transporte')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Título de transporte',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.credit_card, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.credit_card, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'TARJETAR REUSABLE (PLASTICO)', child: Text('TARJETAR REUSABLE (PLASTICO)')),
@@ -510,13 +528,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0,
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Producto utilizado',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.monetization_on_outlined, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.monetization_on_outlined, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'MONEDERO', child: Text('MONEDERO')),
@@ -530,13 +548,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       if(question.sp_TipoRespuesta == 'Género')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige el Género',
                             labelFrontSize: 26.0,
                             hintFrontSize: 26.0,
-                            icono: const Icon(Icons.wc_rounded, size: 30.0),
-                              errorSize: 20
+                            icono: Icon(Icons.wc_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Masculino', child: Text('Masculino')),
@@ -549,13 +567,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0,
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Frecuencia de viajes por semana',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.airplanemode_active, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: '0 - 4', child: Text('0 - 4')),
@@ -571,13 +589,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0,
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Elige la Expectativa del pasajero',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                              icono: const Icon(Icons.timeline, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                              icono: Icon(Icons.timeline, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'NADA', child: Text('NADA')),
@@ -596,12 +614,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           child: SingleChildScrollView(
                             child: FormBuilderTextField(
                               name: 'respuesta_Conclusion',
-                              style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                               decoration: InputDecorations.inputDecoration(
                                 labeltext: 'Escribe la Conclusión (Opcional)',
-                                labelFrontSize: 27.0,
-                                hintFrontSize: 20.0,
-                                icono: const Icon(Icons.notes, size: 30.0)
+                                labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                                hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                                icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
                               ),
                               maxLines: null,
                             ),
@@ -612,13 +630,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
                           menuMaxHeight: 200.0,
-                          style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                           decoration: InputDecorations.inputDecoration(
                             labeltext: 'Cual es el motivo del viaje a metro',
-                            labelFrontSize: 27.0,
-                            hintFrontSize: 20.0,
-                            icono: const Icon(Icons.airplanemode_active, size: 30.0),
-                              errorSize: 20
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                            icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp),
+                              errorSize: isTabletDevice ? 10.sp : 10.sp,
                           ),
                           items: const [
                             DropdownMenuItem(value: 'Trabajo', child: Text('Trabajo')),
@@ -635,8 +653,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       else if (question.sp_Rango == 'Requiere Comentarios (Opcional)') ...comentarios() 
                       else if (question.sp_Rango == 'Requiere Justificación (Opcional)') ...justificacion(),
 
+                      /*
                       if(question.sp_Rango == 'En caso de responder (Si) finaliza la encuesta' ||
-                          question.sp_Rango == 'No se requiere otra cosa mas.' ||
                           question.sp_Rango == 'Requiere Justificación (Opcional)' ||
                           question.sp_Rango == 'Requiere Comentarios (Opcional)' ||
                           question.sp_Rango == 'Comentarios y Justificación (Opcional)')
@@ -646,72 +664,117 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           maxLines: null, // Esto permite que el campo se expanda a medida que se ingresa texto
                           style: const TextStyle(fontSize: 26/*, color: Color.fromARGB(255, 1, 1, 1)*/),
                           decoration: InputDecorations.inputDecoration(
-                            labeltext: 'Requerimientos',
-                            labelFrontSize: 27.0,
-                            // hintFrontSize: 27.0,
-                            icono: const Icon(Icons.notes, size: 30.0),
+                            labeltext: '${question.sp_Rango}',
+                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                            icono: const Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp),
                           ),
                         ),
+                      */
                     ],
                   )
                 ),
               ),
               actions: <Widget>[
-                TextButton(
-                  child: const Text("Cerrar", style: TextStyle(fontSize: 25.0)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  }
-                ),
-
-                TextButton(
-                  onPressed: isLastQuestion ? null : () {
-                    if (_formKey.currentState?.saveAndValidate() ?? false) {
-                      final responseForm = _formKey.currentState!.value;
-
-                      if(selectedAnswer == 'Si' && question.sp_Rango == 'En caso de responder (Si) finaliza la encuesta') {
-                        _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
-
-                        Navigator.of(context).pop();
-                      } else {
-                        _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 0);
-
-                        // Avanza a la próxima pregunta y actualiza el estado
-                        if (!isLastQuestion){
-                          // Reinicia el estado del formulario antes de cargar la siguiente pregunta
-                          // _formKey.currentState?.reset();
-
-                          Navigator.of(context).pop(); // Cierra el diálogo actual
-
-                          final nextQuestion = dataQuestion[currentIndex + 1];
-                          // Aquí forzamos una recarga del estado global
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
-                          });
-                        } else {
-                          // Manejo del caso cuando ya no hay más preguntas
-                          Future.delayed(const Duration(seconds: 2), () {
-                            Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
-                          });
-
-                          _showSuccessDialog(context, 'Has respondido todas las preguntas.');
-                        }
-                      }
-                    }
-                  }, 
-                  child: const Text('Proxima Pregunta', style: TextStyle(fontSize: 25.0))
-                ),
-
-                TextButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.saveAndValidate() ?? false) {
-                      final responseForm = _formKey.currentState!.value;
-                      _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
-                      _respuestaController.syncDataResp();
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(100),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 3)
+                      )
+                    ]
+                  ),
+                  child: TextButton(
+                    child: Text("Cerrar", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp)),
+                    onPressed: () {
                       Navigator.of(context).pop();
                     }
-                  }, 
-                  child: const Text('Finalizar Encuesta', style: TextStyle(fontSize: 25.0))
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(100),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 3)
+                      )
+                    ]
+                  ),
+                  child: TextButton(
+                    onPressed: isLastQuestion ? null : () {
+                      if (_formKey.currentState?.saveAndValidate() ?? false) {
+                        final responseForm = _formKey.currentState!.value;
+                  
+                        if(selectedAnswer == 'Si' && question.sp_Rango == 'En caso de responder (Si) finaliza la encuesta') {
+                          _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
+                  
+                          Navigator.of(context).pop();
+                        } else {
+                          _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 0);
+                  
+                          // Avanza a la próxima pregunta y actualiza el estado
+                          if (!isLastQuestion){
+                            // Reinicia el estado del formulario antes de cargar la siguiente pregunta
+                            _formKey.currentState?.reset();
+                  
+                            Navigator.of(context).pop(); // Cierra el diálogo actual
+                  
+                            final nextQuestion = dataQuestion[currentIndex + 1];
+                            // Aquí forzamos una recarga del estado global
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
+                            });
+                          } else {
+                            // Manejo del caso cuando ya no hay más preguntas
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
+                            });
+                  
+                            _showSuccessDialog(context, 'Has respondido todas las preguntas.');
+                          }
+                        }
+                      }
+                    },
+                    child: Text('Proxima Pregunta', style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
+                  ),
+                ),
+
+                Container(
+                  padding: isTabletDevice ? const EdgeInsets.symmetric(vertical: 1, horizontal: 4) : const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(100),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 3)
+                      )
+                    ]
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      if (_formKey.currentState?.saveAndValidate() ?? false) {
+                        final responseForm = _formKey.currentState!.value;
+                        _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
+                        _respuestaController.syncDataResp();
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Text('Finalizar Encuesta', style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
+                  ),
                 )
               ]
             );
@@ -806,10 +869,16 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
             ),
             actions: [
               TextButton(
-                child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
+                child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
               ),
             ],
           );
@@ -817,71 +886,158 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
+  void _showWarning (BuildContext context, String message) {
+    final isTabletDevice = isTablet(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.warning_rounded, color: Color.fromARGB(255, 255, 196, 1), size: 60.0),
+                const SizedBox(height: 20),
+                const Text(
+                  'Advertencia!',
+                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Flex(
+                  direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {Navigator.of(context).pop();},
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Cancelar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
+                    ),
+
+                    const SizedBox(height: 10.0, width: 10.0),
+
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FormEncuestaScreen(
+                            filtrarUsuarioController: widget.filtrarUsuarioController,
+                            filtrarEmailController: widget.filtrarEmailController,
+                            filtrarId: widget.filtrarId,
+                            // // filtrarCedula: widget.filtrarCedula,
+                          )),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Continuar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 184, 135, 0)))
+                    ),
+                  ],
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
+  }
+
   // cuadro de acceso exito
   void _showSuccessDialog(BuildContext context, String message) {
+    final isTabletDevice = isTablet(context);
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3)
-                        )
-                      ]
-                  ),
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
-                        const SizedBox(height: 20),
-                        const Text(
-                          '¡Éxito!',
-                          style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
+                const SizedBox(height: 20),
+                const Text(
+                  '¡Éxito!',
+                  style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          message,
-                          style: const TextStyle(fontSize: 25.0),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24.0),
-                        Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              style: ElevatedButton.styleFrom(
-                                // backgroundColor: const Color.fromARGB(255, 200, 234, 220), //  se usa para definir el color de fondo del botón.
-                                // foregroundColor: const Color.fromARGB(255, 134, 130, 218), // se usa para definir el color del texto y los iconos dentro del botón.
-                                padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              ),
-                              child: const Text('Continuar', style: TextStyle(fontSize: 25.0, color: Colors.blue)),
-                            ),
+                      ),
+                      child: Text('Continuar', style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: Colors.blue)),
+                    ),
 
-                          ],
-                        )
-                      ]
-                  )
-              )
-          );
-        }
+                  ],
+                )
+              ]
+            )
+          )
+        );
+      }
     );
   }
 
   List<Widget> comentarios() {
+    final isTabletDevice = isTablet(context);
     return [
       Container(
         constraints: const BoxConstraints( 
@@ -890,13 +1046,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         child: SingleChildScrollView(
           child: FormBuilderTextField(
             name: 'comentarios',
-            style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
             decoration: InputDecorations.inputDecoration(
               labeltext: 'Agregar comentarios (Opcional)',
-              labelFrontSize: 27.0,
+              labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
               hintext: ' ',
-              hintFrontSize: 20.0,
-              icono: const Icon(Icons.notes, size: 30.0)
+              hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+              icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
             ),
             maxLines: null,
           ),
@@ -906,6 +1062,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   }
 
   List<Widget> justificacion() {
+    final isTabletDevice = isTablet(context);
     return [
       Container(
         constraints: const BoxConstraints( 
@@ -914,13 +1071,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         child: SingleChildScrollView(
           child: FormBuilderTextField(
             name: 'justificacion',
-            style: const TextStyle(fontSize: 26, color: Color.fromARGB(255, 1, 1, 1)),
+            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
             decoration: InputDecorations.inputDecoration(
               labeltext: 'Justifique su respuesta (Opcional)',
-              labelFrontSize: 27.0,
+              labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
               hintext: ' ',
-              hintFrontSize: 20.0,
-              icono: const Icon(Icons.notes, size: 30.0)
+              hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+              icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
             ),
             maxLines: null,
           ),

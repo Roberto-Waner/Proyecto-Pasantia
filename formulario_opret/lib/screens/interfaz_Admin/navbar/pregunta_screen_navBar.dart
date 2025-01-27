@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/models/pregunta.dart';
@@ -29,15 +30,15 @@ class PreguntaScreenNavbar extends StatefulWidget {
 
 class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('https://10.0.2.2:7190');
+  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('http://wepapi.somee.com');
   late Future<List<Preguntas>> _preguntasData;
-  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://10.0.2.2:7190');
+  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('http://wepapi.somee.com');
   late Future<List<SubPregunta>> _subPreguntasData;
-  final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
+  final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('http://wepapi.somee.com');
   late Future<List<Sesion>> _sesionData;
   String selectedTipRespuestas = 'Respuesta Abierta';
   final tipoRespuestaController = TextEditingController();
-  Offset position = const Offset(700, 1150);
+  Offset position = const Offset(500, 900);
   List<Preguntas> _questions = [];
   int? _savedQuestion;
   List<SubPregunta> _subQuestions = [];
@@ -67,11 +68,6 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     _fetchData();
     _fetchDataSubPregu();
     _refreshSesion();
-    // initializeRango();
-    //-------------------------------------------------
-    // _preguntasData = Future.value([]);
-    // _subPreguntasData = Future.value([]);
-    // _sesionData = Future.value([]);
   }
 
   Future<void> _fetchData() async {
@@ -196,498 +192,690 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     });
   }
 
-  Future<bool> _canPop() async { //metodo utilizado para evitar que el usuario pueda retroceder por medio del boton o gesto para ir atras
-    return false; // Retorna `false` para evitar que la pantalla retroceda
+  //En caso de ser un table
+  bool isTablet(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTabletWidth = size.width > 600;
+    final isTabletHeight = size.height > 800;
+    return isTabletWidth && isTabletHeight;
   }
 
   @override
   Widget build(BuildContext context) {
+    final isTabletDevice = isTablet(context);
+
+    // Si no es tablet, ajusta la posición predeterminada
+    if (!(isTabletDevice)) {
+      position = const Offset(330, 760);
+    }
+
     return PopScope( //Widget utilizado para evitar que el usuario pueda retroceder por medio del boton o gesto para ir atras
       canPop: false, // Retorna `false` para evitar que la pantalla retroceda
-      child: Scaffold(
-        drawer: Navbar(
-          filtrarUsuarioController: widget.filtrarUsuarioController,
-          filtrarEmailController: widget.filtrarEmailController,
-          filtrarId: widget.filtrarId,
-          // // filtrarCedula: widget.filtrarCedula,
-        ),
-        appBar: AppBar(
-          title: const Text('Sección de Preguntas'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh, size: 30.0),
-              tooltip: 'Recargar',
-              onPressed: () {
-                setState(() {
-                  _fetchData();
-                  _fetchDataSubPregu();
-                  _refreshSesion();
-                  
-                });
-              },
-            )
-          ],
-        ),
-      
-        body: Stack(
-          children: [
-            // Cuerpo principal con las tablas
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Tablas de Preguntas',
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-      
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FormBuilderDropdown<String>(
-                            name: 'filtrarPregunta',
-                            menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                            initialValue: selectedFilterPregunta,
-                            style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                            decoration: const InputDecoration(
-                              labelText: 'Filtrar por',
-                              labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: OutlineInputBorder(),
-                            ),
-                            items: [
-                              'No de pregunta',
-                              'Pregunta'
-                            ].map((filter) => DropdownMenuItem(
-                                  value: filter,
-                                  child: Text(filter),
-                                )).toList(),
-                            onChanged: (value) => setState(() {
-                              selectedFilterPregunta = value!;
-                            }),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-      
-                        Expanded(
-                          flex: 2,
-                          child: FormBuilderTextField(
-                            name: 'searchPregunta',
-                            controller: searchPreguntaController,
-                            style: const TextStyle(fontSize: 20.0),
-                            decoration: InputDecoration( 
-                              labelText: 'Buscar', 
-                              labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: const OutlineInputBorder(),
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: searchPreguntaController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: _limpiarBusqueda,
-                                  )
-                                : null 
-                            ),
-                            onChanged: (value) {
-                              if (value!.isNotEmpty) {
-                                _filtrarPreguntas(value);
-                              } else {
-                                setState(() { 
-                                  _preguntaFiltrada = []; 
-                                }); 
-                              }
-                            },
-                          )
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                          
-                    FutureBuilder<List<Preguntas>>(
-                      future: _preguntasData,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }else if(snapshot.hasError) {
-                          return const Center(child: Text('Error al cargar la Sesion de Preguntas.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                        }else {
-                          final questionTable = _preguntaFiltrada.isNotEmpty 
-                                ? _preguntaFiltrada
-                                : snapshot.data ?? [];
-                    
-                          return Container(
-                            margin: const EdgeInsets.all(10.0),
-                            padding: const EdgeInsets.all(7.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                textTheme: Theme.of(context).textTheme.copyWith(
-                                  bodySmall: const TextStyle(
-                                    fontSize: 20,           // Ajusta el tamaño del número
-                                    color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                    fontWeight: FontWeight.bold, // Hace el texto más visible
-                                  ),
-                                ),
-                              ),
-                              child: PaginatedDataTable(
-                                columns: const [
-                                  DataColumn(label: Text('No', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Accion', style: TextStyle(fontSize: 27.0, color: Colors.white, fontWeight: FontWeight.bold)))
-                                ],
-                                source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog),
-                                headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                rowsPerPage: 10, //numeros de filas
-                                columnSpacing: 50, //espacios entre columnas
-                                horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                                showCheckboxColumn: false, //oculta la columna de checkboxes
-                                dataRowMinHeight: 60.0,  // Altura mínima de fila
-                                dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                showFirstLastButtons: true,
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    ),
-                    const Divider(),
-                    
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Tablas de Sub Preguntas',
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-      
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FormBuilderDropdown<String>(
-                            name: 'filtrarSubPregunta',
-                            menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                            initialValue: selectedFilterSubPregunta,
-                            style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                            decoration: const InputDecoration(
-                              labelText: 'Filtrar por',
-                              labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: OutlineInputBorder(),
-                            ),
-                            items: [
-                              'Id de Sub pregunta',
-                              'Sup Pregunta',
-                            ].map((filter) => DropdownMenuItem(
-                                  value: filter,
-                                  child: Text(filter),
-                                )).toList(),
-                            onChanged: (value) => setState(() {
-                              selectedFilterSubPregunta = value!;
-                            }),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-      
-                        Expanded(
-                          flex: 2,
-                          child: FormBuilderTextField(
-                            name: 'searchSubPregunta',
-                            controller: searchSubPreguntaController,
-                            style: const TextStyle(fontSize: 20.0),
-                            decoration: InputDecoration( 
-                              labelText: 'Buscar', 
-                              labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: const OutlineInputBorder(),
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: searchSubPreguntaController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: _limpiarBusqueda,
-                                  )
-                                : null 
-                            ),
-                            onChanged: (value) {
-                              if (value!.isNotEmpty) {
-                                _filtrarSubPreguntas(value);
-                              } else {
-                                setState(() { 
-                                  _subPreguntaFiltrada = []; 
-                                }); 
-                              }
-                            },
-                          )
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                          
-                    FutureBuilder<List<SubPregunta>>(
-                      future: _subPreguntasData,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }else if (snapshot.hasError) {
-                          return const Center(child: Text('Error al cargar la Sub - Preguntas.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                        } else {
-                          final subPregTabla = _subPreguntaFiltrada.isNotEmpty 
-                                ? _subPreguntaFiltrada
-                                : snapshot.data ?? [];
-                          
-                          return Container(
-                            margin: const EdgeInsets.all(16.0),
-                            padding: const EdgeInsets.all(7.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                textTheme: Theme.of(context).textTheme.copyWith(
-                                  bodySmall: const TextStyle(
-                                    fontSize: 20,           // Ajusta el tamaño del número
-                                    color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                    fontWeight: FontWeight.bold, // Hace el texto más visible
-                                  ),
-                                ),
-                              ),
-                              child: PaginatedDataTable(
-                                columns: const [
-                                  DataColumn(label: Text('NO', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Acción', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
-                                ], 
-                                source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta),
-                                headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                rowsPerPage: 7, //numeros de filas
-                                columnSpacing: 50, //espacios entre columnas
-                                horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
-                                showCheckboxColumn: false, //oculta la columna de checkboxes
-                                dataRowMinHeight: 60.0,  // Altura mínima de fila
-                                dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                showFirstLastButtons: true,
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    ),
-                    const Divider(),
-                          
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Tablas administrativa para gestionar las preguntas',
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-      
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FormBuilderDropdown<String>(
-                            name: 'filtrarSesion',
-                            menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                            initialValue: selectedFilterSesion,
-                            style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                            decoration: const InputDecoration(
-                              labelText: 'Filtrar por',
-                              labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: OutlineInputBorder(),
-                            ),
-                            items: [
-                              'Numero de Seccion',
-                              'Tipo de Respuesta',
-                              'Numero de Pregunta',
-                              'No. de Sup Pregunta'
-                            ].map((filter) => DropdownMenuItem(
-                                  value: filter,
-                                  child: Text(filter),
-                                )).toList(),
-                            onChanged: (value) => setState(() {
-                              selectedFilterSesion = value!;
-                            }),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-      
-                        Expanded(
-                          flex: 2,
-                          child: FormBuilderTextField(
-                            name: 'searchSesion',
-                            controller: searchSesionController,
-                            style: const TextStyle(fontSize: 20.0),
-                            decoration: InputDecoration( 
-                              labelText: 'Buscar', 
-                              labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold), 
-                              border: const OutlineInputBorder(),
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: searchSesionController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: _limpiarBusqueda,
-                                  )
-                                : null 
-                            ),
-                            onChanged: (value) {
-                              if (value!.isNotEmpty) {
-                                _filtrarSesion(value);
-                              } else {
-                                setState(() { 
-                                  _sesionFiltrada = []; 
-                                }); 
-                              }
-                            },
-                          )
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                          
-                    FutureBuilder<List<Sesion>>(
-                      future: _sesionData,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }else if (snapshot.hasError) {
-                          return const Center(child: Text('Error al cargar la Sección.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)));
-                        } else if (snapshot.hasData) {
-                          final sesionTable = _sesionFiltrada.isNotEmpty 
-                                ? _sesionFiltrada
-                                : snapshot.data ?? [];
-                          
-                          bool estadoActivo = sesionTable.every((sesion) => sesion.estado);
-                          
-                          return Container(
-                            margin: const EdgeInsets.all(10.0),
-                            padding: const EdgeInsets.all(7.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]
-                            ),
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                textTheme: Theme.of(context).textTheme.copyWith(
-                                  bodySmall: const TextStyle(
-                                    fontSize: 20,           // Ajusta el tamaño del número
-                                    color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                    fontWeight: FontWeight.bold, // Hace el texto más visible
-                                  ),
-                                ),
-                              ),
-                              child: PaginatedDataTable(
-                                header: const Text('Tabla de Recopilación para Encuesta', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                columns: const [
-                                  DataColumn(label: Text('No. de Sección', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Número de \nPregunta en la \nEncuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Acción', style: TextStyle(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold)))
-                                ],
-                                source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion, _actualizarEstado),
-                                headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                rowsPerPage: 10, //numeros de filas
-                                columnSpacing: 50, //espacios entre columnas
-                                horizontalMargin: 40, //para aplicarle un margin horizontal a los campo de la tabla
-                                showCheckboxColumn: false, //oculta la columna de checkboxes
-                                dataRowMinHeight: 60.0,  // Altura mínima de fila
-                                dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                showFirstLastButtons: true,
-                                headingRowHeight: 135.0, // Altura del encabezado
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      _actualizarEstadoTodasSesiones(!estadoActivo);
-                                      setState(() {
-                                        for (var sesion in sesionTable) {
-                                          sesion.estado = !estadoActivo;
-                                        }
-                                      });                                    
-                                    }, 
-                                    child: Text(
-                                      estadoActivo ? 'Deshabilitar Encuestas' : 'Habilitar Encuestas',
-                                      style: const TextStyle(fontSize: 25, color: Color.fromARGB(255, 1, 133, 14), fontWeight: FontWeight.bold),
-                                    )
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return const Center(child: Text('No hay datos disponibles.'));
-                        }
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: Stack(
-          children: [
-            Positioned(
-              left: position.dx,
-              top: position.dy,
-              child: Draggable(
-                feedback: _bottonSaveSpeedDial(),
-                childWhenDragging: Container(), // Widget que aparece en la posición original mientras se arrastra
-                onDragEnd: (details) {
+      child: ScreenUtilInit(
+        designSize: const Size(360, 740),
+        builder: (context, child) => Scaffold(
+          drawer: Navbar(
+            filtrarUsuarioController: widget.filtrarUsuarioController,
+            filtrarEmailController: widget.filtrarEmailController,
+            filtrarId: widget.filtrarId,
+            // // filtrarCedula: widget.filtrarCedula,
+          ),
+          appBar: AppBar(
+            title: const Text('Sección de Preguntas'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, size: 30.0),
+                tooltip: 'Recargar',
+                onPressed: () {
                   setState(() {
-                    // Limitar la posición del botón a los límites de la pantalla
-                    double dx = details.offset.dx;
-                    double dy = details.offset.dy;
-      
-                    if (dx < 0) dx = 0;
-                    if (dx > MediaQuery.of(context).size.width - 56) { // 56 es el tamaño del FAB
-                        dx = MediaQuery.of(context).size.width - 56;
-                    }
-      
-                    if (dy < 0) dy = 0;
-                    if (dy > MediaQuery.of(context).size.height - kToolbarHeight - 60) { // Ajusta para la altura del AppBar y del SpeedDial desplegado
-                        dy = MediaQuery.of(context).size.height - kToolbarHeight - 60;
-                    }
-      
-                    position = Offset(dx, dy);
+                    _fetchData();
+                    _fetchDataSubPregu();
+                    _refreshSesion();
+
                   });
                 },
-                child: _bottonSaveSpeedDial(),
               )
-            )
-          ]
+            ],
+          ),
+
+          body: Stack(
+            children: [
+              // Cuerpo principal con las tablas
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Tablas de Preguntas',
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+
+                      (isTabletDevice)
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: FormBuilderDropdown<String>(
+                                  name: 'filtrarPregunta',
+                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                  initialValue: selectedFilterPregunta,
+                                  style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Filtrar por',
+                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  items: [
+                                    'No de pregunta',
+                                    'Pregunta'
+                                  ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                                  onChanged: (value) => setState(() {
+                                    selectedFilterPregunta = value!;
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              Expanded(
+                                flex: 2,
+                                child: FormBuilderTextField(
+                                  name: 'searchPregunta',
+                                  controller: searchPreguntaController,
+                                  style: const TextStyle(fontSize: 20.0),
+                                  decoration: InputDecoration(
+                                      labelText: 'Buscar',
+                                      labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                      border: const OutlineInputBorder(),
+                                      prefixIcon: const Icon(Icons.search),
+                                      suffixIcon: searchPreguntaController.text.isNotEmpty
+                                          ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: _limpiarBusqueda,
+                                      )
+                                          : null
+                                  ),
+                                  onChanged: (value) {
+                                    if (value!.isNotEmpty) {
+                                      _filtrarPreguntas(value);
+                                    } else {
+                                      setState(() {
+                                        _preguntaFiltrada = [];
+                                      });
+                                    }
+                                  },
+                                )
+                              )
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              FormBuilderDropdown<String>(
+                                name: 'filtrarPregunta',
+                                menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                initialValue: selectedFilterPregunta,
+                                style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                decoration: InputDecoration(
+                                  labelText: 'Filtrar por',
+                                  labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                  border: const OutlineInputBorder(),
+                                ),
+                                items: [
+                                  'No de pregunta',
+                                  'Pregunta'
+                                ].map((filter) => DropdownMenuItem(
+                                  value: filter,
+                                  child: Text(filter),
+                                )).toList(),
+                                onChanged: (value) => setState(() {
+                                  selectedFilterPregunta = value!;
+                                }),
+                              ),
+                              const SizedBox(height: 16),
+
+                              FormBuilderTextField(
+                                name: 'searchPregunta',
+                                controller: searchPreguntaController,
+                                style: const TextStyle(fontSize: 20.0),
+                                decoration: InputDecoration(
+                                    labelText: 'Buscar',
+                                    labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                                    border: const OutlineInputBorder(),
+                                    prefixIcon: const Icon(Icons.search),
+                                    suffixIcon: searchPreguntaController.text.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(Icons.clear),
+                                            onPressed: _limpiarBusqueda,
+                                          )
+                                        : null
+                                ),
+                                onChanged: (value) {
+                                  if (value!.isNotEmpty) {
+                                    _filtrarPreguntas(value);
+                                  } else {
+                                    setState(() {
+                                      _preguntaFiltrada = [];
+                                    });
+                                  }
+                                },
+                              )
+                            ],
+                          ),
+
+                      const SizedBox(height: 20),
+                      const Divider(),
+
+                      FutureBuilder<List<Preguntas>>(
+                        future: _preguntasData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }else if(snapshot.hasError) {
+                            print('Error al cargar la Preguntas: ${snapshot.error}');
+                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                          }else {
+                            final questionTable = _preguntaFiltrada.isNotEmpty
+                                  ? _preguntaFiltrada
+                                  : snapshot.data ?? [];
+
+                            return Container(
+                              margin: const EdgeInsets.all(2.0),
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ]
+                              ),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  textTheme: Theme.of(context).textTheme.copyWith(
+                                    bodySmall: TextStyle(
+                                      fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
+                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+                                    ),
+                                  ),
+                                ),
+                                child: PaginatedDataTable(
+                                  columns: [
+                                    DataColumn(label: Text('No', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                  ],
+                                  source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog, isTabletDevice),
+                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                  rowsPerPage: 7, //numeros de filas
+                                  columnSpacing: 50, //espacios entre columnas
+                                  horizontalMargin: 60, //para aplicarle un margin horizontal a los campo de la tabla
+                                  showCheckboxColumn: false, //oculta la columna de checkboxes
+                                  dataRowMinHeight: 50.0,  // Altura mínima de fila
+                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                  showFirstLastButtons: true,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      ),
+                      const Divider(),
+
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Tablas de Sub Preguntas',
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+
+                      (isTabletDevice)
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: FormBuilderDropdown<String>(
+                                  name: 'filtrarSubPregunta',
+                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                  initialValue: selectedFilterSubPregunta,
+                                  style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Filtrar por',
+                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  items: [
+                                    'Id de Sub pregunta',
+                                    'Sup Pregunta',
+                                  ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                                  onChanged: (value) => setState(() {
+                                    selectedFilterSubPregunta = value!;
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              Expanded(
+                                  flex: 2,
+                                  child: FormBuilderTextField(
+                                    name: 'searchSubPregunta',
+                                    controller: searchSubPreguntaController,
+                                    style: const TextStyle(fontSize: 20.0),
+                                    decoration: InputDecoration(
+                                        labelText: 'Buscar',
+                                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                        border: const OutlineInputBorder(),
+                                        prefixIcon: const Icon(Icons.search),
+                                        suffixIcon: searchSubPreguntaController.text.isNotEmpty
+                                            ? IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: _limpiarBusqueda,
+                                        )
+                                            : null
+                                    ),
+                                    onChanged: (value) {
+                                      if (value!.isNotEmpty) {
+                                        _filtrarSubPreguntas(value);
+                                      } else {
+                                        setState(() {
+                                          _subPreguntaFiltrada = [];
+                                        });
+                                      }
+                                    },
+                                  )
+                              )
+                            ],
+                          )
+                          : Column(
+                              children: [
+                                FormBuilderDropdown<String>(
+                                  name: 'filtrarSubPregunta',
+                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                  initialValue: selectedFilterSubPregunta,
+                                  style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: InputDecoration(
+                                    labelText: 'Filtrar por',
+                                    labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                  items: [
+                                    'Id de Sub pregunta',
+                                    'Sup Pregunta',
+                                  ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                                  onChanged: (value) => setState(() {
+                                    selectedFilterSubPregunta = value!;
+                                  }),
+                                ),
+                                const SizedBox(height: 16),
+
+                                FormBuilderTextField(
+                                  name: 'searchSubPregunta',
+                                  controller: searchSubPreguntaController,
+                                  style: const TextStyle(fontSize: 20.0),
+                                  decoration: InputDecoration(
+                                      labelText: 'Buscar',
+                                      labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                                      border: const OutlineInputBorder(),
+                                      prefixIcon: const Icon(Icons.search),
+                                      suffixIcon: searchSubPreguntaController.text.isNotEmpty
+                                          ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: _limpiarBusqueda,
+                                      )
+                                          : null
+                                  ),
+                                  onChanged: (value) {
+                                    if (value!.isNotEmpty) {
+                                      _filtrarSubPreguntas(value);
+                                    } else {
+                                      setState(() {
+                                        _subPreguntaFiltrada = [];
+                                      });
+                                    }
+                                  },
+                                )
+                              ],
+                            ),
+
+                      const SizedBox(height: 20),
+                      const Divider(),
+
+                      FutureBuilder<List<SubPregunta>>(
+                        future: _subPreguntasData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }else if (snapshot.hasError) {
+                            print('Error al cargar la Sub - Preguntas: ${snapshot.error}');
+                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                          } else {
+                            final subPregTabla = _subPreguntaFiltrada.isNotEmpty
+                                  ? _subPreguntaFiltrada
+                                  : snapshot.data ?? [];
+
+                            return Container(
+                              margin: const EdgeInsets.all(2.0),
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ]
+                              ),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  textTheme: Theme.of(context).textTheme.copyWith(
+                                    bodySmall: TextStyle(
+                                      fontSize: isTabletDevice ? 9.sp : 9.sp,  // Ajusta el tamaño del número
+                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+                                    ),
+                                  ),
+                                ),
+                                child: PaginatedDataTable(
+                                  columns: [
+                                    DataColumn(label: Text('NO', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                  ],
+                                  source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta, isTabletDevice),
+                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                  rowsPerPage: 7, //numeros de filas
+                                  columnSpacing: 50, //espacios entre columnas
+                                  horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                                  showCheckboxColumn: false, //oculta la columna de checkboxes
+                                  dataRowMinHeight: 60.0,  // Altura mínima de fila
+                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                  showFirstLastButtons: true,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      ),
+                      const Divider(),
+
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Tablas administrativa para gestionar las preguntas',
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+
+                      (isTabletDevice)
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: FormBuilderDropdown<String>(
+                                  name: 'filtrarSesion',
+                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                  initialValue: selectedFilterSesion,
+                                  style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Filtrar por',
+                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  items: [
+                                    'Numero de Seccion',
+                                    'Tipo de Respuesta',
+                                    'Numero de Pregunta',
+                                    'No. de Sup Pregunta'
+                                  ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                                  onChanged: (value) => setState(() {
+                                    selectedFilterSesion = value!;
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              Expanded(
+                                  flex: 2,
+                                  child: FormBuilderTextField(
+                                    name: 'searchSesion',
+                                    controller: searchSesionController,
+                                    style: const TextStyle(fontSize: 20.0),
+                                    decoration: InputDecoration(
+                                        labelText: 'Buscar',
+                                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                        border: const OutlineInputBorder(),
+                                        prefixIcon: const Icon(Icons.search),
+                                        suffixIcon: searchSesionController.text.isNotEmpty
+                                            ? IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: _limpiarBusqueda,
+                                        )
+                                            : null
+                                    ),
+                                    onChanged: (value) {
+                                      if (value!.isNotEmpty) {
+                                        _filtrarSesion(value);
+                                      } else {
+                                        setState(() {
+                                          _sesionFiltrada = [];
+                                        });
+                                      }
+                                    },
+                                  )
+                              )
+                            ],
+                          )
+                          : Column(
+                              children: [
+                                FormBuilderDropdown<String>(
+                                  name: 'filtrarSesion',
+                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                  initialValue: selectedFilterSesion,
+                                  style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: InputDecoration(
+                                    labelText: 'Filtrar por',
+                                    labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                  items: [
+                                    'Numero de Seccion',
+                                    'Tipo de Respuesta',
+                                    'Numero de Pregunta',
+                                    'No. de Sup Pregunta'
+                                  ].map((filter) => DropdownMenuItem(
+                                    value: filter,
+                                    child: Text(filter),
+                                  )).toList(),
+                                  onChanged: (value) => setState(() {
+                                    selectedFilterSesion = value!;
+                                  }),
+                                ),
+                                const SizedBox(height: 16),
+
+                                FormBuilderTextField(
+                                  name: 'searchSesion',
+                                  controller: searchSesionController,
+                                  style: const TextStyle(fontSize: 20.0),
+                                  decoration: InputDecoration(
+                                      labelText: 'Buscar',
+                                      labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                      border: const OutlineInputBorder(),
+                                      prefixIcon: const Icon(Icons.search),
+                                      suffixIcon: searchSesionController.text.isNotEmpty
+                                          ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: _limpiarBusqueda,
+                                      )
+                                          : null
+                                  ),
+                                  onChanged: (value) {
+                                    if (value!.isNotEmpty) {
+                                      _filtrarSesion(value);
+                                    } else {
+                                      setState(() {
+                                        _sesionFiltrada = [];
+                                      });
+                                    }
+                                  },
+                                )
+                              ],
+                            ),
+
+                      const SizedBox(height: 20),
+                      const Divider(),
+
+                      FutureBuilder<List<Sesion>>(
+                        future: _sesionData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }else if (snapshot.hasError) {
+                            print('Error al cargar la Sección: ${snapshot.error}');
+                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                          } else if (snapshot.hasData) {
+                            final sesionTable = _sesionFiltrada.isNotEmpty
+                                  ? _sesionFiltrada
+                                  : snapshot.data ?? [];
+
+                            bool estadoActivo = sesionTable.every((sesion) => sesion.estado);
+
+                            return Container(
+                              margin: const EdgeInsets.all(2.0),
+                              padding: const EdgeInsets.all(2.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ]
+                              ),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  textTheme: Theme.of(context).textTheme.copyWith(
+                                    bodySmall: TextStyle(
+                                      fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
+                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+                                    ),
+                                  ),
+                                ),
+                                child: PaginatedDataTable(
+                                  header: Text('Tabla de Recopilación para Encuesta', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, fontWeight: FontWeight.bold)),
+                                  columns: [
+                                    DataColumn(label: Text('No. de Sección', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Número de \nPregunta en la \nEncuesta.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                  ],
+                                  source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion, _actualizarEstado, isTabletDevice),
+                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                  rowsPerPage: 5, //numeros de filas
+                                  columnSpacing: 50, //espacios entre columnas
+                                  horizontalMargin: 40, //para aplicarle un margin horizontal a los campo de la tabla
+                                  showCheckboxColumn: false, //oculta la columna de checkboxes
+                                  dataRowMinHeight: 60.0,  // Altura mínima de fila
+                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                  showFirstLastButtons: true,
+                                  headingRowHeight: 135.0, // Altura del encabezado
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _actualizarEstadoTodasSesiones(!estadoActivo);
+                                        setState(() {
+                                          for (var sesion in sesionTable) {
+                                            sesion.estado = !estadoActivo;
+                                          }
+                                        });
+                                      },
+                                      child: Text(
+                                        estadoActivo ? 'Deshabilitar Encuestas' : 'Habilitar Encuestas',
+                                        style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 133, 14), fontWeight: FontWeight.bold),
+                                      )
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const Center(child: Text('No hay datos disponibles.'));
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          floatingActionButton: Stack(
+            children: [
+              Positioned(
+                left: position.dx,
+                top: position.dy,
+                child: Draggable(
+                  feedback: _bottonSaveSpeedDial(),
+                  childWhenDragging: Container(), // Widget que aparece en la posición original mientras se arrastra
+                  onDragEnd: (details) {
+                    setState(() {
+                      // Limitar la posición del botón a los límites de la pantalla
+                      double maxWidth;
+                      double maxHeight;
+
+                      double dx;
+                      double dy;
+
+                      if (isTabletDevice) {
+                        maxWidth = MediaQuery.of(context).size.width - 50.w;
+                        maxHeight = MediaQuery.of(context).size.height - kToolbarHeight - 10.h;
+                        dx = details.offset.dx.clamp(50.0, maxWidth);
+                        dy = details.offset.dy.clamp(100.0, maxHeight);
+
+                        position = Offset(dx, dy);
+
+                      } else if (!(isTabletDevice)) {
+                        maxWidth = MediaQuery.of(context).size.width - 1.w;
+                        maxHeight = MediaQuery.of(context).size.height - kToolbarHeight - 1.h;
+                        dx = details.offset.dx.clamp(0.0, maxWidth);
+                        dy = details.offset.dy.clamp(0.0, maxHeight);
+
+                        position = Offset(dx, dy);
+                      }
+                    });
+                  },
+                  child: _bottonSaveSpeedDial(),
+                )
+              )
+            ]
+          ),
         ),
       ),
     );
@@ -742,15 +930,17 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showCreateDialog() {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Crear Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(90, 20, 90, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             width: 600,
             child: FormBuilder(
               key: _formKey,
@@ -762,13 +952,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Número de la Pregunta',
-                      labelFrontSize: 30.5,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       hintext: '#',
-                      hintFrontSize: 30.0,
-                      icono: const Icon(Icons.numbers,size: 30.0),
-                      errorSize: 20.0,
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.numbers, size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.numeric(errorText: 'Este campo es requerido')
                   ),
                   
@@ -776,13 +966,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'pregunta',
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Ingresar la Pregunta',
-                      labelFrontSize: 30.5,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       hintext: '¿Agregar preguntas?',
-                      hintFrontSize: 30.0,
-                      icono: const Icon(Icons.question_mark_outlined,size: 30.0),
-                      errorSize: 20.0,
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.question_mark_outlined,size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
                   ),
                 ],
@@ -790,14 +980,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if (_formKey.currentState!.saveAndValidate()) {
                   final dataPreg = _formKey.currentState!.value;
                   final newQuestion = int.parse(dataPreg['noPregunta']);
 
-                  Preguntas? existingQuestion = await ApiServicePreguntas('https://10.0.2.2:7190').getOnePregunta(newQuestion);
+                  Preguntas? existingQuestion = await ApiServicePreguntas('http://wepapi.somee.com').getOnePregunta(newQuestion);
 
                   if (existingQuestion != null) {
                     showDialog(
@@ -830,7 +1020,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   ); // Para verificar el valor antes de la asignación
 
                   try{
-                    final response = await ApiServicePreguntas('https://10.0.2.2:7190').postPreguntas(nuevaPregunta);
+                    final response = await ApiServicePreguntas('http://wepapi.somee.com').postPreguntas(nuevaPregunta);
 
                     if(response.statusCode == 201) {
                       print('La pregunta fue creado con éxito');
@@ -848,7 +1038,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               },
-              child: const Text('Crear', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text(
+                  'Crear',
+                  style: TextStyle(
+                    fontSize: isTabletDevice ? 15.sp : 15.sp,
+                    fontWeight: FontWeight.bold
+                  )
+              )
             )
           ],
         );
@@ -857,15 +1053,17 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showEditDialog(Preguntas questionUpLoad) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Modificar Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(90, 20, 90, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             child: FormBuilder(
               key: _formKey,
               initialValue: {
@@ -878,12 +1076,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'pregunta',
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Ingresar la Pregunta',
-                      labelFrontSize: 30.5,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       hintext: '¿Agregar preguntas?',
-                      hintFrontSize: 30.0,
-                      icono: const Icon(Icons.question_mark_outlined,size: 30.0),
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.question_mark_outlined,size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
                   )
                 ],
@@ -891,7 +1090,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if(_formKey.currentState!.saveAndValidate()){
@@ -902,7 +1101,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServicePreguntas('https://10.0.2.2:7190')
+                    final response = await ApiServicePreguntas('http://wepapi.somee.com')
                       .putPreguntas(questionUpLoad.codPregunta, askUpLoad);
 
                     if(response.statusCode == 204) {
@@ -919,7 +1118,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               }, 
-              child: const Text('Editar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text('Editar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold
+              ))
             )
           ]
         );
@@ -928,27 +1130,35 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showDeleteDialog(Preguntas questionDelete) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context,
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Eliminar Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: const EdgeInsets.fromLTRB(70, 30, 70, 50),
-          content: Text('¿Estás seguro de que deseas eliminar la pregunta número: ${questionDelete.codPregunta}?', style: const TextStyle(fontSize: 30)),
+          content: Text('¿Estás seguro de que deseas eliminar la pregunta número: ${questionDelete.codPregunta}?', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 18.2.sp)),
           actions: [
             TextButton(
-              child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Cancelar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold
+              )),
               onPressed: () {
                 Navigator.of(context).pop(); // Cerrar el diálogo si se cancela
               },
             ),
             TextButton(
-              child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Eliminar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold
+              )),
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServicePreguntas('https://10.0.2.2:7190')
+                  final response = await ApiServicePreguntas('http://wepapi.somee.com')
                       .deletePreguntas(questionDelete.codPregunta);
                   if (response.statusCode == 204) {
                     print('Pregunta eliminado con éxito');
@@ -975,15 +1185,17 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showCreateDialogSubPregunta() {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear Sub-Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Crear Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(90, 20, 90, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             width: 400,
             child: FormBuilder(
               key: _formKey,
@@ -994,13 +1206,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'codigo',
                     decoration: InputDecorations.inputDecoration(
                       hintext: '#',
-                      hintFrontSize: 30.0,
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
                       labeltext: 'Codigo de Sub - Pregunta',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers),
-                      errorSize: 20.0,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      icono: Icon(Icons.numbers, size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
                   ),
 
@@ -1008,13 +1220,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'subPreguntas',
                     decoration: InputDecorations.inputDecoration(
                       hintext: '',
-                      hintFrontSize: 30.0,
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
                       labeltext: 'Ingresar la sub-pregunta',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.help_outline_outlined),
-                      errorSize: 20.0,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      icono: Icon(Icons.help_outline_outlined, size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
                   )
                 ],
@@ -1022,14 +1234,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if(_formKey.currentState!.saveAndValidate()){
                   final dataSebPreg = _formKey.currentState!.value;
                   final newSubPregunta = dataSebPreg['codigo'];
 
-                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('https://10.0.2.2:7190').getOneSubPreg(newSubPregunta);
+                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('http://wepapi.somee.com').getOneSubPreg(newSubPregunta);
 
                   if (existingSubPregunta != null) {
                     showDialog(
@@ -1062,7 +1274,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190').postSubPreg(nuevaSubPregunta);
+                    final response = await ApiServiceSubPreguntas('http://wepapi.somee.com').postSubPreg(nuevaSubPregunta);
 
                     if(response.statusCode == 201) {
                       print('Las sub-Preguntas fue creado con éxito');
@@ -1078,7 +1290,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               },
-              child: const Text('Crear', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text('Crear', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold))
             )
           ]
         );
@@ -1086,25 +1300,30 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     );
   }
 
-  TextButton buttonStop(BuildContext context) {
+  TextButton buttonStop(BuildContext context, bool isTabletDevice) {
     return TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // Cerrar el diálogo sin realizar acción
             }, 
-            child: const Text('Cancelar', style: TextStyle(fontSize: 30)),
+            child: Text('Cancelar', style: TextStyle(
+              fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+              fontWeight: FontWeight.bold
+            )),
           );
   }
 
   void _showEditDialogSubPregunta(SubPregunta subQuestionUpLoad) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar Sub-Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Modificar Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(90, 20, 90, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             child: FormBuilder(
               key: _formKey,
               initialValue: {
@@ -1117,12 +1336,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     name: 'subPreguntas',
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Modicar la Sub pregunta',
-                      labelFrontSize: 30.5,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       hintext: '¿Editar preguntas?',
-                      hintFrontSize: 30.0,
-                      icono: const Icon(Icons.question_mark_outlined,size: 30.0),
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.question_mark_outlined,size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 30.0),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
                   ),
                 ],
@@ -1130,7 +1350,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if(_formKey.currentState!.saveAndValidate()) {
@@ -1142,7 +1362,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
+                    final response = await ApiServiceSubPreguntas('http://wepapi.somee.com')
                       .putSubPreg(subQuestionUpLoad.codSubPregunta, nuevaSubPregunta);
 
                     if(response.statusCode == 204) {
@@ -1159,7 +1379,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               }, 
-              child: const Text('Editar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text('Editar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 15.sp,
+                  fontWeight: FontWeight.bold))
             )
           ],
         );
@@ -1168,27 +1390,33 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showDeleteDialogSubPregunta(SubPregunta subQuestionDelete) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Sub Pregunta', style: TextStyle(fontSize: 33.0)),
+          title: Text('Eliminar Sub Pregunta', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: const EdgeInsets.fromLTRB(70, 30, 70, 50),
-          content: Text('¿Estás seguro de que deseas eliminar la sub-pregunta numero: ${subQuestionDelete.codSubPregunta}?', style: const TextStyle(fontSize: 30)),
+          content: Text('¿Estás seguro de que deseas eliminar la sub-pregunta numero: ${subQuestionDelete.codSubPregunta}?', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           actions: [
             TextButton(
-              child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Cancelar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.of(context).pop(); // Cerrar el diálogo si se cancela
               },
             ),
             TextButton(
-              child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Eliminar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold)),
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
+                  final response = await ApiServiceSubPreguntas('http://wepapi.somee.com')
                       .deleteSubPreg(subQuestionDelete.codSubPregunta);
                   if (response.statusCode == 204) {
                     print('Sub pregunta eliminado con éxito');
@@ -1217,256 +1445,268 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
   void _showCreateDialogSesion() {
     bool estado = false;
+    final isTabletDevice = isTablet(context);
 
     showDialog(
       context: context,
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear Sección', style: TextStyle(fontSize: 33.0)),
+          title: Text('Crear Sección', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),  // Aplica margen
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(40, 20, 40, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             width: 600,
-            child: FormBuilder(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FormBuilderTextField(
-                    name: 'identifEncuesta',
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'No. Pregunta en la Encuesta',
-                      labelFrontSize: 30.5,
-                      hintext: 'Ingresar el No. Identificación de la pregunta',
-                      hintFrontSize: 25.0,
-                      icono: const Icon(Icons.question_answer, size: 30.0),
-                      errorSize: 20.0,
+            child: SingleChildScrollView(
+              child: FormBuilder(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FormBuilderTextField(
+                      name: 'identifEncuesta',
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'No. Pregunta en la Encuesta',
+                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                        hintext: 'Ingresar el No. Identificación de la pregunta',
+                        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                        icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                        errorSize: isTabletDevice ? 10.sp : 10.sp,
+                      ),
+                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                     ),
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                  ),
-
-                  FormBuilderDropdown<int>(
-                    name: 'codPregunta',
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Pregunta',
-                      labelFrontSize: 30.5,
-                      hintext: 'Elegir la Pregunta',
-                      hintFrontSize: 25.0,
-                      icono: const Icon(Icons.question_answer, size: 30.0),
-                      errorSize: 20.0,
+              
+                    FormBuilderDropdown<int>(
+                      name: 'codPregunta',
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Pregunta',
+                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                        hintext: 'Elegir la Pregunta',
+                        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                        icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                        errorSize: isTabletDevice ? 10.sp : 10.sp,
+                      ),
+                      items: _questions.map((preg) {
+                        return DropdownMenuItem(
+                          value: preg.codPregunta,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  preg.pregunta, 
+                                  overflow: TextOverflow.ellipsis, // Maneja texto muy largo
+                                  maxLines: 2, // Limita el texto a 2 líneas
+                                )
+                              ),
+                              const SizedBox(width: 20),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _savedQuestion = value!;
+                          print('Pregunta seleccionada: $_savedQuestion');
+                        });
+                      },
+                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      isExpanded: true,
+                      // dropdownColor: Colors.grey[200], // Cambiar el color del fondo
+                      iconEnabledColor: Colors.blue, // Color del icono desplegable
+                      menuMaxHeight: 300.0, // Altura máxima del cuadro desplegable
                     ),
-                    items: _questions.map((preg) {
-                      return DropdownMenuItem(
-                        value: preg.codPregunta,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                preg.pregunta, 
-                                overflow: TextOverflow.ellipsis, // Maneja texto muy largo
-                                maxLines: 2, // Limita el texto a 2 líneas
-                              )
-                            ),
-                            const SizedBox(width: 20),
-                          ],
+                    const SizedBox(height: 20),
+              
+                    FormBuilderDropdown(
+                      name: 'codSubPregunta',
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Sub Pregunta',
+                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                        hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
+                        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                        icono: Icon(Icons.subdirectory_arrow_right, size: isTabletDevice ? 15.sp : 15.sp),
+                      ),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                      items: [
+                        DropdownMenuItem(
+                          value: null, // Valor para la opción "No elegir sub-preguntas"
+                            child: Text(
+                              'Elegir o dejarlo vacío',
+                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp)
+                            )
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _savedQuestion = value!;
-                        print('Pregunta seleccionada: $_savedQuestion');
-                      });
-                    },
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                    isExpanded: true,
-                    // dropdownColor: Colors.grey[200], // Cambiar el color del fondo
-                    iconEnabledColor: Colors.blue, // Color del icono desplegable
-                    menuMaxHeight: 300.0, // Altura máxima del cuadro desplegable
-                  ),
-                  const SizedBox(height: 20),
-
-                  FormBuilderDropdown(
-                    name: 'codSubPregunta',
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Sub Pregunta',
-                      labelFrontSize: 30.5,
-                      hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
-                      hintFrontSize: 25.0,
-                      icono: const Icon(Icons.subdirectory_arrow_right, size: 30.0),
+                        ..._subQuestions.map((subPreg) {
+                          return DropdownMenuItem(
+                              value: subPreg.codSubPregunta,
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                      child: Text(
+                                          subPreg.subPreguntas!, overflow: TextOverflow.clip)
+                                  ),
+                                ],
+                              )
+                          );
+                        }).toList(),
+                      ],
+                      isExpanded: true, // Permite que los ítems se expandan al ancho disponible
+                      menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    items: _subQuestions.map((subPreg) {
-                      return DropdownMenuItem(
-                        value: subPreg.codSubPregunta,
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                subPreg.subPreguntas!, overflow: TextOverflow.clip)
-                            ),
-                          ],
+                    const SizedBox(height: 20),
+              
+                    FormBuilderDropdown<String>(
+                      name: 'tipoRespuesta',
+                      menuMaxHeight: 250.0, // Altura máxima del cuadro desplegable
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Elige Tipo de Respuesta',
+                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                        // hintext: 'Eliga como se responder esta pregunta',
+                        // hintFrontSize: 30.0,
+                        icono: Icon(Icons.list_alt, size: isTabletDevice ? 15.sp : 15.sp),
+                        errorSize: isTabletDevice ? 10.sp : 10.sp,
+                      ),
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Respuesta Abierta',
+                          child: Text('Respuesta Abierta')
+                        ),
+                        DropdownMenuItem(
+                          value: 'Seleccionar: Si, No, N/A',
+                          child: Text('Seleccionar: Si, No, N/A'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Calificar del 1 a 10',
+                          child: Text('Calificar del 1 a 10'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Solo SI o No',
+                          child: Text('Solo SI o No'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Edad',
+                          child: Text('Edad'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Nacionalidad',
+                          child: Text('Nacionalidad'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Título de transporte',
+                          child: Text('Título de transporte'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Producto utilizado',
+                          child: Text('Producto utilizado'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Género',
+                          child: Text('Género'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Frecuencia de viajes por semana',
+                          child: Text('Frecuencia de viajes por semana'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Expectativa del pasajero',
+                          child: Text('Expectativa del pasajero'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Conclusión',
+                          child: Text('Conclusión'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Motivo del viaje',
+                          child: Text('Motivo del viaje'),
                         )
-                      );
-                    }).toList(),
-                    isExpanded: true, // Permite que los ítems se expandan al ancho disponible
-                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                  ),
-                  const SizedBox(height: 20),
-
-                  FormBuilderDropdown<String>(
-                    name: 'tipoRespuesta',
-                    menuMaxHeight: 250.0, // Altura máxima del cuadro desplegable
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Elige Tipo de Respuesta',
-                      labelFrontSize: 30.5,
-                      // hintext: 'Eliga como se responder esta pregunta',
-                      // hintFrontSize: 30.0,
-                      icono: const Icon(Icons.list_alt, size: 30.0),
-                      errorSize: 20.0,
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedTipRespuestas = value!;
+                        });
+                      },
+                      initialValue: 'Respuesta Abierta',
                     ),
-                    style: const TextStyle(fontSize: 25.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Respuesta Abierta',
-                        child: Text('Respuesta Abierta')
+                    const SizedBox(height: 20),
+              
+                    FormBuilderDropdown(
+                      name: 'nota',
+                      menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                      decoration: InputDecorations.inputDecoration(
+                        labeltext: 'Elige el Requerimiento',
+                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                        icono: Icon(Icons.assignment, size: isTabletDevice ? 15.sp : 15.sp),
+                        errorSize: 20.0,
                       ),
-                      DropdownMenuItem(
-                        value: 'Seleccionar: Si, No, N/A',
-                        child: Text('Seleccionar: Si, No, N/A'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Calificar del 1 a 10',
-                        child: Text('Calificar del 1 a 10'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Solo SI o No',
-                        child: Text('Solo SI o No'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Edad',
-                        child: Text('Edad'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Nacionalidad',
-                        child: Text('Nacionalidad'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Título de transporte',
-                        child: Text('Título de transporte'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Producto utilizado',
-                        child: Text('Producto utilizado'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Género',
-                        child: Text('Género'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Frecuencia de viajes por semana',
-                        child: Text('Frecuencia de viajes por semana'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Expectativa del pasajero',
-                        child: Text('Expectativa del pasajero'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Conclusión',
-                        child: Text('Conclusión'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Motivo del viaje',
-                        child: Text('Motivo del viaje'),
-                      )
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedTipRespuestas = value!;
-                      });
-                    },
-                    initialValue: 'Respuesta Abierta',
-                  ),
-                  const SizedBox(height: 20),
-
-                  FormBuilderDropdown(
-                    name: 'nota',
-                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Elige el Requerimiento',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.assignment, size: 30.0),
-                      errorSize: 20.0,
+                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                      items: const  [
+                        DropdownMenuItem(
+                            value: null,
+                            child: Text('No se requiere nada en la pregunta')
+                        ),
+                        DropdownMenuItem(
+                            value: 'Requiere Justificación (Opcional)',
+                            child: Text('Requiere Justificación (Opcional)')
+                        ),
+                        DropdownMenuItem(
+                            value: 'Requiere Comentarios (Opcional)',
+                            child: Text('Requiere Comentarios (Opcional)')
+                        ),
+                        DropdownMenuItem(
+                            value: 'Comentarios y Justificación (Opcional)',
+                            child: Text('Requiere Comentarios y Justificación (Opcional)')
+                        ),
+                        DropdownMenuItem(
+                            value: 'En caso de responder (Si) finaliza la encuesta',
+                            child: Text('En caso de responder (Si) finaliza la encuesta')
+                        )
+                      ],
+                      isExpanded: true,
                     ),
-                    style: const TextStyle(fontSize: 25.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    items: const  [
-                      DropdownMenuItem(
-                          value: 'No se requiere otra cosa mas.',
-                          child: Text('No se requiere nada en la pregunta')
-                      ),
-                      DropdownMenuItem(
-                          value: 'Requiere Justificación (Opcional)',
-                          child: Text('Requiere Justificación (Opcional)')
-                      ),
-                      DropdownMenuItem(
-                          value: 'Requiere Comentarios (Opcional)',
-                          child: Text('Requiere Comentarios (Opcional)')
-                      ),
-                      DropdownMenuItem(
-                          value: 'Comentarios y Justificación (Opcional)',
-                          child: Text('Requiere Comentarios y Justificación (Opcional)')
-                      ),
-                      DropdownMenuItem(
-                          value: 'En caso de responder (Si) finaliza la encuesta',
-                          child: Text('En caso de responder (Si) finaliza la encuesta')
-                      )
-                    ],
-                    isExpanded: true,
-                  ),
-                  const SizedBox(height: 20),
-
-                  FormBuilderField(
-                    name: 'estado',
-                    builder: (FormFieldState<dynamic> field) {
-                      return FlutterSwitch(
-                        value: estado,
-                        activeText: 'Agregando a Encuesta',
-                        inactiveText: 'Descartado de la Encuesta',
-                        activeColor: Colors.green,
-                        inactiveColor: Colors.red,
-                        activeToggleColor: Colors.white,
-                        inactiveToggleColor: Colors.white,
-                        activeTextColor: Colors.white,
-                        inactiveTextColor: Colors.white,
-                        activeIcon: const Icon(Icons.check_circle, color: Colors.green),
-                        inactiveIcon: const Icon(Icons.close, color: Colors.red),
-                        showOnOff: true, // Esta propiedad muestra el texto
-                        onToggle: (value) => setState(() {
-                          estado = value;
-                          field.didChange(value);
-                        }),
-                        width: 520.0, 
-                        height: 50.5, 
-                        valueFontSize: 27.0, //agrandar los textos
-                        toggleSize: 48.0, //size del icomo
-                        borderRadius: 50.0, 
-                        padding: 8.0,
-                        duration: const Duration(milliseconds: 550), // Duración de la animación para un movimiento suave
-                      );
-                    },
-                  )
-                ] 
-              )
+                    const SizedBox(height: 20),
+              
+                    FormBuilderField(
+                      name: 'estado',
+                      builder: (FormFieldState<dynamic> field) {
+                        return FlutterSwitch(
+                          value: estado,
+                          activeText: 'Agregando a Encuesta',
+                          inactiveText: 'Descartado de la Encuesta',
+                          activeColor: Colors.green,
+                          inactiveColor: Colors.red,
+                          activeToggleColor: Colors.white,
+                          inactiveToggleColor: Colors.white,
+                          activeTextColor: Colors.white,
+                          inactiveTextColor: Colors.white,
+                          activeIcon: const Icon(Icons.check_circle, color: Colors.green),
+                          inactiveIcon: const Icon(Icons.close, color: Colors.red),
+                          showOnOff: true, // Esta propiedad muestra el texto
+                          onToggle: (value) => setState(() {
+                            estado = value;
+                            field.didChange(value);
+                          }),
+                          width: 520.0,
+                          height: isTabletDevice ? 35.5.h : 30.h,
+                          valueFontSize: isTabletDevice ? 12.sp : 12.sp, //agrandar los textos
+                          toggleSize: 50.0, //size del icomo
+                          borderRadius: 50.0, 
+                          padding: isTabletDevice ? 2 : 2,
+                          duration: const Duration(milliseconds: 650), // Duración de la animación para un movimiento suave
+                        );
+                      },
+                    )
+                  ] 
+                )
+              ),
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if (_formKey.currentState!.saveAndValidate()) {
@@ -1484,7 +1724,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   print('Resultados ${nuevaSesion}');
 
                   try{
-                    final response = await ApiServiceSesion('https://10.0.2.2:7190').postSesion(nuevaSesion);
+                    final response = await ApiServiceSesion('http://wepapi.somee.com').postSesion(nuevaSesion);
 
                     if(response.statusCode == 201) {
                       print('La Sesion fue creado con éxito');
@@ -1501,7 +1741,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               },
-              child: const Text('Crear', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text('Crear', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold))
             )
           ],
         );
@@ -1510,20 +1752,22 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showEditDialogSesion(Sesion sectionUpload) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Modificar La Sección', style: TextStyle(fontSize: 33.0)),
+          title: Text('Modificar La Sección', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
           contentPadding: EdgeInsets.zero,
           content: Container(
-            margin: const EdgeInsets.fromLTRB(90, 20, 90, 50),
+            margin: isTabletDevice ? const EdgeInsets.fromLTRB(90, 20, 90, 50) : const EdgeInsets.fromLTRB(30, 20, 30, 50),  // Aplica margen
             child: FormBuilder(
               key: _formKey,
               initialValue: {
                 'tipoRespuesta': sectionUpload.tipoRespuesta,
-                // 'grupoTema': sectionUpload.grupoTema,
+                'identifEncuesta': sectionUpload.identifEncuesta,
                 'codPregunta': sectionUpload.codPregunta,
                 'codSubPregunta': sectionUpload.codSubPregunta,
                 'nota': sectionUpload.rango
@@ -1531,17 +1775,32 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  FormBuilderTextField(
+                    name: 'identifEncuesta',
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'No. Pregunta en la Encuesta',
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      hintext: 'Ingresar el No. Identificación de la pregunta',
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
+                    ),
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                  ),
+
                   FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
                     menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige Tipo de Respuesta',
-                      labelFrontSize: 30.5,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       // hintext: 'Eliga como se responder esta pregunta',
                       // hintFrontSize: 30.0,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      icono: Icon(Icons.numbers,size: isTabletDevice ? 15.sp : 15.sp),
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                     items: const [
                       DropdownMenuItem(
@@ -1608,12 +1867,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   FormBuilderDropdown<int>(
                     name: 'codPregunta',
                     menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'No. de Pregunta',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers,size: 30.0),
-                      errorSize: 20.0,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      icono: Icon(Icons.numbers,size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
                     items: _questions.map((preg) {
                       return DropdownMenuItem(
@@ -1639,31 +1898,40 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     isExpanded: true,
                   ),
 
-                  FormBuilderDropdown<String>(
+                  FormBuilderDropdown(
                     name: 'codSubPregunta',
-                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
-                      labeltext: 'Cod. Sub Pregunta',
-                      labelFrontSize: 30.5,
+                      labeltext: 'Sub Pregunta',
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
                       hintext: 'Elegir la Sub-Pregunta (si lo requiere)',
-                      hintFrontSize: 25.0,
-                      icono: const Icon(Icons.numbers,size: 30.0),
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.subdirectory_arrow_right, size: isTabletDevice ? 15.sp : 15.sp),
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
-                    items: _subQuestions.map((subPreg) {
-                      return DropdownMenuItem(
-                        value: subPreg.codSubPregunta,
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                subPreg.subPreguntas!, overflow: TextOverflow.clip)
-                            ),
-                          ],
-                        )
-                      );
-                    }).toList(),
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                    items: [
+                      DropdownMenuItem(
+                          value: null, // Valor para la opción "No elegir sub-preguntas"
+                          child: Text(
+                              'Elegir o dejarlo vacío',
+                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp)
+                          )
+                      ),
+                      ..._subQuestions.map((subPreg) {
+                        return DropdownMenuItem(
+                            value: subPreg.codSubPregunta,
+                            child: Row(
+                              children: [
+                                Flexible(
+                                    child: Text(
+                                        subPreg.subPreguntas!, overflow: TextOverflow.clip)
+                                ),
+                              ],
+                            )
+                        );
+                      }).toList(),
+                    ],
                     isExpanded: true, // Permite que los ítems se expandan al ancho disponible
+                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                   ),
 
                   FormBuilderDropdown(
@@ -1671,14 +1939,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                     decoration: InputDecorations.inputDecoration(
                       labeltext: 'Elige el Requerimiento',
-                      labelFrontSize: 30.5,
-                      icono: const Icon(Icons.numbers,size: 30.0),
-                      errorSize: 20.0,
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      icono: Icon(Icons.numbers,size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
                     ),
-                    style: const TextStyle(fontSize: 20.0, color: Color.fromARGB(255, 1, 1, 1)),
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                     items: const  [
                       DropdownMenuItem(
-                          value: 'No se requiere otra cosa mas.',
+                          value: null,
                           child: Text('No se requiere nada en la pregunta')
                       ),
                       DropdownMenuItem(
@@ -1690,7 +1958,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                           child: Text('Requiere Comentarios (Opcional)')
                       ),
                       DropdownMenuItem(
-                          value: 'Requiere Comentarios y Justificación (Opcional)',
+                          value: 'Comentarios y Justificación (Opcional)',
                           child: Text('Requiere Comentarios y Justificación (Opcional)')
                       ),
                       DropdownMenuItem(
@@ -1705,7 +1973,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ),
           ),
           actions: [
-            buttonStop(context),
+            buttonStop(context, isTabletDevice),
             TextButton(
               onPressed: () async {
                 if(_formKey.currentState!.saveAndValidate()) {
@@ -1714,17 +1982,17 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   Sesion sesionUpLoad = Sesion(
                     idSesion: sectionUpload.idSesion,
                     tipoRespuesta: selectedTipRespuestas,
-                    // grupoTema: dataSesion['grupoTema'],
+                    identifEncuesta: dataSesion['identifEncuesta'],
                     codPregunta: int.parse(dataSesion['codPregunta'].toString()),
                     codSubPregunta: dataSesion['codSubPregunta'],
-                    estado: sectionUpload.estado, // cambiar
+                    estado: sectionUpload.estado,
                     rango: dataSesion['nota']
                   );
 
                   print('Resultados de sesionUpLoad: $sesionUpLoad');
 
                   try{
-                    final response = await ApiServiceSesion('https://10.0.2.2:7190')
+                    final response = await ApiServiceSesion('http://wepapi.somee.com')
                       .putSesion(sectionUpload.idSesion!, sesionUpLoad);
 
                     if(response.statusCode == 204) {
@@ -1741,7 +2009,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   }
                 }
               }, 
-              child: const Text('Editar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+              child: Text('Editar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold))
             )
           ],
         );
@@ -1750,25 +2020,31 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   void _showDeleteDialogSesion(Sesion sectionDelete) {
+    final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar Sección', style: TextStyle(fontSize: 33.0)),
-          content: Text('¿Estás seguro de que deseas eliminar la sección no. ${sectionDelete.idSesion}?', style: const TextStyle(fontSize: 30)),
+          title: Text('Eliminar Sección', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp)),
+          content: Text('¿Estás seguro de que deseas eliminar la sección no. ${sectionDelete.idSesion}?', style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp)),
           actions: [
             TextButton(
-              child: const Text('Cancelar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Cancelar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.of(context).pop(); // Cerrar el diálogo si se cancela
               },
             ),
             TextButton(
-              child: const Text('Eliminar', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              child: Text('Eliminar', style: TextStyle(
+                  fontSize: isTabletDevice ? 15.sp : 18.2.sp,
+                  fontWeight: FontWeight.bold)),
               onPressed: () async {
                 try{
-                  final response = await ApiServiceSesion('https://10.0.2.2:7190').deleteSesion(sectionDelete.idSesion!);
+                  final response = await ApiServiceSesion('http://wepapi.somee.com').deleteSesion(sectionDelete.idSesion!);
 
                   if (response.statusCode == 204) {
                     print('Sesion eliminado con éxito');
@@ -1807,7 +2083,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       print('Estado actualizado a: ${estadoActualizador.estado}');
 
       try{
-        final response = await ApiServiceSesion('https://10.0.2.2:7190')
+        final response = await ApiServiceSesion('http://wepapi.somee.com')
           .putSesion(actualizarEstado_Sesion.idSesion!, estadoActualizador);
 
         if (estadoActualizador.estado) { // dependiento del valor del campo estado aparecera un cuadro de dialoga que notifica que se ha habilitado o deshabilitado de la encuesta
@@ -1852,7 +2128,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           rango: sesion.rango,
         );
 
-        final response = await ApiServiceSesion('https://10.0.2.2:7190').putSesion(sesion.idSesion!, estadoActualizador);
+        final response = await ApiServiceSesion('http://wepapi.somee.com').putSesion(sesion.idSesion!, estadoActualizador);
 
         if (estadoActualizador.estado) {
           if (response.statusCode == 204) {
@@ -1873,7 +2149,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
         }
       }
       _refreshSesion();
-      _showSuccessDialog(context, 'Todas las sesiones han sido ${nuevoEstado ? 'enviadas a la Encuesta' : 'deshabilitadas de la Encuesta'}');
+      _showSuccessDialog(context, 'Todas las secciones han sido ${nuevoEstado ? 'enviadas a la Encuesta' : 'deshabilitadas de la Encuesta'}');
     } catch (e) {
       print('Error al actualizar todas las sesiones: $e');
       _showErrorDialog(context, 'Error al actualizar todas las sesiones');
@@ -1961,8 +2237,9 @@ class _PreguntasDataSource extends DataTableSource {
   final List<Preguntas> preguntasData;
   final Function(Preguntas) onEdit;
   final Function(Preguntas) onDelete;
+  final bool isTabletDevice;
 
-  _PreguntasDataSource(this.preguntasData, this.onEdit, this.onDelete);
+  _PreguntasDataSource(this.preguntasData, this.onEdit, this.onDelete, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
@@ -1978,11 +2255,11 @@ class _PreguntasDataSource extends DataTableSource {
               : Colors.white;
       }),
       cells: [
-        DataCell(Text(ask.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))), // Conversión explícita de int a String usando .toString()
+        DataCell(Text(ask.codPregunta.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))), // Conversión explícita de int a String usando .toString()
         DataCell(
           Container(
             constraints: const BoxConstraints(maxWidth: 420, minWidth: 420), // Ancho fijo para la celda
-            child: Text(ask.pregunta, style: const TextStyle(fontSize: 20.0), softWrap: true)
+            child: Text(ask.pregunta, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp), softWrap: true)
           )
         ),
         DataCell(
@@ -2024,8 +2301,9 @@ class _SubPreguntasDataSource extends DataTableSource {
   final List<SubPregunta> _subPreguntasData;
   final Function(SubPregunta) onEdit;
   final Function(SubPregunta) onDelete;
+  final bool isTabletDevice;
 
-  _SubPreguntasDataSource(this._subPreguntasData, this.onEdit, this.onDelete);
+  _SubPreguntasDataSource(this._subPreguntasData, this.onEdit, this.onDelete, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
@@ -2041,10 +2319,10 @@ class _SubPreguntasDataSource extends DataTableSource {
               : Colors.white;
       }),
       cells: [
-        DataCell(Text(sub.codSubPregunta, style: const TextStyle(fontSize: 20.0))),
+        DataCell(Text(sub.codSubPregunta, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
         DataCell(sub.subPreguntas != null ? Container(
           constraints: const BoxConstraints(maxWidth: 420, minWidth: 420),
-          child: Text(sub.subPreguntas!, style: const TextStyle(fontSize: 20.0), softWrap: true)
+          child: Text(sub.subPreguntas!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp), softWrap: true)
         ) : const Text('')),
         DataCell(
           Row(
@@ -2086,8 +2364,9 @@ class _SesionDataSource extends DataTableSource {
   final Function(Sesion) onEdit;
   final Function(Sesion) onDelete;
   final Function(Sesion) _estado;
+  final bool isTabletDevice;
 
-  _SesionDataSource(this._sesionData, this.onEdit, this.onDelete, this._estado);
+  _SesionDataSource(this._sesionData, this.onEdit, this.onDelete, this._estado, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
@@ -2103,22 +2382,34 @@ class _SesionDataSource extends DataTableSource {
               : Colors.white;
       }),
       cells: [
-        DataCell(Text(section.idSesion.toString(), style: const TextStyle(fontSize: 20.0))),
-        DataCell(Text(section.tipoRespuesta, style: const TextStyle(fontSize: 20.0))),
-        DataCell(section.identifEncuesta != null ? Text(section.identifEncuesta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-        DataCell(Text(section.codPregunta.toString(), style: const TextStyle(fontSize: 20.0))),
-        DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
-        DataCell(section.rango != null ? Text(section.rango!, style: const TextStyle(fontSize: 20.0)) : const Text('')),
+        DataCell(Text(section.idSesion.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(Text(section.tipoRespuesta, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(section.identifEncuesta != null ? Text(section.identifEncuesta!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(Text(section.codPregunta.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(section.rango != null ? Text(section.rango!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
         DataCell(
-          Switch(
+          FlutterSwitch(
             value: section.estado,
-            onChanged: (value) {
-              // onEstadoChanged(section, value);
+            activeColor: Colors.green,
+            inactiveColor: Colors.red,
+            activeToggleColor: Colors.white,
+            inactiveToggleColor: Colors.white,
+            activeTextColor: Colors.white,
+            inactiveTextColor: Colors.white,
+            activeIcon: const Icon(Icons.check_circle, color: Colors.green),
+            inactiveIcon: const Icon(Icons.close, color: Colors.red),
+            onToggle: (value) {
               print('Cambiando el estado a: $value');
               section.estado = value;
               _estado(section);
               notifyListeners(); // Notifica los cambios en la tabla
             },
+            width: 120.0,
+            height: isTabletDevice ? 27.5.h : 29.h,
+            toggleSize: 36.0,
+            borderRadius: 60.0,
+            duration: const Duration(milliseconds: 550), // Duración de la animación
           )
         ),
         DataCell(

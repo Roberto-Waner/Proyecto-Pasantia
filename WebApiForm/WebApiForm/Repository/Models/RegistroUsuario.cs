@@ -14,7 +14,7 @@ public partial class RegistroUsuario
     [Column("id_usuarios")]
     [StringLength(100)]
     [Unicode(false)]
-    public string IdUsuarios { get; set; } = null!;
+    public string? IdUsuarios { get; set; } = null!;
 
     [Column("nombre_apellido")]
     [StringLength(200)]

@@ -59,6 +59,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//para que se pueda visualizar en el hosting
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
 
 // Usa CORS

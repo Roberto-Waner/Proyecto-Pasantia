@@ -44,11 +44,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 // Registrar el servicio en vace a stored procedure
+builder.Services.AddScoped<FormularioRepository>();
+//--------------------------------------------------------
 builder.Services.AddScoped<EstacionPorLineaService>();
-//builder.Services.AddScoped<EmpleadoService>();
 builder.Services.AddScoped<PreguntaCompletaService>();
 builder.Services.AddScoped<RespuestaService>();
 builder.Services.AddScoped<FormularioServices>();
+//--------------------------------------------------------
 
 var app = builder.Build();
 

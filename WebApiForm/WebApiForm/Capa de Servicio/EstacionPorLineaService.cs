@@ -5,9 +5,9 @@ namespace WebApiForm.Capa_de_Servicio
 {
     public class EstacionPorLineaService
     {
-        private readonly FormEncuestaDbContext _context;
+        private readonly FormularioRepository _context;
 
-        public EstacionPorLineaService(FormEncuestaDbContext context)
+        public EstacionPorLineaService(FormularioRepository context)
         {
             _context = context;
         }

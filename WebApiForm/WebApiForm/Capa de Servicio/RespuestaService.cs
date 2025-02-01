@@ -9,36 +9,30 @@ namespace WebApiForm.Capa_de_Servicio
 {
     public class RespuestaService
     {
-        private readonly FormEncuestaDbContext _context;
+        private readonly FormularioRepository _context;
 
-        public RespuestaService(FormEncuestaDbContext context)
+        // Inyectar el repositorio en el constructor
+        public RespuestaService(FormularioRepository context)
         {
             _context = context;
         }
 
+        // Método para insertar una respuesta
         public async Task InsertarRespuestaAsyncServices(Respuesta_Dto respuesta)
         {
             await _context.InsertarRespuestaAsync(respuesta);
         }
 
-        //para filtrar datos de la tabla Respuesta usando parametros, como: IdUsuario, NoEncuesta, IdSesion
-        //public async Task<List<FiltrarRespuestas_Dto>> FiltrarRespuestaAsyncServices(FiltrarRespuestas_Dto filtrar)
-        //{
-        //    var query = "EXEC sp_filtrar_Respuesta @id_usuarios = {0}, @no_encuesta = {1}, @id_sesion = {2}";
-        //    var parameters = new List<object>
-        //    {
-        //        filtrar.IdUsuarios ?? (object)DBNull.Value,
-        //        filtrar.NoEncuesta ?? (object)DBNull.Value,
-        //        filtrar.IdSesion ?? (object)DBNull.Value
-        //    };
-
-        //    return await _context.FiltrarRespuestasDtos.FromSqlRaw(query, parameters.ToArray()).ToListAsync();
-        //}
-
+        // Método para obtener respuestas
         //Obtener todas las Respuesta de su tabla Respuestas mas el Usuario, Sesion, Preguntas, Subpreguntas, basado en un stored procedure
         public async Task<List<ObtenerRespuestas_Dto>> ObtenerRespuestasAsyncService()
         {
             return await _context.ObtenerRespuestasAsync();
+        }
+
+        public async Task<List<ReportRespuestas_Dto>> ExportReportRespuestaServices()
+        {
+            return await _context.GetReporteAsync();
         }
     }
 }

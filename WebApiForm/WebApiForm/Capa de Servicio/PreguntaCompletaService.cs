@@ -5,9 +5,9 @@ namespace WebApiForm.Capa_de_Servicio
 {
     public class PreguntaCompletaService
     {
-        private readonly FormEncuestaDbContext _context;
+        private readonly FormularioRepository _context;
 
-        public PreguntaCompletaService(FormEncuestaDbContext context)
+        public PreguntaCompletaService(FormularioRepository context)
         {
             _context = context;
         }

@@ -41,7 +41,7 @@ public partial class Sesion
 
     [ForeignKey("CodPregunta")]
     [InverseProperty("Sesions")]
-    public virtual Pregunta? CodPreguntaNavigation { get; set; } = null!;
+    public virtual Pregunta? CodPreguntaNavigation { get; set; }
 
     [ForeignKey("CodSubPregunta")]
     [InverseProperty("Sesions")]

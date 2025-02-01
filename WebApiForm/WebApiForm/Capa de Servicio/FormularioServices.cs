@@ -7,9 +7,9 @@ namespace WebApiForm.Capa_de_Servicio
 {
     public class FormularioServices
     {
-        private readonly FormEncuestaDbContext _context;
+        private readonly FormularioRepository _context;
 
-        public FormularioServices(FormEncuestaDbContext context)
+        public FormularioServices(FormularioRepository context)
         {
             _context = context;
         }
@@ -18,11 +18,5 @@ namespace WebApiForm.Capa_de_Servicio
         {
             return await _context.ObtenerFormularioAsync();
         }
-
-        //public async Task<List<FiltrarFormularios_Dto>> FiltrarFormularioAsyncServices(string filtrar) //no esta en uso actualmente
-        //{
-        //    var query = "EXEC sp_FiltrarFormulario @Filtro = {0}";
-        //    return await _context.filtrarFormulariosDtos.FromSqlRaw(query, filtrar).ToListAsync();
-        //}
     }
 }

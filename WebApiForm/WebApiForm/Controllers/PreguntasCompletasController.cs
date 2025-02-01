@@ -18,12 +18,20 @@ namespace WebApiForm.Controllers
         [HttpGet("obtenerQuestion")]
         public async Task<ActionResult<IEnumerable<PreguntaCompleta>>> ObtenerPreguntasCompleto()
         {
-            var preguntasCompleto = await _preguntaCompletaService.ObtenerPreguntasCompletoAsync();
-            if (preguntasCompleto == null || preguntasCompleto.Count == 0)
+            try
             {
-                return NotFound("No se encontraron preguntas completas.");
+                var preguntasCompleto = await _preguntaCompletaService.ObtenerPreguntasCompletoAsync();
+                if (preguntasCompleto == null || preguntasCompleto.Count == 0)
+                {
+                    return StatusCode(404, "No se encontraron preguntas completas.");
+                }
+                return Ok(preguntasCompleto);
+
             }
-            return Ok(preguntasCompleto);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error interno al procesar la solicitud. Por favor, inténtelo de nuevo más tarde.");
+            }
         }
     }
 }

@@ -133,12 +133,6 @@ namespace WebApiForm.Controllers
             {
                 foreach (var answer in respuestas)
                 {
-                    //// Validación para asegurarse que FinalizarSesion no sea mayor que 1
-                    //if (answer.FinalizarSesion > 1)
-                    //{
-                    //    return BadRequest(new { message = "El valor de FinalizarSesion no puede ser mayor que 1." });
-                    //}
-
                     await _respuestaService.InsertarRespuestaAsyncServices(answer);
                 }
             }
@@ -149,20 +143,6 @@ namespace WebApiForm.Controllers
 
             return Ok();
         }
-
-        //[HttpGet("filtrar")]
-        //public async Task<IActionResult> postFiltrarRespuesta([FromBody] FiltrarRespuestas_Dto filtrar)
-        //{
-        //    try
-        //    {
-        //        var filtrarRespuestas = await _respuestaService.FiltrarRespuestaAsyncServices(filtrar); 
-        //        return Ok(filtrarRespuestas);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = "Error al filtrar la respuesta", details = ex.Message });
-        //    }
-        //}
 
         [HttpGet("ObtenerResp")]
         public async Task<ActionResult<List<ObtenerRespuestas_Dto>>> getObtenerRespuestas()

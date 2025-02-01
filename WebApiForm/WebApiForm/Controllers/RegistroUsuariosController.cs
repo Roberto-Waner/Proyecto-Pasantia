@@ -228,12 +228,5 @@ namespace WebApiForm.Controllers
         {
             return _context.RegistroUsuarios.Any(e => e.IdUsuarios == id);
         }
-
-        //[HttpGet("ObtenerEmpl")]
-        //public async Task<ActionResult<List<ObtenerEmpleados>>> getObtenerEmpleados()
-        //{
-        //    var empleados = await _empleadoService._ObtenerEmpleadosAsync();
-        //    return Ok(empleados);
-        //}
     }
 }

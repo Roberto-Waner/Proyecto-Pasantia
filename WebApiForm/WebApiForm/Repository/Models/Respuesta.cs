@@ -38,11 +38,23 @@ public partial class Respuesta
     [Unicode(false)]
     public string? Justificacion { get; set; }
 
+    [Column("hora_respuestas")]
+    [StringLength(30)]
+    [Unicode(false)]
+    public string? HoraRespuestas { get; set; }
+
+    [Column("identifacador_form")]
+    public int? IdentifacadorForm { get; set; }
+
     [ForeignKey("IdSesion")]
     [InverseProperty("Respuestas")]
-    public virtual Sesion? IdSesionNavigation { get; set; } = null!;
+    public virtual Sesion? IdSesionNavigation { get; set; }
 
     [ForeignKey("IdUsuarios")]
     [InverseProperty("Respuestas")]
-    public virtual RegistroUsuario? IdUsuariosNavigation { get; set; } = null!;
+    public virtual RegistroUsuario? IdUsuariosNavigation { get; set; }
+
+    [ForeignKey("IdentifacadorForm")]
+    [InverseProperty("Respuestas")]
+    public virtual Formulario? IdentifacadorFormNavigation { get; set; }
 }

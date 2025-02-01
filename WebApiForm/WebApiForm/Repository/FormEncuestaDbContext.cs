@@ -19,6 +19,7 @@ public partial class FormEncuestaDbContext : DbContext
     {
     }
 
+    // DbSet para las entidades y DTOs 
     public virtual DbSet<Estacion> Estacions { get; set; }
 
     public virtual DbSet<Formulario> Formularios { get; set; }
@@ -35,14 +36,14 @@ public partial class FormEncuestaDbContext : DbContext
 
     public virtual DbSet<SubPregunta> SubPreguntas { get; set; }
 
+    // DbSet para DTOs (entidades sin clave primaria)
     public DbSet<PreguntaCompleta> PreguntaCompletas { get; set; }
-
     public DbSet<EstacionPorLinea> EstacionPorLineas { get; set; }
-
     public DbSet<ObtenerForm_Dto> obtenerFormDtos { get; set; }
-
     public DbSet<ObtenerRespuestas_Dto> obtenerRespuestasDtos { get; set; }
+    public DbSet<ReportRespuestas_Dto> reportRespuestas_Dtos { get; set; }
 
+    // Configuración de la cadena de conexión
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=DBConnection");
 
@@ -95,13 +96,16 @@ public partial class FormEncuestaDbContext : DbContext
         {
             entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C29C85BCD");
 
-            entity.HasOne(d => d.IdSesionNavigation).WithMany(p => p.Respuestas)
+            entity.HasOne(d => d.IdSesionNavigation)
+                .WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_Respuestas_Sesion");
 
             entity.HasOne(d => d.IdUsuariosNavigation).WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_Respuestas_User");
+
+            entity.HasOne(d => d.IdentifacadorFormNavigation).WithMany(p => p.Respuestas).HasConstraintName("fk_Respuestas_Form");
         });
 
         modelBuilder.Entity<Sesion>(entity =>
@@ -128,46 +132,11 @@ public partial class FormEncuestaDbContext : DbContext
         modelBuilder.Entity<EstacionPorLinea>().HasNoKey();
         modelBuilder.Entity<ObtenerForm_Dto>().HasNoKey();
         modelBuilder.Entity<ObtenerRespuestas_Dto>().HasNoKey();
+        modelBuilder.Entity<ReportRespuestas_Dto>().HasNoKey();
 
         base.OnModelCreating(modelBuilder);
         OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-    public async Task<List<PreguntaCompleta>> GetPreguntasCompleto()
-    {
-        return await this.PreguntaCompletas.FromSqlRaw("EXEC sp_ObtenerPreguntasCompleto").ToListAsync();
-    }
-
-    public async Task<List<EstacionPorLinea>> GetEstacionPorLineas(string idLinea)
-    {
-        return await this.EstacionPorLineas.FromSqlRaw("EXEC sp_ObternerEstacionesPorLinea @idLinea = {0}", idLinea).ToListAsync();
-    }
-
-    public async Task<List<ObtenerForm_Dto>> ObtenerFormularioAsync()
-    {
-        return await this.obtenerFormDtos.FromSqlRaw("EXEC sp_ObtenerForm_Linea_Estacion").ToListAsync();
-    }
-
-    public async Task<List<ObtenerRespuestas_Dto>> ObtenerRespuestasAsync()
-    {
-        return await this.obtenerRespuestasDtos.FromSqlRaw("EXEC sp_ObtenerRespuestas").ToListAsync();
-    }
-
-    public async Task InsertarRespuestaAsync(Respuesta_Dto respuesta_Dto) => await this.Database.ExecuteSqlRawAsync(
-        "EXEC sp_InsertarRespuesta " +
-            "@idUsuarios = {0}," +
-            "@idSesion = {1}, " +
-            "@respuesta = {2}, " +
-            "@comentarios = {3}, " +
-            "@justificacion = {4}, " +
-            "@finalizarSesion = {5}",
-        respuesta_Dto.IdUsuarios,
-        respuesta_Dto.IdSesion,
-        respuesta_Dto.Respuesta,
-        respuesta_Dto.Comentarios,
-        respuesta_Dto.Justificacion,
-        respuesta_Dto.FinalizarSesion
-    );
 }

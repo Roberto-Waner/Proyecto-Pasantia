@@ -1,3 +1,4 @@
+import 'package:formulario_opret/models/Stored%20Procedure/Exportados/sp_Respuestas_Export.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/respuesta.dart';
@@ -60,6 +61,21 @@ class ApiServiceRespuesta {
         return response.map((json) => SpFiltrarRespuestas.fromJson(json)).toList();
       } catch(e) {
         print('Error al cargar las Respuestas: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('No se pudo conectar a la API');
+    }
+  }
+
+  Future<List<SpRespuestasExport>> getExportReporte() async {
+    final isCheckOk = await service.check();
+    if (isCheckOk) {
+      try{
+        final response = await service.getAllData('Report/ExportReporte');
+        return response.map((json) => SpRespuestasExport.fromJson(json)).toList();
+      } catch(e) {
+        print('Error al cargar el reporte: $e');
         rethrow;
       }
     } else {

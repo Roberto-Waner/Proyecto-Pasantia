@@ -2,10 +2,14 @@
 <!--    para habilitar los permiso del uso de internet en los dipositivos moviles-->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
         android:label="Encuesta (OPRET)"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
         <!-- ENCUESTA PERCEPCION DEL SERVICIO -->
         <activity
             android:name=".MainActivity"

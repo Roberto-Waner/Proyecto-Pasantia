@@ -33,7 +33,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('http://wepapi.somee.com');
+  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
   final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos

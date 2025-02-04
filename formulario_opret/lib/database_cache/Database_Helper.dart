@@ -56,6 +56,8 @@ class DatabaseHelper {
         respuesta TEXT NULL,
         comentarios TEXT NULL,
         justificacion TEXT NULL,
+        horaResp TEXT NULL,
+        fechaResp TEXT NULL,
         finalizarSesion INTEGER DEFAULT 0,
         isUpdated INTEGER DEFAULT 0,
         isDeleted INTEGER DEFAULT 0

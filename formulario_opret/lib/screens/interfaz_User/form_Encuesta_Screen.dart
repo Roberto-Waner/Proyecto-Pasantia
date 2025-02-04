@@ -37,7 +37,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   String? _selectLineMetro; // Línea seleccionada
   int? _selectedStation; // Estación seleccionada
-  String year = DateFormat('yyyy').format(DateTime.now()); // Obtener el año actual en el momento del registro
+  // String year = DateFormat('yyyy').format(DateTime.now()); // Obtener el año actual en el momento del registro
 
   List<Linea> _lineas = [];
   List<EstacionPorLinea> _estaciones = [];
@@ -98,7 +98,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
 
       FormularioRegistro formEncuesta = FormularioRegistro(
         idUsuarios: data['idUsuarios'],
-        // cedula: data['cedula'],
         fecha: currentDate,
         hora: currentTime,
         idEstacion: _selectedStation,

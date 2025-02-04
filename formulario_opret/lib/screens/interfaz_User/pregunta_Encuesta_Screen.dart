@@ -11,12 +11,12 @@ import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
+import 'package:intl/intl.dart';
 
 class PreguntaEncuestaScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
-  // final TextEditingController filtrarCedula;
   final TextEditingController noEncuestaFiltrar;
 
   const PreguntaEncuestaScreen({
@@ -37,15 +37,19 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
+  // late List<FormularioRegistro> dataForm = [];
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   List<bool> _isExpandedList = [];
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
+  final TextEditingController fechaController = TextEditingController();
+  final TextEditingController horaController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
+    _setInitialValues(); // para que la fecha y la hora se asignen automaticamente de acuerdo a la tabla
   }
 
   void _refreshPreguntas() async {
@@ -63,6 +67,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     } catch (e) {
       print('Error al cargar las preguntas: $e');
     }
+  }
+
+  void _setInitialValues() {
+    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    String currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+
+    fechaController.text = currentDate;
+    horaController.text = currentTime;
   }
 
   //En caso de ser un table
@@ -675,27 +687,27 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 ),
               ),
               actions: <Widget>[
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 3,
-                          offset: const Offset(0, 3)
-                      )
-                    ]
-                  ),
-                  child: TextButton(
-                    child: Text("Cerrar", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp)),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    }
-                  ),
-                ),
+                // Container(
+                //   padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                //   decoration: BoxDecoration(
+                //     color: Colors.white,
+                //     borderRadius: BorderRadius.circular(100),
+                //     boxShadow: [
+                //       BoxShadow(
+                //           color: Colors.grey.withOpacity(0.5),
+                //           spreadRadius: 1,
+                //           blurRadius: 3,
+                //           offset: const Offset(0, 3)
+                //       )
+                //     ]
+                //   ),
+                //   child: TextButton(
+                //     child: Text("Cerrar", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp)),
+                //     onPressed: () {
+                //       Navigator.of(context).pop();
+                //     }
+                //   ),
+                // ),
 
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
@@ -768,9 +780,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                     onPressed: () {
                       if (_formKey.currentState?.saveAndValidate() ?? false) {
                         final responseForm = _formKey.currentState!.value;
-                        _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
-                        _respuestaController.syncDataResp();
-                        Navigator.of(context).pop();
+                        _showContinue(
+                            context,
+                            '¿Estás seguro de querer finalizar la encuesta?\n\nTen en cuenta que no podrás modificar las respuestas.',
+                            () {
+                              _saveRespuesta(question, responseForm, formKey: _formKey, finalizarSesion: 1);
+                              _respuestaController.syncDataResp();
+                              Navigator.of(context).pop();
+                            }
+                        );
                       }
                     },
                     child: Text('Finalizar Encuesta', style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
@@ -800,6 +818,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         required GlobalKey<FormBuilderState> formKey, // Recibe un GlobalKey único como parámetro
         int finalizarSesion = 0
       }) async {
+    String currentDate = fechaController.text;
+    String currentTime = horaController.text;
 
     // Verificamos si el formulario es válido antes de guardar
     if (formKey.currentState!.saveAndValidate()){
@@ -821,6 +841,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         respuesta: respuestaFinal, // para recibir diferentes tipos de respuestas
         comentarios: dataAnswer['comentarios'],
         justificacion: dataAnswer['justificacion'],
+        horaResp: currentTime,
+        fechaResp: currentDate,
         finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con 1 = true y 0 = false
       );
 
@@ -1033,6 +1055,86 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
           )
         );
       }
+    );
+  }
+
+  void _showContinue (BuildContext context, String message, Function onConfirm) {
+    final isTabletDevice = isTablet(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+              ),
+              child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3)
+                        )
+                      ]
+                  ),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.send_to_mobile_outlined, color: Color.fromARGB(
+                            255, 165, 0, 220), size: 70.0),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Finalizar Encuesta y Enviar',
+                          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          message,
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24.0),
+                        Flex(
+                          direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {Navigator.of(context).pop();},
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: Text('Cancelar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
+                            ),
+
+                            const SizedBox(height: 10.0, width: 10.0),
+
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  onConfirm();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                child: Text('Continuar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 184, 135, 0)))
+                            ),
+                          ],
+                        )
+                      ]
+                  )
+              )
+          );
+        }
     );
   }
 

@@ -1,12 +1,88 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\repository\\formulariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\repository\\formulariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\dto (data transfer object)\\respuesta_dto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\dto (data transfer object)\\respuesta_dto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\repository\\formencuestadbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\repository\\formencuestadbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\repository\\models\\respuesta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\repository\\models\\respuesta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Respuesta_Dto.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\Respuesta_Dto.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\DTO (Data Transfer Object)\\Respuesta_Dto.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\Respuesta_Dto.cs",
+              "RelativeToolTip": "WebApiForm\\DTO (Data Transfer Object)\\Respuesta_Dto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-03T21:13:33.127Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FormularioRepository.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormularioRepository.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Repository\\FormularioRepository.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormularioRepository.cs",
+              "RelativeToolTip": "WebApiForm\\Repository\\FormularioRepository.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAiwDsAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-03T21:13:15.735Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Respuesta.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\Models\\Respuesta.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Repository\\Models\\Respuesta.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\Models\\Respuesta.cs",
+              "RelativeToolTip": "WebApiForm\\Repository\\Models\\Respuesta.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAAADsAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-03T21:05:20.075Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FormEncuestaDbContext.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormEncuestaDbContext.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Repository\\FormEncuestaDbContext.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Repository\\FormEncuestaDbContext.cs",
+              "RelativeToolTip": "WebApiForm\\Repository\\FormEncuestaDbContext.cs",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAAAIUAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-03T21:00:15.326Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

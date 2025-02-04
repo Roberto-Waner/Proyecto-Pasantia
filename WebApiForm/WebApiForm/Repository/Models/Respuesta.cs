@@ -39,12 +39,17 @@ public partial class Respuesta
     public string? Justificacion { get; set; }
 
     [Column("hora_respuestas")]
-    [StringLength(30)]
+    [StringLength(100)]
     [Unicode(false)]
     public string? HoraRespuestas { get; set; }
 
     [Column("identifacador_form")]
     public int? IdentifacadorForm { get; set; }
+
+    [Column("fecha_respuestas")]
+    [StringLength(100)]
+    [Unicode(false)]
+    public string? FechaRespuestas { get; set; }
 
     [ForeignKey("IdSesion")]
     [InverseProperty("Respuestas")]

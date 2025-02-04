@@ -8,7 +8,7 @@
         public string? Comentarios { get; set; }
         public string? Justificacion { get; set; }
         public string? HoraResp { get; set; }
-        public int IdentifacadorForm { get; set; }
+        public string? FechaResp { get; set; }
         public int FinalizarSesion { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace WebApiForm.Repository
                 "@comentarios = {3}, " +
                 "@justificacion = {4}, " +
                 "@horaRespuestas = {5}," +
-                "@identifacador_form = {6}," +
+                "@fechaRespuestas = {6}," +
                 "@finalizarSesion = {7}",
             respuesta_Dto.IdUsuarios,
             respuesta_Dto.IdSesion,
@@ -58,7 +58,7 @@ namespace WebApiForm.Repository
             respuesta_Dto.Comentarios,
             respuesta_Dto.Justificacion,
             respuesta_Dto.HoraResp,
-            respuesta_Dto.IdentifacadorForm,
+            respuesta_Dto.FechaResp,
             respuesta_Dto.FinalizarSesion
         );
 

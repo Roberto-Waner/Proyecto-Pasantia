@@ -19,7 +19,6 @@ public partial class FormEncuestaDbContext : DbContext
     {
     }
 
-    // DbSet para las entidades y DTOs 
     public virtual DbSet<Estacion> Estacions { get; set; }
 
     public virtual DbSet<Formulario> Formularios { get; set; }
@@ -44,6 +43,7 @@ public partial class FormEncuestaDbContext : DbContext
     public DbSet<ReportRespuestas_Dto> reportRespuestas_Dtos { get; set; }
 
     // Configuración de la cadena de conexión
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=DBConnection");
 
@@ -96,8 +96,7 @@ public partial class FormEncuestaDbContext : DbContext
         {
             entity.HasKey(e => e.IdRespuestas).HasName("PK__Respuest__D875135C29C85BCD");
 
-            entity.HasOne(d => d.IdSesionNavigation)
-                .WithMany(p => p.Respuestas)
+            entity.HasOne(d => d.IdSesionNavigation).WithMany(p => p.Respuestas)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_Respuestas_Sesion");
 

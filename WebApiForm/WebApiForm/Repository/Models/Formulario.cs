@@ -11,7 +11,7 @@ public partial class Formulario
 {
     [Key]
     [Column("identifacador_form")]
-    public int IdentifacadorForm { get; set; }
+    public int? IdentifacadorForm { get; set; }
 
     [Column("id_usuarios")]
     [StringLength(100)]

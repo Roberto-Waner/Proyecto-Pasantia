@@ -84,17 +84,6 @@ namespace WebApiForm.Controllers
             existingUser.Usuario = registroUsuario.Usuario;
             existingUser.Email = registroUsuario.Email;
 
-            //var updatedUser = new RegistroUsuario
-            //{
-            //    IdUsuarios = existingUser.IdUsuarios,
-            //    NombreApellido = registroUsuario.NombreApellido,
-            //    Usuario = registroUsuario.Usuario,
-            //    Email = registroUsuario.Email,
-            //    Passwords = string.IsNullOrWhiteSpace(registroUsuario.Passwords)
-            //        ? existingUser.Passwords
-            //        : $"{SaltHelper.GenerateSalt(32)}:{HashHelper.Hash(registroUsuario.Passwords, SaltHelper.GenerateSalt(32))}"
-            //};
-
             _context.Entry(existingUser).State = EntityState.Modified;
 
             try

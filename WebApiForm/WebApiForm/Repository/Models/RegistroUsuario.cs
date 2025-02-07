@@ -53,5 +53,8 @@ public partial class RegistroUsuario
     public virtual ICollection<Formulario> Formularios { get; set; } = new List<Formulario>();
 
     [InverseProperty("IdUsuariosNavigation")]
+    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
+
+    [InverseProperty("IdUsuariosNavigation")]
     public virtual ICollection<Respuesta> Respuestas { get; set; } = new List<Respuesta>();
 }

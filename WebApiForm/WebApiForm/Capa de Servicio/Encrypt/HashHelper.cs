@@ -49,19 +49,5 @@ namespace WebApiForm.Capa_de_Servicio.Encrypt
 
             return true;
         }
-
-        //public static string GetSHA256(string pass, string salt)
-        //{
-        //    var combinarPass = pass + salt;
-
-        //    using (SHA256 sha256Hash = SHA256.Create())
-        //    {
-        //        UTF8Encoding encoding = new UTF8Encoding();
-        //        byte[] stream = sha256Hash.ComputeHash(encoding.GetBytes(combinarPass));
-        //        StringBuilder sb = new StringBuilder();
-        //        for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
-        //        return sb.ToString();
-        //    }
-        //}
     }
 }

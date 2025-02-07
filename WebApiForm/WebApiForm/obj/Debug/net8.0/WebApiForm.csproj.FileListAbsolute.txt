@@ -259,3 +259,13 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\Mi
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\SendGrid.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\StarkbankEcdsa.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\ClosedXML.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\ClosedXML.Parser.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\ExcelNumberFormat.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\RBush.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\SixLabors.Fonts.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\System.IO.Packaging.dll

@@ -39,3 +39,8 @@
     }
   }
 }
+
+/*
+  "applicationUrl": "http://localhost:5190"
+  "applicationUrl": "https://localhost:7190;http://localhost:5190"
+*/

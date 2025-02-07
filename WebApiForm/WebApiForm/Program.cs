@@ -5,6 +5,8 @@ using System.Text;
 using WebApiForm.Capa_de_Servicio;
 using WebApiForm.Middleware;
 using WebApiForm.Repository;
+using WebApiForm.Interfaces;
+using WebApiForm.Capa_de_Servicio.Exportacion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +52,11 @@ builder.Services.AddScoped<EstacionPorLineaService>();
 builder.Services.AddScoped<PreguntaCompletaService>();
 builder.Services.AddScoped<RespuestaService>();
 builder.Services.AddScoped<FormularioServices>();
+builder.Services.AddScoped<ExcelExportService>();
 //--------------------------------------------------------
+
+// Registrar el servicio de envío de correo electrónico
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 

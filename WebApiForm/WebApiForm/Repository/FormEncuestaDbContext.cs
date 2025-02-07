@@ -25,6 +25,8 @@ public partial class FormEncuestaDbContext : DbContext
 
     public virtual DbSet<Linea> Lineas { get; set; }
 
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     public virtual DbSet<Pregunta> Preguntas { get; set; }
 
     public virtual DbSet<RegistroUsuario> RegistroUsuarios { get; set; }
@@ -76,6 +78,15 @@ public partial class FormEncuestaDbContext : DbContext
         modelBuilder.Entity<Linea>(entity =>
         {
             entity.HasKey(e => e.IdLinea).HasName("PK__Linea__E346BA199780FE6E");
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.Token).HasName("PK__Password__CA90DA7BCC5754EE");
+
+            entity.HasOne(d => d.IdUsuariosNavigation).WithMany(p => p.PasswordResetTokens)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_Token_Usuarios");
         });
 
         modelBuilder.Entity<Pregunta>(entity =>

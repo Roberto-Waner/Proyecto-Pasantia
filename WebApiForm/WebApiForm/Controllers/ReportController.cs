@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiForm.Capa_de_Servicio;
+using WebApiForm.Capa_de_Servicio.Exportacion;
 using WebApiForm.DTO__Data_Transfer_Object_;
 
 namespace WebApiForm.Controllers
@@ -9,10 +10,12 @@ namespace WebApiForm.Controllers
     public class ReportController : ControllerBase
     {
         private readonly RespuestaService _respuestaService;
+        private readonly ExcelExportService _excelExport;
 
-        public ReportController(RespuestaService respuestaService)
+        public ReportController(RespuestaService respuestaService, ExcelExportService excelExport)
         {
             _respuestaService = respuestaService;
+            _excelExport = excelExport;
         }
 
         [HttpGet("ExportReporte")]
@@ -23,9 +26,11 @@ namespace WebApiForm.Controllers
                 var reporte = await _respuestaService.ExportReportRespuestaServices();
                 if (reporte == null || reporte.Count == 0)
                 {
-                    return StatusCode(404, "No se encontraron reportes de Respuestas para Exportar.");
+                    return StatusCode(404, "No se encontraron reportes de Respuestas y Formularios para Exportar.");
                 }
-                return Ok(reporte);
+                //return Ok(reporte);
+                var content = _excelExport.GenerateExcelReport(reporte);
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte.xlsx");
 
             }catch (Exception ex)
             {

@@ -5,6 +5,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebApiForm.Capa_de_Servicio.Encrypt;
+using WebApiForm.Capa_de_Servicio.Modelo_Tokens;
+using WebApiForm.DTO__Data_Transfer_Object_;
+using WebApiForm.Interfaces;
 using WebApiForm.Middleware;
 using WebApiForm.Repository;
 using WebApiForm.Repository.Models;
@@ -18,11 +21,13 @@ namespace WebApiForm.Controllers
     {
         private readonly IConfiguration _config;
         private readonly FormEncuestaDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public LoginController(IConfiguration config, FormEncuestaDbContext context)
+        public LoginController(IConfiguration config, FormEncuestaDbContext context, IEmailSender emailSender)
         {
             _config = config;
             _context = context;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
@@ -118,6 +123,62 @@ namespace WebApiForm.Controllers
             TokenBlacklist.Add(token);
 
             return Ok(new { success = true, message = "Logged out successfully" });
+        }
+
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgot)
+        {
+            var user = await _context.RegistroUsuarios.FirstOrDefaultAsync(x => x.Email == forgot.Email);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "Usuario no encontrado" });
+            }
+
+            var token = Guid.NewGuid().ToString();
+            var expiration = DateTime.UtcNow.AddDays(1); // El token expira en 1 hora
+
+            var resetToken = new PasswordResetToken
+            {
+                Token = token,
+                IdUsuarios = user.IdUsuarios,
+                Expiration = expiration
+            };
+
+            _context.PasswordResetTokens.Add(resetToken);
+            await _context.SaveChangesAsync();
+
+            // Enviar correo electrónico con el token
+            await _emailSender.SendPasswordResetEmailAsync(user.Email, token);
+
+            return Ok(new { success = true, message = "Correo de recuperación enviado." });
+        }
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resert)
+        {
+            var resetToken = await _context.PasswordResetTokens.FirstOrDefaultAsync(x => x.Token == resert.Token && x.Expiration > DateTime.UtcNow);
+            if (resetToken == null)
+            {
+                return NotFound(new { success = false, message = "Token no válido o expirado" });
+            }
+
+            var user = await _context.RegistroUsuarios.FirstOrDefaultAsync(x => x.IdUsuarios == resetToken.IdUsuarios);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "Usuario no encontrado" });
+            }
+
+            var salt = SaltHelper.GenerateSalt();
+            var hashedPassword = HashHelper.Hash(resert.NewPassword, salt);
+            user.Passwords = $"{salt}:{hashedPassword}";
+
+            // Eliminar el token de recuperación usado
+            _context.PasswordResetTokens.Remove(resetToken);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Contraseña actualizada con éxito." });
         }
     }
 }

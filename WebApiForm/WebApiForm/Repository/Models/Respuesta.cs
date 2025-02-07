@@ -10,7 +10,7 @@ public partial class Respuesta
 {
     [Key]
     [Column("id_respuestas")]
-    public int IdRespuestas { get; set; }
+    public int? IdRespuestas { get; set; }
 
     [Column("id_usuarios")]
     [StringLength(100)]

@@ -1,9 +1,8 @@
 import 'dart:io';
-import 'package:excel/excel.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:formulario_opret/models/Stored%20Procedure/Exportados/sp_Respuestas_Export.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/graphic/graphic_Respuestas_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
@@ -33,7 +32,6 @@ class RepuestaResultadosScreen extends StatefulWidget {
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://10.0.2.2:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
-  List<SpRespuestasExport> exportReporte = [];
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarRespuestas> respuestasFiltrados = [];
   List<SpFiltrarRespuestas> todasLasRespuestas = [];
@@ -105,6 +103,30 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     final isTabletWidth = size.width > 600;
     final isTabletHeight = size.height > 800;
     return isTabletWidth && isTabletHeight;
+  }
+
+  //Este metodo es la que se encargar de hacer las solicitudes de permisos al almacenamientos
+  Future<bool> requestStoragePermission() async {
+    if (await Permission.storage.isGranted) {
+      return true;
+    }
+
+    PermissionStatus status = await Permission.storage.request();
+
+    if (status.isGranted) {
+      // El permiso ha sido concedido
+      return true;
+    } else if (status.isDenied) {
+      // El permiso ha sido denegado temporalmente
+      // _showErrorDialog(context, 'El permiso ha sido denegado temporalmente.');
+      return false;
+    } else if (status.isPermanentlyDenied) {
+      // El permiso ha sido denegado permanentemente
+      _showErrorDialog(context, 'Permiso denegado permanentemente. Abriendo configuración...');
+      await openAppSettings();
+      return false;
+    }
+    return false;
   }
 
   @override
@@ -341,120 +363,111 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     );
   }
 
-  Future<void> exportToExcel(List<SpRespuestasExport> data) async {
-    print("La función exportToExcel ha sido llamada.");
-    
-    // Crear un nuevo archivo Excel
-    var excel = Excel.createExcel();
-    var sheet = excel['Sheet1'];
+  Future<void> downloadExcel() async {
+    bool hasPermission = await requestStoragePermission();
 
-    // Agregar encabezados
-    List<String> headers = [
-      'ID Usuarios',
-      'Nombre y Apellido',
-      'Usuarios',
-      'Email',
-      'ID Formulario',
-      'Fecha Inicio Encuesta',
-      'Hora Inicio Encuesta',
-      'Nombre Línea',
-      'Nombre Estación',
-      'ID Sesión',
-      'Código Pregunta',
-      'Pregunta',
-      'Código Subpregunta',
-      'Subpregunta',
-      'No. Encuestas',
-      'Tipo Respuesta',
-      'Hora Respondida',
-      'Respuestas',
-      'Comentarios',
-      'Justificación'
-    ];
-
-    // Insertar encabezados
-    sheet.appendRow(headers.map((header) => TextCellValue(header)).toList());
-
-    // Agregar datos
-    for (var item in data) { 
-      sheet.appendRow([ 
-        TextCellValue(item.rp_IdUsuarios ?? ''), 
-        TextCellValue(item.rp_NombreApellido ?? ''), 
-        TextCellValue(item.rp_Usuarios ?? ''), 
-        TextCellValue(item.rp_Email ?? ''), 
-        TextCellValue(item.rp_IdFormulario?.toString() ?? ''), 
-        TextCellValue(item.rp_FechaInicioEncuesta ?? ''), 
-        TextCellValue(item.rp_HoraInicioEncuesta ?? ''), 
-        TextCellValue(item.rp_NombreLinea ?? ''), 
-        TextCellValue(item.rp_NombreEstacion ?? ''), 
-        TextCellValue(item.rp_IdSesion?.toString() ?? ''), 
-        TextCellValue(item.rp_CodPreg?.toString() ?? ''), 
-        TextCellValue(item.rp_Pregunta ?? ''), 
-        TextCellValue(item.rp_CodSubPreg ?? ''), 
-        TextCellValue(item.rp_SubPregunta ?? ''), 
-        TextCellValue(item.rp_NoEncuestas ?? ''), 
-        TextCellValue(item.rp_TipoResp ?? ''), 
-        TextCellValue(item.rp_HoraRespondida ?? ''), 
-        TextCellValue(item.rp_Respuestas ?? ''), 
-        TextCellValue(item.rp_Comentarios ?? ''), 
-        TextCellValue(item.rp_Justificacion ?? '') 
-      ]); 
+    if (!hasPermission) {
+      print('Permiso de almacenamiento denegado.');
+      _showErrorDialog(context, 'Permiso de almacenamiento denegado.');
+      return;
     }
 
-    // Pedir permisos de almacenamiento
-    if (await Permission.storage.request().isGranted) {
-      print("Permiso concedido.");
-      try {
-        Directory? directory = await getExternalStorageDirectory();
-        directory ??= await getApplicationDocumentsDirectory();
-        String path = "${directory.path}/Report(OPRET).xlsx";
+    final dio = Dio();
+    const url = 'https://10.0.2.2:7190/api/Report/ExportReporte';
 
-        // Guardar el archivo Excel
-        File file = File(path);
-        await file.writeAsBytes(excel.encode()!);
-        
-        print("Archivo guardado en: $path");
-        _showSuccessDialog(context, "Archivo guardado en: $path");
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+        )
+      );
 
-        // Abrir el archivo
-        OpenFile.open(path);
-      } catch (e) {
-        print("Error al guardar el archivo: $e");
-        _showErrorDialog(context, "Error al guardar el archivo: $e");
+      // Obtener el directorio de documentos de la aplicación
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String appDocPath = appDocDir.path;
+      String filePath = '$appDocPath/Reporte.xlsx';
+
+      // Escribir los bytes del archivo en el sistema de archivos
+      File file = File(filePath);
+      await file.writeAsBytes(response.data);
+      print('Archivo descargado en: $filePath');
+
+      _showSuccessDialog(context, 'Archivo descargado.');
+
+      // Abrir el archivo utilizando el paquete open_file
+      final result = await OpenFile.open(file.path);
+      if (result.type != ResultType.done) {
+        print('No se pudo abrir el archivo.');
+        _showErrorDialog(context, 'No se pudo abrir el archivo.');
       }
-    } else {
-      print("Permiso de almacenamiento denegado");
-      _showErrorDialog(context, "Permiso de almacenamiento denegado");
+    } catch (e) {
+      print('Error al descargar el archivo: $e');
+      _showErrorDialog(context, 'Error al descargar el archivo.');
     }
   }
 
-  void _showErrorDialog(BuildContext context, String message) {
+  void _showErrorDialog (BuildContext context, String message) {
+    final isTabletDevice = isTablet(context);
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-            contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
-            content: Container(
-                margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
-                child: Text(message, style: const TextStyle(fontSize: 28))
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3)
+                )
+              ]
             ),
-            actions: [
-              TextButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline_sharp, color: Color.fromARGB(255, 181, 3, 3), size: 80.0),
+                const SizedBox(height: 20),
+                const Text(
+                  'Error!',
+                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
-              ),
-            ],
-          );
-        }
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Flex(
+                  direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {Navigator.of(context).pop();},
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Ok', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
+                    )
+                  ],
+                )
+              ]
+            )
+          )
+        );
+      }
     );
   }
 
@@ -515,9 +528,9 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                     const SizedBox(height: 10.0, width: 10.0),
 
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.of(context).pop();
-                        exportToExcel(exportReporte);
+                        await downloadExcel();
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -742,3 +755,33 @@ class RespuestasDataSource extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
+
+// void _showErrorDialog(BuildContext context, String message) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return AlertDialog(
+//         title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+//         contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
+//         content: Container(
+//             margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
+//             child: Text(message, style: const TextStyle(fontSize: 28))
+//         ),
+//         actions: [
+//           TextButton(
+//             style: ElevatedButton.styleFrom(
+//               padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(50),
+//               ),
+//             ),
+//             onPressed: () {
+//               Navigator.of(context).pop();
+//             },
+//             child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
+//           ),
+//         ],
+//       );
+//     }
+//   );
+// }

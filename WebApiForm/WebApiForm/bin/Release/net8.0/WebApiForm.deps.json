@@ -9,6 +9,8 @@
       "WebApiForm/1.0.0": {
         "dependencies": {
           "Bricelam.EntityFrameworkCore.Pluralizer": "1.0.0",
+          "ClosedXML": "0.104.2",
+          "DocumentFormat.OpenXml": "3.2.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.10",
           "Microsoft.EntityFrameworkCore": "8.0.10",
           "Microsoft.EntityFrameworkCore.Design": "8.0.10",
@@ -16,6 +18,7 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.10",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.10",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "8.0.7",
+          "SendGrid": "9.29.3",
           "Swashbuckle.AspNetCore": "6.8.1",
           "Swashbuckle.AspNetCore.Swagger": "6.8.1"
         },
@@ -65,6 +68,59 @@
           "lib/netstandard2.0/Bricelam.EntityFrameworkCore.Pluralizer.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "ClosedXML/0.104.2": {
+        "dependencies": {
+          "ClosedXML.Parser": "1.2.0",
+          "DocumentFormat.OpenXml": "3.2.0",
+          "ExcelNumberFormat": "1.1.0",
+          "RBush": "4.0.0",
+          "SixLabors.Fonts": "1.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/ClosedXML.dll": {
+            "assemblyVersion": "0.104.2.0",
+            "fileVersion": "0.104.2.0"
+          }
+        }
+      },
+      "ClosedXML.Parser/1.2.0": {
+        "runtime": {
+          "lib/netstandard2.1/ClosedXML.Parser.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml/3.2.0": {
+        "dependencies": {
+          "DocumentFormat.OpenXml.Framework": "3.2.0"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
+            "assemblyVersion": "3.2.0.0",
+            "fileVersion": "3.2.0.0"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml.Framework/3.2.0": {
+        "dependencies": {
+          "System.IO.Packaging": "8.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
+            "assemblyVersion": "3.2.0.0",
+            "fileVersion": "3.2.0.0"
+          }
+        }
+      },
+      "ExcelNumberFormat/1.1.0": {
+        "runtime": {
+          "lib/netstandard2.0/ExcelNumberFormat.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
           }
         }
       },
@@ -1662,6 +1718,42 @@
           }
         }
       },
+      "RBush/4.0.0": {
+        "runtime": {
+          "lib/net8.0/RBush.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.0.0.0"
+          }
+        }
+      },
+      "SendGrid/9.29.3": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3",
+          "starkbank-ecdsa": "1.3.3"
+        },
+        "runtime": {
+          "lib/netstandard2.0/SendGrid.dll": {
+            "assemblyVersion": "9.29.3.0",
+            "fileVersion": "9.29.3.0"
+          }
+        }
+      },
+      "SixLabors.Fonts/1.0.0": {
+        "runtime": {
+          "lib/netcoreapp3.1/SixLabors.Fonts.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "starkbank-ecdsa/1.3.3": {
+        "runtime": {
+          "lib/netstandard2.1/StarkbankEcdsa.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/6.8.1": {
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "6.0.5",
@@ -1827,6 +1919,14 @@
           "System.Security.Principal.Windows": "5.0.0"
         }
       },
+      "System.IO.Packaging/8.0.1": {
+        "runtime": {
+          "lib/net8.0/System.IO.Packaging.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.1024.46610"
+          }
+        }
+      },
       "System.IO.Pipelines/7.0.0": {},
       "System.Memory/4.5.4": {},
       "System.Memory.Data/1.0.2": {
@@ -1984,6 +2084,41 @@
       "sha512": "sha512-akiz3hGnpDgZssTGTnTehy7cy8gJ3RME7jULOkxWHuoSUUmkyxHO8USA/DDTz9Zc+o3RvTdY888NrjDcmb3OJA==",
       "path": "bricelam.entityframeworkcore.pluralizer/1.0.0",
       "hashPath": "bricelam.entityframeworkcore.pluralizer.1.0.0.nupkg.sha512"
+    },
+    "ClosedXML/0.104.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-gOkSjQ152MhpKmw70cBkJV+FnaZAWzDwM36luRf/7FlWYnNeH++9XYdGTd0Y4KQlVPkKVxy948M5MMsnsGC4GQ==",
+      "path": "closedxml/0.104.2",
+      "hashPath": "closedxml.0.104.2.nupkg.sha512"
+    },
+    "ClosedXML.Parser/1.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-w+/0tsxABS3lkSH8EUlA7IGme+mq5T/Puf3DbOiTckmSuUpAUO2LK29oXYByCcWkBv6wcRHxgWlQb1lxkwI0Tw==",
+      "path": "closedxml.parser/1.2.0",
+      "hashPath": "closedxml.parser.1.2.0.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml/3.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-eDBT9G0sAWUvjgE8l8E5bGCFXgxCZXIecQ8dqUnj2PyxyMR5eBmLahqRRw3Q7uSKM3cKbysaL2mEY0JJbEEOEA==",
+      "path": "documentformat.openxml/3.2.0",
+      "hashPath": "documentformat.openxml.3.2.0.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml.Framework/3.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-e1neOKqRnSHUom4JQEorAoZ67aiJOp6+Xzsu0fc6IYfFcgQn6roo+w6i2w//N2u/5ilEfvLr35bNO9zaIN7r7g==",
+      "path": "documentformat.openxml.framework/3.2.0",
+      "hashPath": "documentformat.openxml.framework.3.2.0.nupkg.sha512"
+    },
+    "ExcelNumberFormat/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-R3BVHPs9O+RkExbZYTGT0+9HLbi8ZrNij1Yziyw6znd3J7P3uoIR07uwTLGOogtz1p6+0sna66eBoXu7tBiVQA==",
+      "path": "excelnumberformat/1.1.0",
+      "hashPath": "excelnumberformat.1.1.0.nupkg.sha512"
     },
     "Humanizer/2.14.1": {
       "type": "package",
@@ -2818,6 +2953,34 @@
       "path": "nuget.versioning/6.11.0",
       "hashPath": "nuget.versioning.6.11.0.nupkg.sha512"
     },
+    "RBush/4.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-j3GeRxxLUQdc+UrZnvythdQxi3bd8ayn87VDjfGXrvfodF550n9wR6SgQvpo+YiAv3GJezsu6lK0l47rRqnbdg==",
+      "path": "rbush/4.0.0",
+      "hashPath": "rbush.4.0.0.nupkg.sha512"
+    },
+    "SendGrid/9.29.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nb/zHePecN9U4/Bmct+O+lpgK994JklbCCNMIgGPOone/DngjQoMCHeTvkl+m0Nglvm0dqMEshmvB4fO8eF3dA==",
+      "path": "sendgrid/9.29.3",
+      "hashPath": "sendgrid.9.29.3.nupkg.sha512"
+    },
+    "SixLabors.Fonts/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-LFQsCZlV0xlUyXAOMUo5kkSl+8zAQXXbbdwWchtk0B4o7zotZhQsQOcJUELGHdfPfm/xDAsz6hONAuV25bJaAg==",
+      "path": "sixlabors.fonts/1.0.0",
+      "hashPath": "sixlabors.fonts.1.0.0.nupkg.sha512"
+    },
+    "starkbank-ecdsa/1.3.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-OblOaKb1enXn+dSp7tsx9yjwV+/BEKM9jFhshIkZTwCk7LuTFTp+wSon6rFzuPiIiTGtvVWQNUw2slHjGktJog==",
+      "path": "starkbank-ecdsa/1.3.3",
+      "hashPath": "starkbank-ecdsa.1.3.3.nupkg.sha512"
+    },
     "Swashbuckle.AspNetCore/6.8.1": {
       "type": "package",
       "serviceable": true,
@@ -2957,6 +3120,13 @@
       "sha512": "sha512-SxHB3nuNrpptVk+vZ/F+7OHEpoHUIKKMl02bUmYHQr1r+glbZQxs7pRtsf4ENO29TVm2TH3AEeep2fJcy92oYw==",
       "path": "system.io.filesystem.accesscontrol/5.0.0",
       "hashPath": "system.io.filesystem.accesscontrol.5.0.0.nupkg.sha512"
+    },
+    "System.IO.Packaging/8.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KYkIOAvPexQOLDxPO2g0BVoWInnQhPpkFzRqvNrNrMhVT6kqhVr0zEb6KCHlptLFukxnZrjuMVAnxK7pOGUYrw==",
+      "path": "system.io.packaging/8.0.1",
+      "hashPath": "system.io.packaging.8.0.1.nupkg.sha512"
     },
     "System.IO.Pipelines/7.0.0": {
       "type": "package",

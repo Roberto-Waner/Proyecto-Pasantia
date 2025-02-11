@@ -81,13 +81,25 @@ namespace WebApiForm.Controllers
             try
             {
                 // Deshabilitar el seguimiento de cambios para permitir que el trigger maneje la clave primaria
-                _context.ChangeTracker.AutoDetectChangesEnabled = false;
+                //_context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                // Asegúrate de que IdSesion no tenga un valor asignado
+                sesion.IdSesion = 0;
 
                 _context.Sesions.Add(sesion);
                 await _context.SaveChangesAsync();
 
+                // Recuperar el valor generado por el trigger
+                var newId = await _context.Sesions
+                    .OrderByDescending(s => s.IdSesion)
+                    .Select(s => s.IdSesion)
+                    .FirstOrDefaultAsync();
+
+                // Asignar el valor generado a la entidad
+                sesion.IdSesion = newId;
+
                 // Rehabilitar el seguimiento de cambios
-                _context.ChangeTracker.AutoDetectChangesEnabled = true;
+                //_context.ChangeTracker.AutoDetectChangesEnabled = true;
 
                 return CreatedAtAction("GetSesion", new { id = sesion.IdSesion }, sesion);
             }

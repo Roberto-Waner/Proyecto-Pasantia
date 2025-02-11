@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "5ylIkQKjKuM=",
+  "dgSpecHash": "RmFcGpa1zos=",
   "success": true,
   "projectFilePath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\WebApiForm.csproj",
   "expectedPackageFiles": [
@@ -9,8 +9,8 @@
     "C:\\Users\\rober\\.nuget\\packages\\bricelam.entityframeworkcore.pluralizer\\1.0.0\\bricelam.entityframeworkcore.pluralizer.1.0.0.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\closedxml\\0.104.2\\closedxml.0.104.2.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\closedxml.parser\\1.2.0\\closedxml.parser.1.2.0.nupkg.sha512",
-    "C:\\Users\\rober\\.nuget\\packages\\documentformat.openxml\\3.1.1\\documentformat.openxml.3.1.1.nupkg.sha512",
-    "C:\\Users\\rober\\.nuget\\packages\\documentformat.openxml.framework\\3.1.1\\documentformat.openxml.framework.3.1.1.nupkg.sha512",
+    "C:\\Users\\rober\\.nuget\\packages\\documentformat.openxml\\3.2.0\\documentformat.openxml.3.2.0.nupkg.sha512",
+    "C:\\Users\\rober\\.nuget\\packages\\documentformat.openxml.framework\\3.2.0\\documentformat.openxml.framework.3.2.0.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\excelnumberformat\\1.1.0\\excelnumberformat.1.1.0.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\rober\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

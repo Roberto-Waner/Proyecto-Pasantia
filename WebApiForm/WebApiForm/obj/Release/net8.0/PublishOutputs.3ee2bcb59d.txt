@@ -6,6 +6,11 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\WebApiForm.pdb
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Azure.Core.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Azure.Identity.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ClosedXML.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ClosedXML.Parser.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.Framework.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ExcelNumberFormat.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Humanizer.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.AspNetCore.Razor.Language.dll
@@ -66,6 +71,10 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\NuGet.ProjectModel.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\NuGet.Protocol.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\NuGet.Versioning.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\RBush.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\SendGrid.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\SixLabors.Fonts.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\StarkbankEcdsa.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -78,6 +87,7 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Configuration.ConfigurationManager.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Drawing.Common.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.IO.Packaging.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Memory.Data.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Reflection.MetadataLoadContext.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Runtime.Caching.dll

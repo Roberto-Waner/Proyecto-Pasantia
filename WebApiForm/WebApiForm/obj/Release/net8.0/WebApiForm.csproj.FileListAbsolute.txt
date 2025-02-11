@@ -259,3 +259,13 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\WebApiForm.pdb
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\WebApiForm.genruntimeconfig.cache
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\ref\WebApiForm.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\ClosedXML.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\ClosedXML.Parser.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\DocumentFormat.OpenXml.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\DocumentFormat.OpenXml.Framework.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\ExcelNumberFormat.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\RBush.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\SendGrid.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\SixLabors.Fonts.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\StarkbankEcdsa.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\System.IO.Packaging.dll

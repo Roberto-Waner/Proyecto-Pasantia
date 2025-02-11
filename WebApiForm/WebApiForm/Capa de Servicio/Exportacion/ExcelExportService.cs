@@ -1,5 +1,11 @@
 ﻿using ClosedXML.Excel;
+using A = DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using WebApiForm.DTO__Data_Transfer_Object_;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using DocumentFormat.OpenXml;
 
 namespace WebApiForm.Capa_de_Servicio.Exportacion
 {
@@ -32,6 +38,13 @@ namespace WebApiForm.Capa_de_Servicio.Exportacion
             worksheet.Cell(1, 19).Value = "Comentarios";
             worksheet.Cell(1, 20).Value = "Justificación";
 
+            // Seleccionar el rango de los encabezados
+            var headerRange = worksheet.Range("A1:T1");
+
+            // Aplicar formato en negrita y fondo gris claro a los encabezados
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.BackgroundColor = XLColor.DarkGreen;
+
             // Agregar datos
             int row = 2;
             foreach (var item in report)
@@ -59,8 +72,18 @@ namespace WebApiForm.Capa_de_Servicio.Exportacion
                 row++;
             }
 
+            // Definir el rango de la tabla incluyendo encabezados y datos
+            var dataRange = worksheet.Range(1, 1, row - 1, 20);
+
+            // Crear la tabla a partir del rango de datos
+            var excelTable = dataRange.CreateTable();
+
+            // Asignar un estilo a la tabla (opcional)
+            excelTable.Theme = XLTableTheme.TableStyleDark11;
+
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
+            stream.Position = 0;
             return stream.ToArray();
         }
     }

@@ -33,11 +33,10 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
+  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('http://sistemaencuestaopretapi.somee.com');
   final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
-  // late List<FormularioRegistro> dataForm = [];
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   List<bool> _isExpandedList = [];
@@ -348,7 +347,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
-  void _showPreguntaDialog(SpPreguntascompleta question) {
+  void _showPreguntaDialog(SpPreguntascompleta question) async {
     final isTabletDevice = isTablet(context);
 
     showDialog(
@@ -359,24 +358,48 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
           builder: (BuildContext context, StateSetter setState) {
             // Filtrar preguntas que tienen estado en true
             final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == true).toList();
-
             final currentIndex = filteredQuestions.indexOf(question);
+            // final isFirstQuestion = currentIndex == filteredQuestions.length + 1;
             final isLastQuestion = currentIndex == filteredQuestions.length - 1;
             
             // Reinicializa 'selectedAnswer' para cada nueva pregunta
             String? selectedAnswer = '';
 
+            // Configurar los valores iniciales del formulario
+            // Map<String, dynamic> initialValue = {
+            //   // 'requerimientos': question.sp_Rango,
+            //   'respuesta_selected': previousAnswer?.respuesta ?? '',
+            //   'comentarios': previousAnswer?.comentarios ?? '',
+            //   'justificacion': previousAnswer?.justificacion ?? '',
+            // };
+
             return AlertDialog(
-              title: Text('No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp)),
+              // title: Text('No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp)),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Título del diálogo
+                  Expanded(
+                    child: Text(
+                      'No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}',
+                      style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp),
+                    ),
+                  ),
+                  const SizedBox(width: 35),
+                  // Botón de cierre
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.red, size: isTabletDevice ? 20.sp : 20.sp),
+                    onPressed: () => Navigator.of(context).pop()
+                  ),
+                ],
+              ),
               content: Container(
-                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),  // Aplica margen
-                // width: 1500,
+                margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),  // Aplica margen
+                width: isTabletDevice ? 700 : 500,
                 padding: EdgeInsets.zero,
                 child: FormBuilder(
                   key: _formKey,
-                  initialValue: {
-                    'requerimientos': question.sp_Rango
-                  },
+                  // initialValue: initialValue,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -384,8 +407,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       // Determina el tipo de respuesta y muestra el widget adecuado segun el tipo Respuesta de la tabla sesion
                       if (question.sp_TipoRespuesta == 'Respuesta Abierta')
                         Container(
-                          constraints: const BoxConstraints( 
-                            maxHeight: 100.0, // Ajusta la altura máxima del contenedor 
+                          constraints: const BoxConstraints(
+                            maxHeight: 100.0, // Ajusta la altura máxima del contenedor
                           ),
                           child: SingleChildScrollView(
                             child: FormBuilderTextField(
@@ -403,7 +426,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             ),
                           ),
                         ),
-                      
+
                       if(question.sp_TipoRespuesta == 'Seleccionar: Si, No, N/A')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -422,7 +445,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Calificar del 1 a 10')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -449,7 +472,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Solo SI o No')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -472,7 +495,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             });
                           },
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Edad')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -498,7 +521,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Nacionalidad')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -517,7 +540,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Título de transporte')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -535,7 +558,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Producto utilizado')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -556,7 +579,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Género')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -574,7 +597,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Frecuencia de viajes por semana')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -596,7 +619,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Expectativa del pasajero')
                         FormBuilderDropdown(
                           name: 'respuesta_selected',
@@ -617,11 +640,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           ],
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
-                
+
                       if(question.sp_TipoRespuesta == 'Conclusión')
                         Container(
-                          constraints: const BoxConstraints( 
-                            maxHeight: 100.0, // Ajusta la altura máxima del contenedor 
+                          constraints: const BoxConstraints(
+                            maxHeight: 100.0, // Ajusta la altura máxima del contenedor
                           ),
                           child: SingleChildScrollView(
                             child: FormBuilderTextField(
@@ -661,32 +684,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                         ),
 
-                      if (question.sp_Rango == 'Comentarios y Justificación (Opcional)') ...comentarios() + justificacion() 
-                      else if (question.sp_Rango == 'Requiere Comentarios (Opcional)') ...comentarios() 
+                      if (question.sp_Rango == 'Comentarios y Justificación (Opcional)') ...comentarios() + justificacion()
+                      else if (question.sp_Rango == 'Requiere Comentarios (Opcional)') ...comentarios()
                       else if (question.sp_Rango == 'Requiere Justificación (Opcional)') ...justificacion(),
-
-                      /*
-                      if(question.sp_Rango == 'En caso de responder (Si) finaliza la encuesta' ||
-                          question.sp_Rango == 'Requiere Justificación (Opcional)' ||
-                          question.sp_Rango == 'Requiere Comentarios (Opcional)' ||
-                          question.sp_Rango == 'Comentarios y Justificación (Opcional)')
-                        FormBuilderTextField(
-                          name: 'requerimientos',
-                          enabled: false,
-                          maxLines: null, // Esto permite que el campo se expanda a medida que se ingresa texto
-                          style: const TextStyle(fontSize: 26/*, color: Color.fromARGB(255, 1, 1, 1)*/),
-                          decoration: InputDecorations.inputDecoration(
-                            labeltext: '${question.sp_Rango}',
-                            labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
-                            icono: const Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp),
-                          ),
-                        ),
-                      */
                     ],
                   )
                 ),
               ),
               actions: <Widget>[
+                //boton para retroceder
                 // Container(
                 //   padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
                 //   decoration: BoxDecoration(
@@ -702,13 +708,21 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 //     ]
                 //   ),
                 //   child: TextButton(
-                //     child: Text("Cerrar", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp)),
-                //     onPressed: () {
-                //       Navigator.of(context).pop();
-                //     }
+                //     onPressed: isFirstQuestion ? null : () {
+                //       final previousQuestion = dataQuestion[currentIndex - 1];
+                //       if(!isFirstQuestion){
+                //         _formKey.currentState?.reset();
+                //         Navigator.of(context).pop();
+                //         WidgetsBinding.instance.addPostFrameCallback((_) {
+                //           _showPreguntaDialog(previousQuestion); // Abre el diálogo con la pregunta anterior
+                //         });
+                //       }
+                //     },
+                //     child: Text("Pregunta \nAnterior", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
                 //   ),
                 // ),
 
+                //boton para avanzar a la siguiente pregunta
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
                   decoration: BoxDecoration(
@@ -762,6 +776,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   ),
                 ),
 
+                //boton para finalizar la pregunta
                 Container(
                   padding: isTabletDevice ? const EdgeInsets.symmetric(vertical: 1, horizontal: 4) : const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                   decoration: BoxDecoration(
@@ -850,11 +865,21 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
       try {
-        // await _respuestaController.saveRespuesta([nuevaRespuesta]);
-        // saveRespuesta_Directa([nuevaRespuesta], finalizarSesion);
-        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
 
-        // await _apiRespuesta.postRespuesta(nuevaRespuesta);
+        // final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta!);
+        // print('Respuesta existente: $respuestaExistente');
+        //
+        // if (respuestaExistente != null) {
+        //   // Actualizar la respuesta existente
+        //   nuevaRespuesta.idSesion = respuestaExistente.idSesion;
+        //   await _respuestaCrud.updateRespuesta(nuevaRespuesta);
+        //   print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
+        // } else {
+        //   await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+        //   print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
+        // }
+
+        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
         print('Respuesta guardada localmente');
 
         if(finalizarSesion == 0) {
@@ -985,7 +1010,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {Navigator.of(context).pop();},
+                      onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
                         shape: RoundedRectangleBorder(

@@ -43,7 +43,7 @@ class SpInsertarRespuestas {
     data['justificacion'] = justificacion;
     data['horaResp'] = horaResp;
     data['fechaResp'] = fechaResp;
-    data['finalizarSesion'] = finalizarSesion /*? true : false*/; // Convierte true a 1 y false a 0
+    data['finalizarSesion'] = finalizarSesion;
     return data;
   }
 }

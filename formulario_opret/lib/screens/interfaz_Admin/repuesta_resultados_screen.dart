@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,9 +5,7 @@ import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas
 import 'package:formulario_opret/screens/interfaz_Admin/graphic/graphic_Respuestas_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/respuestas_services.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RepuestaResultadosScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -30,7 +26,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://10.0.2.2:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('http://sistemaencuestaopretapi.somee.com');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarRespuestas> respuestasFiltrados = [];
@@ -106,7 +102,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   }
 
   //Este metodo es la que se encargar de hacer las solicitudes de permisos al almacenamientos
-  Future<bool> requestStoragePermission() async {
+  /*Future<bool> requestStoragePermission() async {
     if (await Permission.storage.isGranted) {
       return true;
     }
@@ -127,6 +123,17 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
       return false;
     }
     return false;
+  }*/
+
+  Future<void> openExcelReport() async {
+    final Uri url = Uri.parse('http://sistemaencuestaopretapi.somee.com/api/Report/ExportReporte');
+
+    if(!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )){
+      throw 'No se pudo abrir el archivo Excel $url';
+    }
   }
 
   @override
@@ -363,50 +370,50 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     );
   }
 
-  Future<void> downloadExcel() async {
-    bool hasPermission = await requestStoragePermission();
+  // Future<void> downloadExcel() async {
+  //   bool hasPermission = await requestStoragePermission();
 
-    if (!hasPermission) {
-      print('Permiso de almacenamiento denegado.');
-      _showErrorDialog(context, 'Permiso de almacenamiento denegado.');
-      return;
-    }
+  //   if (!hasPermission) {
+  //     print('Permiso de almacenamiento denegado.');
+  //     _showErrorDialog(context, 'Permiso de almacenamiento denegado.');
+  //     return;
+  //   }
 
-    final dio = Dio();
-    const url = 'https://10.0.2.2:7190/api/Report/ExportReporte';
+  //   final dio = Dio();
+  //   const url = 'https://10.0.2.2:7190/api/Report/ExportReporte';
 
-    try {
-      final response = await dio.get(
-        url,
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: false,
-        )
-      );
+  //   try {
+  //     final response = await dio.get(
+  //       url,
+  //       options: Options(
+  //         responseType: ResponseType.bytes,
+  //         followRedirects: false,
+  //       )
+  //     );
 
-      // Obtener el directorio de documentos de la aplicación
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath = appDocDir.path;
-      String filePath = '$appDocPath/Reporte.xlsx';
+  //     // Obtener el directorio de documentos de la aplicación
+  //     Directory appDocDir = await getApplicationDocumentsDirectory();
+  //     String appDocPath = appDocDir.path;
+  //     String filePath = '$appDocPath/Reporte.xlsx';
 
-      // Escribir los bytes del archivo en el sistema de archivos
-      File file = File(filePath);
-      await file.writeAsBytes(response.data);
-      print('Archivo descargado en: $filePath');
+  //     // Escribir los bytes del archivo en el sistema de archivos
+  //     File file = File(filePath);
+  //     await file.writeAsBytes(response.data);
+  //     print('Archivo descargado en: $filePath');
 
-      _showSuccessDialog(context, 'Archivo descargado.');
+  //     _showSuccessDialog(context, 'Archivo descargado.');
 
-      // Abrir el archivo utilizando el paquete open_file
-      final result = await OpenFile.open(file.path);
-      if (result.type != ResultType.done) {
-        print('No se pudo abrir el archivo.');
-        _showErrorDialog(context, 'No se pudo abrir el archivo.');
-      }
-    } catch (e) {
-      print('Error al descargar el archivo: $e');
-      _showErrorDialog(context, 'Error al descargar el archivo.');
-    }
-  }
+  //     // Abrir el archivo utilizando el paquete open_file
+  //     final result = await OpenFile.open(file.path);
+  //     if (result.type != ResultType.done) {
+  //       print('No se pudo abrir el archivo.');
+  //       _showErrorDialog(context, 'No se pudo abrir el archivo.');
+  //     }
+  //   } catch (e) {
+  //     print('Error al descargar el archivo: $e');
+  //     _showErrorDialog(context, 'Error al descargar el archivo.');
+  //   }
+  // }
 
   void _showErrorDialog (BuildContext context, String message) {
     final isTabletDevice = isTablet(context);
@@ -530,7 +537,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await downloadExcel();
+                        await openExcelReport();
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),

@@ -13,27 +13,45 @@ class RespuestaCrud {
     Batch batch = db.batch();
     for (var respuesta in respuestas) {
       batch.insert(
-        'localRespuestas', 
+        'localRespuestas',
         respuesta.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
 
-    await batch.commit(noResult: true); 
+    await batch.commit(noResult: true);
     print('Respuestas guardadas en la base de datos local SQLite con éxito');
   }
 
-  Future<void> actualizarCrud(int id, SpInsertarRespuestas answer) async {
-    final db = await _databaseHelper.database;
-
-    await db.update(
-      'localRespuestas',
-      answer.toJson(),
-      where: 'idSesion = ?',
-      whereArgs: [id],
-    );
-    print('Campo finalizarSesion actualizado a 1 para idUsuarios: $id');
-  }
+  // Future<void> insertRespuestas(List<SpInsertarRespuestas> respuestas) async {
+  //   final db = await _databaseHelper.database;
+  //   Batch batch = db.batch();
+  //
+  //   for (var respuesta in respuestas) {
+  //     final List<Map<String, dynamic>> existing = await db.query(
+  //       'localRespuestas',
+  //       where: 'idSesion = ?',
+  //       whereArgs: [respuesta.idSesion],
+  //     );
+  //
+  //     if (existing.isNotEmpty && respuesta.finalizarSesion == 0) {
+  //       batch.update(
+  //         'localRespuestas',
+  //         respuesta.toJson(),
+  //         where: 'idSesion = ?',
+  //         whereArgs: [respuesta.idSesion],
+  //       );
+  //     } else {
+  //       batch.insert(
+  //         'localRespuestas',
+  //         respuesta.toJson(),
+  //         conflictAlgorithm: ConflictAlgorithm.replace,
+  //       );
+  //     }
+  //   }
+  //
+  //   await batch.commit(noResult: true);
+  // }
 
   Future<List<SpInsertarRespuestas>> getAnswerCrud() async {
     final db = await _databaseHelper.database;
@@ -53,13 +71,60 @@ class RespuestaCrud {
     print('Todos los registros eliminados de la tabla localRespuestas');
   }
 
-  Future<void> deleteAnswerCrud(int id) async {
-    final db = await _databaseHelper.database;
-    await db.delete(
-        'RespuestasLocal',
+  // Cargar una respuesta específica desde la caché local
+  Future<SpInsertarRespuestas?> getRespuestaById(int idSesion) async {
+    try {
+      final db = await DatabaseHelper.instance.database;
+      final result = await db.query(
+        'localRespuestas',
         where: 'idSesion = ?',
-        whereArgs: [id]
-    );
-    print("Respuesta borrada y agregada nuevamente por parte del usuario con ID: $id");
+        whereArgs: [idSesion],
+      );
+      if (result.isNotEmpty) {
+        return SpInsertarRespuestas.fromJson(result.first);
+      }
+      return null;
+    } catch (e) {
+      print('Error al cargar la respuesta: $e');
+      return null;
+    }
+  }
+
+  // Actualizar una respuesta específica en la caché local
+  Future<void> updateRespuesta(SpInsertarRespuestas respuesta) async {
+    try {
+      final db = await DatabaseHelper.instance.database;
+      await db.update(
+        'localRespuestas',
+        respuesta.toJson(),
+        where: 'idSesion = ?',
+        whereArgs: [respuesta.idSesion],
+      );
+      print('Respuesta actualizada en la caché local para idSesion: ${respuesta.idSesion}');
+    } catch (e) {
+      print('Error al actualizar la respuesta: $e');
+    }
   }
 }
+
+// Future<void> deleteAnswerCrud(int id) async {
+//   final db = await _databaseHelper.database;
+//   await db.delete(
+//       'RespuestasLocal',
+//       where: 'idSesion = ?',
+//       whereArgs: [id]
+//   );
+//   print("Respuesta borrada y agregada nuevamente por parte del usuario con ID: $id");
+// }
+
+// Future<void> actualizarCrud(int id, SpInsertarRespuestas answer) async {
+//   final db = await _databaseHelper.database;
+//
+//   await db.update(
+//     'localRespuestas',
+//     answer.toJson(),
+//     where: 'idSesion = ?',
+//     whereArgs: [id],
+//   );
+//   print('Campo finalizarSesion actualizado a 1 para idUsuarios: $id');
+// }

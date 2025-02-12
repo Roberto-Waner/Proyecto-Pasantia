@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _filtrarId = TextEditingController();
   // final TextEditingController _filtrarCedula = TextEditingController();
 
-  final ApiServiceToken _serviceToken = ApiServiceToken('http://sistemaencuestaopretapi.somee.com',false);
+  final ApiServiceToken _serviceToken = ApiServiceToken('https://192.168.1.5:7190',false);
   String myToken ="";
   bool _isLoading = false;
   bool _obscureText = true;

@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/Exportados/sp_Respuestas_Export.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/graphic/graphic_Respuestas_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/respuestas_services.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RepuestaResultadosScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -26,8 +29,9 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('http://sistemaencuestaopretapi.somee.com');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.5:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
+  List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarRespuestas> respuestasFiltrados = [];
   List<SpFiltrarRespuestas> todasLasRespuestas = [];
@@ -101,38 +105,76 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     return isTabletWidth && isTabletHeight;
   }
 
-  //Este metodo es la que se encargar de hacer las solicitudes de permisos al almacenamientos
-  /*Future<bool> requestStoragePermission() async {
-    if (await Permission.storage.isGranted) {
-      return true;
-    }
-
-    PermissionStatus status = await Permission.storage.request();
-
-    if (status.isGranted) {
-      // El permiso ha sido concedido
-      return true;
-    } else if (status.isDenied) {
-      // El permiso ha sido denegado temporalmente
-      // _showErrorDialog(context, 'El permiso ha sido denegado temporalmente.');
-      return false;
-    } else if (status.isPermanentlyDenied) {
-      // El permiso ha sido denegado permanentemente
-      _showErrorDialog(context, 'Permiso denegado permanentemente. Abriendo configuración...');
-      await openAppSettings();
-      return false;
-    }
-    return false;
-  }*/
-
+  /*
   Future<void> openExcelReport() async {
-    final Uri url = Uri.parse('http://sistemaencuestaopretapi.somee.com/api/Report/ExportReporte');
+    String endpoint = 'api/Report/ExportReporte';
+    final Uri url = Uri.parse('https://192.168.1.5:7190/$endpoint');
 
     if(!await launchUrl(
       url,
       mode: LaunchMode.externalApplication,
     )){
       throw 'No se pudo abrir el archivo Excel $url';
+    }
+  }*/
+
+  Future<void> exportToCsv(BuildContext context) async {
+    try {
+      // Obtener los datos desde el backend
+      List<SpRespuestasExport> data = await _apiServiceRespuesta.getExportReporte();
+
+      // Verificar si hay datos
+      if (data.isEmpty) {
+        _showErrorDialog(context, 'No hay datos disponibles para exportar.');
+        return;
+      }
+
+      // Crear el contenido del archivo CSV
+      final StringBuffer csvContent = StringBuffer();
+
+      // Agregar encabezados
+      csvContent.writeln(
+        'ID Usuarios,Nombre y Apellido,Usuarios,Email,ID Formulario,Fecha Inicio Encuesta,Hora Inicio Encuesta,Nombre Línea,Nombre Estación,ID Sesión,Código Pregunta,Pregunta,Código Subpregunta,Subpregunta,No. Encuestas,Tipo Respuesta,Hora Respondida,Respuestas,Comentarios,Justificación'
+      );
+
+      // Agregar datos al CSV
+      for (var item in data) {
+        csvContent.writeln(
+          '${item.rp_IdUsuarios ?? ""},'
+          '${item.rp_NombreApellido ?? ""},'
+          '${item.rp_Usuarios ?? ""},'
+          '${item.rp_Email ?? ""},'
+          '${item.rp_IdFormulario ?? 0},'
+          '${item.rp_FechaInicioEncuesta ?? ""},'
+          '${item.rp_HoraInicioEncuesta ?? ""},'
+          '${item.rp_NombreLinea ?? ""},'
+          '${item.rp_NombreEstacion ?? ""},'
+          '${item.rp_IdSesion ?? 0},'
+          '${item.rp_CodPreg ?? 0},'
+          '${item.rp_Pregunta ?? ""},'
+          '${item.rp_CodSubPreg ?? ""},'
+          '${item.rp_SubPregunta ?? ""},'
+          '${item.rp_NoEncuestas ?? ""},'
+          '${item.rp_TipoResp ?? ""},'
+          '${item.rp_HoraRespondida ?? ""},'
+          '${item.rp_Respuestas ?? ""},'
+          '${item.rp_Comentarios ?? ""},'
+          '${item.rp_Justificacion ?? ""}'
+        );
+      }
+
+      // Guardar el archivo CSV
+      final directory = await getApplicationDocumentsDirectory();
+      final path = '${directory.path}/Reporte.csv';
+      File(path).writeAsStringSync(csvContent.toString());
+      // _showSuccessDialog(context, 'Archivo descargado correctamente.');
+
+      // Abrir el archivo
+      OpenFile.open(path);
+
+    } catch (e) {
+      print('Error al exportar CSV: $e');
+      _showErrorDialog(context, 'Error al exportar CSV.');
     }
   }
 
@@ -347,7 +389,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato Excel?");
+                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?", report);
                       },
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -358,7 +400,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                           borderRadius: BorderRadius.circular(50),
                         )
                       ),
-                      child: const Text('Exportar en Excel')
+                      child: const Text('Exportar')
                     )
                   )
                 ],
@@ -369,51 +411,6 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
       ),
     );
   }
-
-  // Future<void> downloadExcel() async {
-  //   bool hasPermission = await requestStoragePermission();
-
-  //   if (!hasPermission) {
-  //     print('Permiso de almacenamiento denegado.');
-  //     _showErrorDialog(context, 'Permiso de almacenamiento denegado.');
-  //     return;
-  //   }
-
-  //   final dio = Dio();
-  //   const url = 'https://10.0.2.2:7190/api/Report/ExportReporte';
-
-  //   try {
-  //     final response = await dio.get(
-  //       url,
-  //       options: Options(
-  //         responseType: ResponseType.bytes,
-  //         followRedirects: false,
-  //       )
-  //     );
-
-  //     // Obtener el directorio de documentos de la aplicación
-  //     Directory appDocDir = await getApplicationDocumentsDirectory();
-  //     String appDocPath = appDocDir.path;
-  //     String filePath = '$appDocPath/Reporte.xlsx';
-
-  //     // Escribir los bytes del archivo en el sistema de archivos
-  //     File file = File(filePath);
-  //     await file.writeAsBytes(response.data);
-  //     print('Archivo descargado en: $filePath');
-
-  //     _showSuccessDialog(context, 'Archivo descargado.');
-
-  //     // Abrir el archivo utilizando el paquete open_file
-  //     final result = await OpenFile.open(file.path);
-  //     if (result.type != ResultType.done) {
-  //       print('No se pudo abrir el archivo.');
-  //       _showErrorDialog(context, 'No se pudo abrir el archivo.');
-  //     }
-  //   } catch (e) {
-  //     print('Error al descargar el archivo: $e');
-  //     _showErrorDialog(context, 'Error al descargar el archivo.');
-  //   }
-  // }
 
   void _showErrorDialog (BuildContext context, String message) {
     final isTabletDevice = isTablet(context);
@@ -478,7 +475,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     );
   }
 
-  void _showDownload (BuildContext context, String message) {
+  void _showDownload (BuildContext context, String message, List<SpRespuestasExport> data) {
     final isTabletDevice = isTablet(context);
     showDialog(
       context: context,
@@ -537,7 +534,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await openExcelReport();
+                        await exportToCsv(context);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -762,33 +759,3 @@ class RespuestasDataSource extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
-
-// void _showErrorDialog(BuildContext context, String message) {
-//   showDialog(
-//     context: context,
-//     builder: (BuildContext context) {
-//       return AlertDialog(
-//         title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-//         contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
-//         content: Container(
-//             margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
-//             child: Text(message, style: const TextStyle(fontSize: 28))
-//         ),
-//         actions: [
-//           TextButton(
-//             style: ElevatedButton.styleFrom(
-//               padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(50),
-//               ),
-//             ),
-//             onPressed: () {
-//               Navigator.of(context).pop();
-//             },
-//             child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)),
-//           ),
-//         ],
-//       );
-//     }
-//   );
-// }

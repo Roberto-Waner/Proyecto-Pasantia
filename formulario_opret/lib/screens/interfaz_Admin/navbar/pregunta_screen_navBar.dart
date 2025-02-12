@@ -30,11 +30,11 @@ class PreguntaScreenNavbar extends StatefulWidget {
 
 class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('http://sistemaencuestaopretapi.somee.com');
+  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('https://192.168.1.5:7190');
   late Future<List<Preguntas>> _preguntasData;
-  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('http://sistemaencuestaopretapi.somee.com');
+  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://192.168.1.5:7190');
   late Future<List<SubPregunta>> _subPreguntasData;
-  final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('http://sistemaencuestaopretapi.somee.com');
+  final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://192.168.1.5:7190');
   late Future<List<Sesion>> _sesionData;
   String selectedTipRespuestas = 'Respuesta Abierta';
   final tipoRespuestaController = TextEditingController();
@@ -987,7 +987,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   final dataPreg = _formKey.currentState!.value;
                   final newQuestion = int.parse(dataPreg['noPregunta']);
 
-                  Preguntas? existingQuestion = await ApiServicePreguntas('http://sistemaencuestaopretapi.somee.com').getOnePregunta(newQuestion);
+                  Preguntas? existingQuestion = await ApiServicePreguntas('https://192.168.1.5:7190').getOnePregunta(newQuestion);
 
                   if (existingQuestion != null) {
                     showDialog(
@@ -1020,7 +1020,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   ); // Para verificar el valor antes de la asignación
 
                   try{
-                    final response = await ApiServicePreguntas('http://sistemaencuestaopretapi.somee.com').postPreguntas(nuevaPregunta);
+                    final response = await ApiServicePreguntas('https://192.168.1.5:7190').postPreguntas(nuevaPregunta);
 
                     if(response.statusCode == 201) {
                       print('La pregunta fue creado con éxito');
@@ -1101,7 +1101,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServicePreguntas('http://sistemaencuestaopretapi.somee.com')
+                    final response = await ApiServicePreguntas('https://192.168.1.5:7190')
                       .putPreguntas(questionUpLoad.codPregunta, askUpLoad);
 
                     if(response.statusCode == 204) {
@@ -1158,7 +1158,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServicePreguntas('http://sistemaencuestaopretapi.somee.com')
+                  final response = await ApiServicePreguntas('https://192.168.1.5:7190')
                       .deletePreguntas(questionDelete.codPregunta);
                   if (response.statusCode == 204) {
                     print('Pregunta eliminado con éxito');
@@ -1241,7 +1241,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   final dataSebPreg = _formKey.currentState!.value;
                   final newSubPregunta = dataSebPreg['codigo'];
 
-                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('http://sistemaencuestaopretapi.somee.com').getOneSubPreg(newSubPregunta);
+                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('https://192.168.1.5:7190').getOneSubPreg(newSubPregunta);
 
                   if (existingSubPregunta != null) {
                     showDialog(
@@ -1274,7 +1274,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('http://sistemaencuestaopretapi.somee.com').postSubPreg(nuevaSubPregunta);
+                    final response = await ApiServiceSubPreguntas('https://192.168.1.5:7190').postSubPreg(nuevaSubPregunta);
 
                     if(response.statusCode == 201) {
                       print('Las sub-Preguntas fue creado con éxito');
@@ -1362,7 +1362,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('http://sistemaencuestaopretapi.somee.com')
+                    final response = await ApiServiceSubPreguntas('https://192.168.1.5:7190')
                       .putSubPreg(subQuestionUpLoad.codSubPregunta, nuevaSubPregunta);
 
                     if(response.statusCode == 204) {
@@ -1416,7 +1416,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServiceSubPreguntas('http://sistemaencuestaopretapi.somee.com')
+                  final response = await ApiServiceSubPreguntas('https://192.168.1.5:7190')
                       .deleteSubPreg(subQuestionDelete.codSubPregunta);
                   if (response.statusCode == 204) {
                     print('Sub pregunta eliminado con éxito');
@@ -1724,7 +1724,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   print('Resultados ${nuevaSesion}');
 
                   try{
-                    final response = await ApiServiceSesion('http://sistemaencuestaopretapi.somee.com').postSesion(nuevaSesion);
+                    final response = await ApiServiceSesion('https://192.168.1.5:7190').postSesion(nuevaSesion);
 
                     if(response.statusCode == 201) {
                       print('La Sesion fue creado con éxito');
@@ -1992,7 +1992,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   print('Resultados de sesionUpLoad: $sesionUpLoad');
 
                   try{
-                    final response = await ApiServiceSesion('http://sistemaencuestaopretapi.somee.com')
+                    final response = await ApiServiceSesion('https://192.168.1.5:7190')
                       .putSesion(sectionUpload.idSesion!, sesionUpLoad);
 
                     if(response.statusCode == 204) {
@@ -2044,7 +2044,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   fontWeight: FontWeight.bold)),
               onPressed: () async {
                 try{
-                  final response = await ApiServiceSesion('http://sistemaencuestaopretapi.somee.com').deleteSesion(sectionDelete.idSesion!);
+                  final response = await ApiServiceSesion('https://192.168.1.5:7190').deleteSesion(sectionDelete.idSesion!);
 
                   if (response.statusCode == 204) {
                     print('Sesion eliminado con éxito');
@@ -2083,7 +2083,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       print('Estado actualizado a: ${estadoActualizador.estado}');
 
       try{
-        final response = await ApiServiceSesion('http://sistemaencuestaopretapi.somee.com')
+        final response = await ApiServiceSesion('https://192.168.1.5:7190')
           .putSesion(actualizarEstado_Sesion.idSesion!, estadoActualizador);
 
         if (estadoActualizador.estado) { // dependiento del valor del campo estado aparecera un cuadro de dialoga que notifica que se ha habilitado o deshabilitado de la encuesta
@@ -2128,7 +2128,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           rango: sesion.rango,
         );
 
-        final response = await ApiServiceSesion('http://sistemaencuestaopretapi.somee.com').putSesion(sesion.idSesion!, estadoActualizador);
+        final response = await ApiServiceSesion('https://192.168.1.5:7190').putSesion(sesion.idSesion!, estadoActualizador);
 
         if (estadoActualizador.estado) {
           if (response.statusCode == 204) {

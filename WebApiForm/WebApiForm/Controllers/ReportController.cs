@@ -28,11 +28,12 @@ namespace WebApiForm.Controllers
                 {
                     return StatusCode(404, "No se encontraron reportes de Respuestas y Formularios para Exportar.");
                 }
-                //return Ok(reporte);
-                var content = _excelExport.GenerateExcelReport(reporte);
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte.xlsx");
+                return Ok(reporte);
+                //var content = _excelExport.GenerateExcelReport(reporte);
+                //return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte.xlsx");
 
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Ocurrió un error interno al procesar la solicitud. Por favor, inténtelo de nuevo más tarde.");
             }

@@ -101,6 +101,7 @@ class RespuestaCrud {
         whereArgs: [respuesta.idSesion],
       );
       print('Respuesta actualizada en la caché local para idSesion: ${respuesta.idSesion}');
+      print('dato actualizado: $db');
     } catch (e) {
       print('Error al actualizar la respuesta: $e');
     }

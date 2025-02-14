@@ -28,11 +28,15 @@ class RespuestaController {
       if (respuestasPendientes.isNotEmpty) {
         // Envía las respuestas al backend
         final postResponse = await _apiServiceRespuesta.postRespuesta(respuestasPendientes);
+        print(postResponse);
 
         // Si la sincronización es exitosa, vacía la tabla local
         if (postResponse.statusCode == 200 || postResponse.statusCode == 201) {
-          await _respuestaCrud.vaciarTable();
-          print('Respuestas sincronizadas con la API y tabla local vaciada');
+          // await Future.delayed(const Duration(seconds: 5), () async {
+            await _respuestaCrud.vaciarTable();
+            print('Respuestas sincronizadas con la API y tabla local vaciada');
+          // });
+
         } else {
           print('Error al sincronizar las respuestas: ${postResponse.statusCode}');
           print('Cuerpo de la respuesta: ${postResponse.body}');

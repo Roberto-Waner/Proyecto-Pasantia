@@ -141,6 +141,28 @@ namespace WebApiForm.Controllers
                 return BadRequest(new { message = "Error al enviar la respuesta", details = ex.Message });
             }
 
+            /*
+            var resultados = new List<object>(); // Lista para almacenar el estado de cada respuesta
+
+            try{
+                foreach (var answer in respuestas)
+                {
+                    try
+                    {
+                        await _respuestaService.InsertarRespuestaAsyncServices(answer);
+                        resultados.Add(new { respuestas = answer, status = "success" });
+                    }
+                    catch(Exception ex)
+                    {
+                        resultados.Add(new { respuestas = answer, status = "error", message = ex.Message });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error general al enviar la respuesta", details = ex.Message });
+            }*/
+
             return Ok();
         }
 

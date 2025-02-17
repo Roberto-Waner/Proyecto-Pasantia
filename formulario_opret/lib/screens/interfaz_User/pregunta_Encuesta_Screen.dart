@@ -1,9 +1,11 @@
+// import 'package:expandable/expandable.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
+import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/data/respuesta_crud.dart';
 import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
@@ -25,7 +27,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
     required this.filtrarId,
-    // required this.filtrarCedula, 
+    // required this.filtrarCedula,
   });
 
   @override
@@ -35,10 +37,11 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://192.168.1.5:7190');
   final RespuestaController _respuestaController = RespuestaController();
+  final SectionController _sectionController = SectionController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
-  List<bool> _isExpandedList = [];
+  // List<bool> _isExpandedList = [];
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
   final SectionCrud _sectionCrud = SectionCrud();
   final TextEditingController fechaController = TextEditingController();
@@ -57,11 +60,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
       // Filtrar solo las preguntas con estado verdadero
       // preguntas = preguntas.where((pregunta) => pregunta.sp_Estado == true).toList();
-
+      _sectionController.syncData();
       _respuestaController.syncDataResp();
       setState(() {
         dataQuestion = preguntas;
-        _isExpandedList = List.filled(dataQuestion.length, false);
+        // _isExpandedList = List.filled(dataQuestion.length, false);
       });
     } catch (e) {
       print('Error al cargar las preguntas: $e');
@@ -113,19 +116,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               children: [
                 Expanded(
                   child: FutureBuilder(
-                      // future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
-                      //   print('Error al cargar desde la API, cargando desde SQLite: $e');
-                      //   return await _sectionCrud.querySectionCrud();
-                      // }),
-                    future: _apiSesion.getSpPreguntascompletaListada().then((preguntas) {
-                      if (preguntas.isEmpty) {
-                        return _sectionCrud.querySectionCrud();
-                      }
-                      return preguntas;
-                    }).catchError((e) async {
-                      print('Error al cargar desde la API, cargando desde SQLite: $e');
-                      return await _sectionCrud.querySectionCrud();
-                    }),
+                      future: _apiSesion.getSpPreguntascompletaListada().then((preguntas) {
+                        if (preguntas.isEmpty) {
+                          return _sectionCrud.querySectionCrud();
+                        }
+                        return preguntas;
+                      }).catchError((e) async {
+                        print('Error al cargar desde la API, cargando desde SQLite: $e');
+                        return await _sectionCrud.querySectionCrud();
+                      }),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
@@ -201,141 +200,280 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     final isTabletDevice = isTablet(context);
 
     return SingleChildScrollView(
-      child: Padding(
-          padding: const EdgeInsets.all(28.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: filteredQuestions.length,
-                physics: const NeverScrollableScrollPhysics(), // Evita conflictos de desplazamiento
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isExpandedList[index] = !_isExpandedList[index];
-                      });
-                    },
-                    child: Card(
-                      elevation: 5,//para elevar hacia delante los cuadros de la preguntas
-                      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: filteredQuestions.length,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final pregunta = filteredQuestions[index];
+          return GestureDetector(
+            onTap: () {
+              _showPreguntaDialog(pregunta); // Abre el diálogo al hacer clic en la tarjeta
+            },
+            child: Card(
+              elevation: 10,
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Título de la pregunta
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Número de la pregunta: ',
+                            style: TextStyle(fontSize: isTabletDevice ? 12.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                          ),
+                          TextSpan(
+                            text: '${pregunta.sp_noIdentifEncuesta}',
+                            style: TextStyle(fontSize: isTabletDevice ? 12.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                          )
+                        ]
+                      )
+                    ),
+                    const SizedBox(height: 8),
+      
+                    // Descripción breve de la pregunta
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '- Pregunta: ',
+                            style: TextStyle(fontSize: isTabletDevice ? 11.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                          ),
+                          TextSpan(
+                            text: ('${filteredQuestions[index].sp_Pregunta}'),
+                            style: TextStyle(fontSize: isTabletDevice ? 11.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                          )
+                        ]
                       ),
-                      child: ExpandablePanel(
-                        theme: ExpandableThemeData(
-                          expandIcon: Icons.arrow_drop_down_circle_outlined, // Ícono para expandir
-                          collapseIcon: Icons.arrow_circle_up_sharp, // Ícono para colapsar
-                          iconSize: isTabletDevice ? 50 : 45.0, // Tamaño del ícono predeterminado
-                          iconColor: const Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
-                        ),
-                        header: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: RichText(
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+      
+                    // Botón de expansión para más detalles
+                    ExpandablePanel(
+                      collapsed: Container(), 
+                      theme: ExpandableThemeData(
+                        expandIcon: Icons.arrow_drop_down_circle_outlined,
+                        collapseIcon: Icons.arrow_circle_up_sharp,
+                        iconSize: isTabletDevice ? 28 : 30,
+                        iconColor: const Color.fromARGB(255, 12, 44, 19),
+                      ),
+                      header: Text('Más detalles', style: TextStyle(fontSize: isTabletDevice ? 12.25.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1))), 
+                      expanded: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            title: RichText(
                               text: TextSpan(
+                                style: DefaultTextStyle.of(context).style,
+                                children: [
+                                  TextSpan(
+                                    text: 'Respuesta que solo recibe es: ',
+                                    style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                  ),
+                                  TextSpan(
+                                    text: ('${pregunta.sp_TipoRespuesta}'),
+                                    style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                  )
+                                ]
+                              )
+                            ),
+                          ),
+
+                          if (pregunta.sp_SubPregunta != null)
+                            ListTile(
+                              title: RichText(
+                                text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'Número de la pregunta: ',
-                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 18.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                      text: 'Sub-Pregunta: ',
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                     ),
                                     TextSpan(
-                                      text: '${filteredQuestions[index].sp_noIdentifEncuesta}',
-                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                      text: ('${filteredQuestions[index].sp_SubPregunta}'),
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
                                   ]
+                                )
+                              ),
+                            ),
+                          
+                          if (pregunta.sp_Rango != null)
+                            ListTile(
+                              title: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Requerimiento: ',
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    ),
+                                    TextSpan(
+                                      text: ('${filteredQuestions[index].sp_Rango}'),
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                    )
+                                  ]
+                                )
+                              ),
+                            ),
+                        ],
+                      )
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+
+    /*
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(28.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: filteredQuestions.length,
+              physics: const NeverScrollableScrollPhysics(), // Evita conflictos de desplazamiento
+              itemBuilder: (BuildContext context, int index) {
+                final pregunta = filteredQuestions[index];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpandedList[index] = !_isExpandedList[index];
+                    });
+                  },
+                  child: Card(
+                    elevation: 5,//para elevar hacia delante los cuadros de la preguntas
+                    margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: ExpandablePanel(
+                      theme: ExpandableThemeData(
+                        expandIcon: Icons.arrow_drop_down_circle_outlined, // Ícono para expandir
+                        collapseIcon: Icons.arrow_circle_up_sharp, // Ícono para colapsar
+                        iconSize: isTabletDevice ? 50 : 45.0, // Tamaño del ícono predeterminado
+                        iconColor: const Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
+                      ),
+                      header: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Número de la pregunta: ',
+                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 18.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                              ),
+                              TextSpan(
+                                text: '${filteredQuestions[index].sp_noIdentifEncuesta}',
+                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                               )
-                          ),
+                            ]
+                          )
                         ),
-                        collapsed: Container(), // Puedes añadir contenido para mostrar cuando el panel esté colapsado
-                        expanded: Padding(
-                          padding: const EdgeInsets.only(top: 20.0, bottom: 50.0, left: 45.0, right: 45.0),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 10),
-                                RichText(
-                                    text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Respuesta que solo recibe es: \n',
-                                            style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                          ),
-                                          TextSpan(
-                                            text: ('  ${filteredQuestions[index].sp_TipoRespuesta}'),
-                                            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                          )
-                                        ]
+                      ),
+                      collapsed: Container(), // Puedes añadir contenido para mostrar cuando el panel esté colapsado
+                      expanded: Padding(
+                        padding: const EdgeInsets.only(top: 20.0, bottom: 50.0, left: 45.0, right: 45.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Respuesta que solo recibe es: \n',
+                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                  ),
+                                  TextSpan(
+                                    text: ('  ${filteredQuestions[index].sp_TipoRespuesta}'),
+                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                  )
+                                ]
+                              )
+                            ),
+                            const SizedBox(height: 15),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '- Pregunta: \n',
+                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                  ),
+                                  TextSpan(
+                                    text: ('    ${filteredQuestions[index].sp_Pregunta}'),
+                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
+                                  )
+                                ]
+                              )
+                            ),
+                            const SizedBox(height: 15),
+                            if (filteredQuestions[index].sp_SubPregunta != null)
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '-- Sub-Pregunta: \n',
+                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    ),
+                                    TextSpan(
+                                      text: ('    ${filteredQuestions[index].sp_SubPregunta}'),
+                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
-                                ),
-                                const SizedBox(height: 15),
-                                RichText(
-                                    text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '- Pregunta: \n',
-                                            style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                          ),
-                                          TextSpan(
-                                            text: ('    ${filteredQuestions[index].sp_Pregunta}'),
-                                            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                          )
-                                        ]
+                                  ]
+                                )
+                              ),
+                            const SizedBox(height: 5),
+                            if (filteredQuestions[index].sp_Rango != null)
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '--- Requerimiento: \n',
+                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
+                                    ),
+                                    TextSpan(
+                                      text: ('    ${filteredQuestions[index].sp_Rango}'),
+                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
-                                ),
-                                const SizedBox(height: 15),
-                                if (filteredQuestions[index].sp_SubPregunta != null)
-                                  RichText(
-                                      text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '-- Sub-Pregunta: \n',
-                                              style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                            ),
-                                            TextSpan(
-                                              text: ('    ${filteredQuestions[index].sp_SubPregunta}'),
-                                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                            )
-                                          ]
-                                      )
-                                  ),
-                                const SizedBox(height: 5),
-                                if (filteredQuestions[index].sp_Rango != null)
-                                  RichText(
-                                      text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '--- Requerimiento: \n',
-                                              style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                            ),
-                                            TextSpan(
-                                              text: ('    ${filteredQuestions[index].sp_Rango}'),
-                                              style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                            )
-                                          ]
-                                      )
-                                  ),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                      onPressed: () {
-                                        _showPreguntaDialog(filteredQuestions[index]); // Muestra el diálogo al hacer clic
-                                      },
-                                      child: Text('Responder.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 17.sp))
-                                  ),
-                                ),
-                              ]
-                          ),
+                                  ]
+                                )
+                              ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  _showPreguntaDialog(filteredQuestions[index]); // Muestra el diálogo al hacer clic
+                                },
+                                child: Text('Responder.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 17.sp))
+                              ),
+                            ),
+                          ]
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ],
-          )
+                  ),
+                );
+              },
+            ),
+          ],
+        )
       ),
-    );
+    );*/
   }
 
   void _showPreguntaDialog(SpPreguntascompleta question) async {
@@ -679,29 +817,29 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(100),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: const Offset(0, 3)
-                            )
-                          ]
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 3)
+                              )
+                            ]
                         ),
                         child: TextButton(
-                          onPressed: isFirstQuestion ? null : () {
-                            final previousQuestion = dataQuestion[currentIndex - 1];
-                            if(!isFirstQuestion){
-                              _formKey.currentState?.reset();
-                              Navigator.of(context).pop();
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                _showPreguntaDialog(previousQuestion); // Abre el diálogo con la pregunta anterior
-                              });
-                            }
-                          },
-                          child: Text("Pregunta \nAnterior", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
+                            onPressed: isFirstQuestion ? null : () {
+                              final previousQuestion = dataQuestion[currentIndex - 1];
+                              if(!isFirstQuestion){
+                                _formKey.currentState?.reset();
+                                Navigator.of(context).pop();
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  _showPreguntaDialog(previousQuestion); // Abre el diálogo con la pregunta anterior
+                                });
+                              }
+                            },
+                            child: Text("Pregunta \nAnterior", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
                         ),
                       ),
 
@@ -1188,7 +1326,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     return [
       Container(
         constraints: const BoxConstraints(
-          maxHeight: 100.0, // Ajusta la altura máxima del contenedor 
+          maxHeight: 100.0, // Ajusta la altura máxima del contenedor
         ),
         child: SingleChildScrollView(
           child: FormBuilderTextField(
@@ -1213,7 +1351,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     return [
       Container(
         constraints: const BoxConstraints(
-          maxHeight: 100.0, // Ajusta la altura máxima del contenedor 
+          maxHeight: 100.0, // Ajusta la altura máxima del contenedor
         ),
         child: SingleChildScrollView(
           child: FormBuilderTextField(

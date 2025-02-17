@@ -2,7 +2,7 @@ class SpPreguntascompleta {
   int? sp_CodPregunta;
   String? sp_TipoRespuesta;
   String? sp_noIdentifEncuesta;
-  String? sp_Pregunta;
+  String sp_Pregunta;
   String? sp_SubPregunta;
   bool? sp_Estado;
   String? sp_Rango;
@@ -11,7 +11,7 @@ class SpPreguntascompleta {
     this.sp_CodPregunta,
     this.sp_TipoRespuesta,
     this.sp_noIdentifEncuesta,
-    this.sp_Pregunta,
+    required this.sp_Pregunta,
     this.sp_SubPregunta,
     this.sp_Estado,
     this.sp_Rango,

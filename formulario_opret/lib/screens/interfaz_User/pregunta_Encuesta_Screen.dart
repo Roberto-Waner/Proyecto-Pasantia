@@ -4,8 +4,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
-import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/data/respuesta_crud.dart';
+import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
@@ -34,13 +34,13 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://192.168.1.5:7190');
-  final SectionController _sectionController = SectionController();
   final RespuestaController _respuestaController = RespuestaController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   List<bool> _isExpandedList = [];
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
+  final SectionCrud _sectionCrud = SectionCrud();
   final TextEditingController fechaController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
 
@@ -53,10 +53,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
   void _refreshPreguntas() async {
     try {
-      List<SpPreguntascompleta> preguntas = await _sectionController.loadFromApi();
+      final preguntas = await _sectionCrud.querySectionCrud();
 
       // Filtrar solo las preguntas con estado verdadero
-      preguntas = preguntas.where((pregunta) => pregunta.sp_Estado == true).toList();
+      // preguntas = preguntas.where((pregunta) => pregunta.sp_Estado == true).toList();
 
       _respuestaController.syncDataResp();
       setState(() {
@@ -93,12 +93,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       child: ScreenUtilInit(
         designSize: const Size(360, 740),
         builder: (context, child) => Scaffold(
-          // drawer: NavbarEmpl(
-          //   filtrarUsuarioController: widget.filtrarUsuarioController,
-          //   filtrarEmailController: widget.filtrarEmailController,
-          //   filtrarId: widget.filtrarId,
-          //   // // filtrarCedula: widget.filtrarCedula,
-          // ),
 
             appBar: AppBar(
               title: const Text('Preguntas de Encuesta'),
@@ -119,10 +113,19 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               children: [
                 Expanded(
                   child: FutureBuilder(
-                      future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
-                        print('Error al cargar desde la API, cargando desde SQLite: $e');
-                        return await _sectionController.loadFromSQLite().timeout(const Duration(seconds: 5));
-                      }),
+                      // future: _apiSesion.getSpPreguntascompletaListada().catchError((e) async {
+                      //   print('Error al cargar desde la API, cargando desde SQLite: $e');
+                      //   return await _sectionCrud.querySectionCrud();
+                      // }),
+                    future: _apiSesion.getSpPreguntascompletaListada().then((preguntas) {
+                      if (preguntas.isEmpty) {
+                        return _sectionCrud.querySectionCrud();
+                      }
+                      return preguntas;
+                    }).catchError((e) async {
+                      print('Error al cargar desde la API, cargando desde SQLite: $e');
+                      return await _sectionCrud.querySectionCrud();
+                    }),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
@@ -156,14 +159,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         } else if (snapshot.hasError) {
                           print('Error al cargar los datos: ${snapshot.error}');
                           return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
-                        } else if (dataQuestion.isEmpty) {
-                          // WidgetsBinding.instance.addPostFrameCallback((_) {
-                          //   _showErrorDialog(context, "Los sentimos en estos momentos no hay Preguntas de Encuestas disponibles por ahora.");
-                          // });
+                        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
                           return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
                         } else {
-                          // dataQuestion = snapshot.data!;
-                          return _buildPreguntaList(); // Construye la lista de preguntas si hay datos
+                          return _buildPreguntaList(snapshot.data as List<SpPreguntascompleta>); // Construye la lista de preguntas si hay datos
                         }
                       }
                   ),
@@ -175,15 +174,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                     child: ElevatedButton(
                         onPressed: () {
                           _showWarning(context, 'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla.');
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => FormEncuestaScreen(
-                          //     filtrarUsuarioController: widget.filtrarUsuarioController,
-                          //     filtrarEmailController: widget.filtrarEmailController,
-                          //     filtrarId: widget.filtrarId,
-                          //     // // filtrarCedula: widget.filtrarCedula,
-                          //   )),
-                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
@@ -204,9 +194,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
-  Widget _buildPreguntaList() {
+  Widget _buildPreguntaList(List<SpPreguntascompleta> preguntas) {
     //filtrar las preguntas segun el estado sea igual a true
-    final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == true).toList();
+    // final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == true).toList();
+    final filteredQuestions = preguntas.where((q) => q.sp_Estado == true).toList();
     final isTabletDevice = isTablet(context);
 
     return SingleChildScrollView(
@@ -350,28 +341,20 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void _showPreguntaDialog(SpPreguntascompleta question) async {
     final isTabletDevice = isTablet(context);
 
+    // Filtrar preguntas que tienen estado en true
+    final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == true).toList();
+    final currentIndex = filteredQuestions.indexOf(question);
+    final isFirstQuestion = currentIndex == filteredQuestions.length - 1;
+    final isLastQuestion = currentIndex == 0;
+
     showDialog(
         context: context,
         barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
         builder: (BuildContext context, ) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                // Filtrar preguntas que tienen estado en true
-                final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == true).toList();
-                final currentIndex = filteredQuestions.indexOf(question);
-                final isFirstQuestion = currentIndex == 0;
-                final isLastQuestion = currentIndex == filteredQuestions.length - 1;
-
                 // Reinicializa 'selectedAnswer' para cada nueva pregunta
                 String? selectedAnswer = '';
-
-                // Configurar los valores iniciales del formulario
-                // Map<String, dynamic> initialValue = {
-                //   // 'requerimientos': question.sp_Rango,
-                //   'respuesta_selected': previousAnswer?.respuesta ?? '',
-                //   'comentarios': previousAnswer?.comentarios ?? '',
-                //   'justificacion': previousAnswer?.justificacion ?? '',
-                // };
 
                 return AlertDialog(
                   // title: Text('No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp)),
@@ -753,21 +736,20 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                   if (!isLastQuestion){
                                     // Reinicia el estado del formulario antes de cargar la siguiente pregunta
                                     _formKey.currentState?.reset();
-
-                                    Navigator.of(context).pop(); // Cierra el diálogo actual
-
+                                    Navigator.of(context).pop();
                                     final nextQuestion = dataQuestion[currentIndex + 1];
                                     // Aquí forzamos una recarga del estado global
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
                                       _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
+
                                     });
                                   } else {
+                                    _showSuccessDialog(context, 'Has respondido todas las preguntas.');
+
                                     // Manejo del caso cuando ya no hay más preguntas
                                     Future.delayed(const Duration(seconds: 2), () {
                                       Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
                                     });
-
-                                    _showSuccessDialog(context, 'Has respondido todas las preguntas.');
                                   }
                                 }
                               }
@@ -864,19 +846,21 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
+      DatosCachesRespuestas cache = DatosCachesRespuestas();
+
       try {
 
-        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta!);
+        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
         print('Respuesta existente: $respuestaExistente');
 
-        if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1) {
+        if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1 /*|| cache.permitirEdic == 0*/) {
           // Actualizar la respuesta existente
-          nuevaRespuesta.idSesion = respuestaExistente.idSesion;
+          nuevaRespuesta.idSesion = respuestaExistente!.idSesion;
           await _respuestaCrud.updateRespuesta(nuevaRespuesta);
           print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
         } else {
           await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
-          // _respuestaController.syncDataResp();
+
           print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
         }
 
@@ -888,6 +872,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               const SnackBar(content: Text('Respuesta guardada con éxito'))
           );
         } else {
+          await _respuestaCrud.permissionToEdict();
           _respuestaController.syncDataResp();
           _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
         }

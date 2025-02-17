@@ -59,8 +59,7 @@ class DatabaseHelper {
         horaResp TEXT NULL,
         fechaResp TEXT NULL,
         finalizarSesion INTEGER DEFAULT 0,
-        isUpdated INTEGER DEFAULT 0,
-        isDeleted INTEGER DEFAULT 0
+        isUpdated INTEGER DEFAULT 0
       )
     ''');
     await db.execute('''
@@ -71,9 +70,7 @@ class DatabaseHelper {
         pregunta text null,
         subPregunta text null,
         estado INTEGER NULL,
-        rango text null,
-        isUpdated INTEGER DEFAULT 0,
-        isDeleted INTEGER DEFAULT 0
+        rango text null
       )
     ''');
   }

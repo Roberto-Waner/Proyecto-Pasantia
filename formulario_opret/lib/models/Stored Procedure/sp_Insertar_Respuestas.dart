@@ -47,3 +47,27 @@ class SpInsertarRespuestas {
     return data;
   }
 }
+
+class DatosCachesRespuestas {
+  int? id;
+  int? idSesion;
+  int? permitirEdic;
+
+  DatosCachesRespuestas({this.id, this.idSesion, this.permitirEdic});
+
+  factory DatosCachesRespuestas.fromJson(Map<String, dynamic> cache) {
+    return DatosCachesRespuestas(
+      id: cache['id'],
+        idSesion: cache['idSesion'],
+        permitirEdic: cache['isUpdated']
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> dataCache = <String, dynamic>{};
+    dataCache['id'] = id;
+    dataCache['idSesion'] = idSesion;
+    dataCache['isUpdated'] = permitirEdic;
+    return dataCache;
+  }
+}

@@ -26,6 +26,7 @@ class SectionCrud {
     });
   }
 
+  /*
   Future<int> updateSectionCrud(int id, SpPreguntascompleta question) async {
     final db = await _databaseHelper.database;
     return await db.update(
@@ -51,6 +52,8 @@ class SectionCrud {
       return null;
     }
   }
+
+   */
 
   // Método para truncar la tabla SeccionPreguntas
   Future<void> truncateSectionCrud() async {

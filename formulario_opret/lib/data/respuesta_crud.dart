@@ -23,36 +23,6 @@ class RespuestaCrud {
     print('Respuestas guardadas en la base de datos local SQLite con éxito');
   }
 
-  // Future<void> insertRespuestas(List<SpInsertarRespuestas> respuestas) async {
-  //   final db = await _databaseHelper.database;
-  //   Batch batch = db.batch();
-  //
-  //   for (var respuesta in respuestas) {
-  //     final List<Map<String, dynamic>> existing = await db.query(
-  //       'localRespuestas',
-  //       where: 'idSesion = ?',
-  //       whereArgs: [respuesta.idSesion],
-  //     );
-  //
-  //     if (existing.isNotEmpty && respuesta.finalizarSesion == 0) {
-  //       batch.update(
-  //         'localRespuestas',
-  //         respuesta.toJson(),
-  //         where: 'idSesion = ?',
-  //         whereArgs: [respuesta.idSesion],
-  //       );
-  //     } else {
-  //       batch.insert(
-  //         'localRespuestas',
-  //         respuesta.toJson(),
-  //         conflictAlgorithm: ConflictAlgorithm.replace,
-  //       );
-  //     }
-  //   }
-  //
-  //   await batch.commit(noResult: true);
-  // }
-
   Future<List<SpInsertarRespuestas>> getAnswerCrud() async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -106,26 +76,14 @@ class RespuestaCrud {
       print('Error al actualizar la respuesta: $e');
     }
   }
+
+  Future<int> permissionToEdict() async {
+    final db = await _databaseHelper.database;
+
+    // Actualizar todos los registros de la tabla localRespuestas a isUpdated = 1
+    return await db.update(
+      'localRespuestas',
+      {'isUpdated': 1},
+    );
+  }
 }
-
-// Future<void> deleteAnswerCrud(int id) async {
-//   final db = await _databaseHelper.database;
-//   await db.delete(
-//       'RespuestasLocal',
-//       where: 'idSesion = ?',
-//       whereArgs: [id]
-//   );
-//   print("Respuesta borrada y agregada nuevamente por parte del usuario con ID: $id");
-// }
-
-// Future<void> actualizarCrud(int id, SpInsertarRespuestas answer) async {
-//   final db = await _databaseHelper.database;
-//
-//   await db.update(
-//     'localRespuestas',
-//     answer.toJson(),
-//     where: 'idSesion = ?',
-//     whereArgs: [id],
-//   );
-//   print('Campo finalizarSesion actualizado a 1 para idUsuarios: $id');
-// }

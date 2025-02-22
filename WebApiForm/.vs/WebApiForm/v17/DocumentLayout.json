@@ -4,10 +4,6 @@
   "Documents": [
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/ROBERTO_WANER_SQLEXPRESS/database_FormOpret/True/SqlTable/dbo.Respuestas.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\controllers\\respuestascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\controllers\\respuestascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,20 +22,7 @@
               "DocumentMoniker": "ViewDataWindow_MSSQL__/ROBERTO_WANER_SQLEXPRESS/database_FormOpret/True/SqlTable/dbo.Respuestas.sql",
               "ToolTip": "dbo.Respuestas [Datos]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2025-02-14T04:02:39.052Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "RespuestasController.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RespuestasController.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\Controllers\\RespuestasController.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\RespuestasController.cs",
-              "RelativeToolTip": "WebApiForm\\Controllers\\RespuestasController.cs",
-              "ViewState": "AgIAAHMAAAAAAAAAAAAAAIoAAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T13:51:31.214Z",
+              "WhenOpened": "2025-02-21T20:40:47.512Z",
               "EditorCaption": ""
             }
           ]

@@ -129,19 +129,19 @@ namespace WebApiForm.Controllers
                 return BadRequest(new { message = "El cuerpo de la solicitud debe ser un array de respuestas." }); 
             }
 
-            try
-            {
-                foreach (var answer in respuestas)
-                {
-                    await _respuestaService.InsertarRespuestaAsyncServices(answer);
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = "Error al enviar la respuesta", details = ex.Message });
-            }
+            //try
+            //{
+            //    foreach (var answer in respuestas)
+            //    {
+            //        await _respuestaService.InsertarRespuestaAsyncServices(answer);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(new { message = "Error al enviar la respuesta", details = ex.Message });
+            //}
 
-            /*
+            
             var resultados = new List<object>(); // Lista para almacenar el estado de cada respuesta
 
             try{
@@ -161,9 +161,9 @@ namespace WebApiForm.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { message = "Error general al enviar la respuesta", details = ex.Message });
-            }*/
+            }
 
-            return Ok();
+            return Ok(resultados);
         }
 
         [HttpGet("ObtenerResp")]

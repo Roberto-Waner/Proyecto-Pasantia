@@ -6,7 +6,6 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
 import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/data/respuesta_crud.dart';
-import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
@@ -54,6 +53,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
   Future<List<SpPreguntascompleta>> _refreshPreguntas() async {
     try {
+      await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
+
       List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache();
       // List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud();
       print("Preguntas cargadas: $preguntas");
@@ -63,7 +64,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       });
 
       // Sincronización en segundo plano
-      _sectionController.syncData();
       _respuestaController.syncDataResp();
 
       return preguntas; // Devuelve la lista de preguntas
@@ -105,10 +105,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 IconButton(
                   icon: Icon(Icons.refresh, size: isTabletDevice ? 15.sp : 15.sp),
                   tooltip: 'Recargar',
-                  onPressed: () {
+                  onPressed: () async {
+                    List<SpPreguntascompleta> getNewQuestion = await _refreshPreguntas();
                     setState(() {
                       // _refreshPreguntas();
-                      _preguntasFuture = _refreshPreguntas();
+                      // _preguntasFuture = _refreshPreguntas();
+                      dataQuestion = getNewQuestion;
                     });
                   },
                 )
@@ -839,31 +841,36 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       // DatosCachesRespuestas cache = DatosCachesRespuestas();
 
       try {
-        /*
-        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
+
+        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0, 0); // pendiente
         print('Respuesta existente: $respuestaExistente');
 
-        if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1 /*|| cache.permitirEdic == 0*/) {
+        if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1 && nuevaRespuesta.permission != 1) {
           // Actualizar la respuesta existente
-          nuevaRespuesta.idSesion = respuestaExistente!.idSesion;
+          nuevaRespuesta.id = respuestaExistente.id;
+          // nuevaRespuesta.idSesion = respuestaExistente.idSesion;
           await _respuestaCrud.updateRespuesta(nuevaRespuesta);
           print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
         } else {
           await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
-
           print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
-        }*/
 
-        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+          // Recuperar la última respuesta insertada para obtener su ID autoincrementado
+          // final newAnswer = await _respuestaCrud.getAnswerCrud();
+          // nuevaRespuesta.id = newAnswer.last.id;
+        }
+
+        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
         print('Respuesta guardada localmente');
 
         if(finalizarSesion == 0) {
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Respuesta guardada con éxito'))
           );
+          await _respuestaCrud.resetPermissionToEdict();
         } else {
-          // await _respuestaCrud.permissionToEdict();
-          _respuestaController.syncDataResp();
+          await _respuestaCrud.permissionToEdict();
+          await _respuestaController.syncDataResp();
           _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
         }
 

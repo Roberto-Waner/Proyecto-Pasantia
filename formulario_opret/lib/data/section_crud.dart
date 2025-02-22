@@ -5,27 +5,14 @@ import 'package:sqflite/sqflite.dart';
 class SectionCrud {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
-  /*Future<int> insertSectionCrud(SpPreguntascompleta question) async {
+  Future<void> insertSectionCrud(List<SpPreguntascompleta> questions) async {
     final db = await _databaseHelper.database;
-    return await db.insert(
-      'SeccionPreguntas',
-      question.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }*/
 
-  Future<void> insertSectionCrud(SpPreguntascompleta question) async {
-    final db = await _databaseHelper.database;
-    try {
-      await db.insert(
-        'SeccionPreguntas',
-        question.toJson(), // Convierte el objeto a un mapa
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      print("✅ Pregunta insertada: ${question.sp_Pregunta}");
-    } catch (e) {
-      print("⚠️ Error al insertar pregunta: $e");
-    }
+    await db.transaction((txn) async {
+      for (var question in questions) {
+        await txn.insert('SeccionPreguntas', question.toJson());
+      }
+    });
   }
 
   Future<List<SpPreguntascompleta>> querySectionCrud() async {
@@ -48,12 +35,25 @@ class SectionCrud {
   }
 }
 
-// Future<void> insertSectionCrud(List<SpPreguntascompleta> questions) async {
-//   final db = await _databaseHelper.database;
-//
-//   await db.transaction((txn) async {
-//     for (var question in questions) {
-//       await txn.insert('SeccionPreguntas', question.toJson());
-//     }
-//   });
-// }
+/*Future<int> insertSectionCrud(SpPreguntascompleta question) async {
+    final db = await _databaseHelper.database;
+    return await db.insert(
+      'SeccionPreguntas',
+      question.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }*/
+
+/*Future<void> insertSectionCrud(SpPreguntascompleta question) async {
+    final db = await _databaseHelper.database;
+    try {
+      await db.insert(
+        'SeccionPreguntas',
+        question.toJson(), // Convierte el objeto a un mapa
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print("✅ Pregunta insertada: ${question.sp_Pregunta}");
+    } catch (e) {
+      print("⚠️ Error al insertar pregunta: $e");
+    }
+  }*/

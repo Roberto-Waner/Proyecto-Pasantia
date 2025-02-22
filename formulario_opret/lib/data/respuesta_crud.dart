@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 class RespuestaCrud {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  int incremento = 1; //pendiente
 
   // Insertar múltiples respuestas localmente
   Future<void> insertRespuestas(List<SpInsertarRespuestas> respuestas) async {
@@ -15,7 +16,7 @@ class RespuestaCrud {
       batch.insert(
         'localRespuestas',
         respuesta.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        conflictAlgorithm: ConflictAlgorithm.ignore, // No sobrescribe respuestas previas
       );
     }
 
@@ -27,7 +28,6 @@ class RespuestaCrud {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'localRespuestas',
-      // where: 'isUpdated = 0'
     );
     return List.generate(maps.length, (i) {
       return SpInsertarRespuestas.fromJson(maps[i]);
@@ -42,13 +42,13 @@ class RespuestaCrud {
   }
 
   // Cargar una respuesta específica desde la caché local
-  Future<SpInsertarRespuestas?> getRespuestaById(int idSesion) async {
+  Future<SpInsertarRespuestas?> getRespuestaById(int idSesion, int id) async {
     try {
       final db = await DatabaseHelper.instance.database;
       final result = await db.query(
         'localRespuestas',
-        where: 'idSesion = ?',
-        whereArgs: [idSesion],
+        where: 'idSesion = ? and id = ?',
+        whereArgs: [idSesion, id],
       );
       if (result.isNotEmpty) {
         return SpInsertarRespuestas.fromJson(result.first);
@@ -67,8 +67,8 @@ class RespuestaCrud {
       await db.update(
         'localRespuestas',
         respuesta.toJson(),
-        where: 'idSesion = ?',
-        whereArgs: [respuesta.idSesion],
+        where: 'idSesion = ? and id = ?',
+        whereArgs: [respuesta.idSesion, respuesta.id],
       );
       print('Respuesta actualizada en la caché local para idSesion: ${respuesta.idSesion}');
       print('dato actualizado: $db');
@@ -80,10 +80,25 @@ class RespuestaCrud {
   Future<int> permissionToEdict() async {
     final db = await _databaseHelper.database;
 
-    // Actualizar todos los registros de la tabla localRespuestas a isUpdated = 1
-    return await db.update(
-      'localRespuestas',
-      {'isUpdated': 1},
+    // Actualizar todos los registros de la tabla localRespuestas a isUpdated = 1 haste que 'finalizarSesion = 1'
+    int updateRows = await db.update(
+        'localRespuestas',
+        {'isUpdated': 1},
+        where: 'finalizarSesion = 1'
     );
+
+    return updateRows;
+  }
+
+  Future<int> resetPermissionToEdict() async {
+    final db = await _databaseHelper.database;
+
+    int resetRows = await db.update(
+        'localRespuestas',
+        {'isUpdated': 0},
+        where: 'finalizarSesion = 0'
+    );
+
+    return resetRows;
   }
 }

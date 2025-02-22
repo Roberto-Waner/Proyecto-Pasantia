@@ -1,4 +1,6 @@
 class SpInsertarRespuestas {
+  int? id;
+  int? permission;
   String idUsuarios;
   int idSesion;
   String respuesta;
@@ -9,6 +11,8 @@ class SpInsertarRespuestas {
   int finalizarSesion;
 
   SpInsertarRespuestas({
+    this.id,
+    this.permission,
     required this.idUsuarios,
     required this.idSesion,
     required this.respuesta,
@@ -22,6 +26,8 @@ class SpInsertarRespuestas {
   // Conversión desde JSON (cuando se recibe datos del backend)
   factory SpInsertarRespuestas.fromJson(Map<String, dynamic> json) {
     return SpInsertarRespuestas(
+      id: json['id'],
+      permission: json['isUpdated'],
       idUsuarios: json['idUsuarios'],
       idSesion: json['idSesion'],
       respuesta: json['respuesta'],
@@ -36,6 +42,7 @@ class SpInsertarRespuestas {
   // Conversión a JSON (cuando se envía datos al backend)
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    if(id != null) data['id'] = id;
     data['idUsuarios'] = idUsuarios;
     data['idSesion'] = idSesion;
     data['respuesta'] = respuesta;
@@ -48,6 +55,7 @@ class SpInsertarRespuestas {
   }
 }
 
+/*
 class DatosCachesRespuestas {
   int? id;
   int? idSesion;
@@ -71,3 +79,4 @@ class DatosCachesRespuestas {
     return dataCache;
   }
 }
+ */

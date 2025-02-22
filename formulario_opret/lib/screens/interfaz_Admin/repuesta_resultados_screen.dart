@@ -29,7 +29,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.5:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://10.0.2.2:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
@@ -108,7 +108,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
   /*
   Future<void> openExcelReport() async {
     String endpoint = 'api/Report/ExportReporte';
-    final Uri url = Uri.parse('https://192.168.1.5:7190/$endpoint');
+    final Uri url = Uri.parse('https://10.0.2.2:7190/$endpoint');
 
     if(!await launchUrl(
       url,

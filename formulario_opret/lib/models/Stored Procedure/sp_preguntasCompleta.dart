@@ -4,7 +4,7 @@ class SpPreguntascompleta {
   String? sp_noIdentifEncuesta;
   String sp_Pregunta;
   String? sp_SubPregunta;
-  bool? sp_Estado;
+  int? sp_Estado;
   String? sp_Rango;
 
   SpPreguntascompleta({

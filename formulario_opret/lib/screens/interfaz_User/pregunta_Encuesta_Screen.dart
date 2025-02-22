@@ -1,4 +1,3 @@
-// import 'package:expandable/expandable.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -11,7 +10,6 @@ import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
-import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 import 'package:intl/intl.dart';
 
@@ -27,7 +25,6 @@ class PreguntaEncuestaScreen extends StatefulWidget {
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
     required this.filtrarId,
-    // required this.filtrarCedula,
   });
 
   @override
@@ -35,39 +32,44 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 }
 
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
-  final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://192.168.1.5:7190');
+  // final ApiServiceSesion2 _apiSesion = ApiServiceSesion2('https://10.0.2.2:7190');
   final RespuestaController _respuestaController = RespuestaController();
   final SectionController _sectionController = SectionController();
   late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
-  // List<bool> _isExpandedList = [];
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
-  final SectionCrud _sectionCrud = SectionCrud();
+  // final SectionCrud _sectionCrud = SectionCrud();
   final TextEditingController fechaController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
+  late Future<List<SpPreguntascompleta>> _preguntasFuture;
 
   @override
   void initState() {
     super.initState();
-    _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
+    print("initState ejecutado");
+    _preguntasFuture = _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
     _setInitialValues(); // para que la fecha y la hora se asignen automaticamente de acuerdo a la tabla
   }
 
-  void _refreshPreguntas() async {
+  Future<List<SpPreguntascompleta>> _refreshPreguntas() async {
     try {
-      final preguntas = await _sectionCrud.querySectionCrud();
+      List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache();
+      // List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud();
+      print("Preguntas cargadas: $preguntas");
 
-      // Filtrar solo las preguntas con estado verdadero
-      // preguntas = preguntas.where((pregunta) => pregunta.sp_Estado == true).toList();
-      _sectionController.syncData();
-      _respuestaController.syncDataResp();
       setState(() {
         dataQuestion = preguntas;
-        // _isExpandedList = List.filled(dataQuestion.length, false);
       });
+
+      // Sincronización en segundo plano
+      _sectionController.syncData();
+      _respuestaController.syncDataResp();
+
+      return preguntas; // Devuelve la lista de preguntas
     } catch (e) {
-      print('Error al cargar las preguntas: $e');
+      print("⚠️ Error: $e");
+      return [];
     }
   }
 
@@ -105,30 +107,22 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   tooltip: 'Recargar',
                   onPressed: () {
                     setState(() {
-                      _refreshPreguntas();
+                      // _refreshPreguntas();
+                      _preguntasFuture = _refreshPreguntas();
                     });
                   },
                 )
               ],
             ),
 
-            body:Column(
+            body: Column(
               children: [
                 Expanded(
                   child: FutureBuilder(
-                      future: _apiSesion.getSpPreguntascompletaListada().then((preguntas) {
-                        if (preguntas.isEmpty) {
-                          return _sectionCrud.querySectionCrud();
-                        }
-                        return preguntas;
-                      }).catchError((e) async {
-                        print('Error al cargar desde la API, cargando desde SQLite: $e');
-                        return await _sectionCrud.querySectionCrud();
-                      }),
+                      future: _preguntasFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
-                            // child: CircularProgressIndicator()
                               child: Dialog(
                                 backgroundColor: Colors.transparent,
                                 child: Container(
@@ -161,7 +155,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
                           return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
                         } else {
-                          return _buildPreguntaList(snapshot.data as List<SpPreguntascompleta>); // Construye la lista de preguntas si hay datos
+                          return _buildPreguntaList();
                         }
                       }
                   ),
@@ -193,10 +187,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     );
   }
 
-  Widget _buildPreguntaList(List<SpPreguntascompleta> preguntas) {
+  Widget _buildPreguntaList() {
     //filtrar las preguntas segun el estado sea igual a true
-    // final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == true).toList();
-    final filteredQuestions = preguntas.where((q) => q.sp_Estado == true).toList();
+    final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == 1).toList();
+    print("Preguntas filtradas: ${filteredQuestions.length}");
     final isTabletDevice = isTablet(context);
 
     return SingleChildScrollView(
@@ -206,10 +200,9 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final pregunta = filteredQuestions[index];
+          print("Mostrando pregunta: ${pregunta.sp_Pregunta}");
           return GestureDetector(
-            onTap: () {
-              _showPreguntaDialog(pregunta); // Abre el diálogo al hacer clic en la tarjeta
-            },
+            onTap: () => _showPreguntaDialog(pregunta), // Abre el diálogo al hacer clic en la tarjeta
             child: Card(
               elevation: 10,
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -247,7 +240,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             style: TextStyle(fontSize: isTabletDevice ? 11.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                           ),
                           TextSpan(
-                            text: ('${filteredQuestions[index].sp_Pregunta}'),
+                            text: (pregunta.sp_Pregunta),
                             style: TextStyle(fontSize: isTabletDevice ? 11.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                           )
                         ]
@@ -298,7 +291,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                       style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                     ),
                                     TextSpan(
-                                      text: ('${filteredQuestions[index].sp_SubPregunta}'),
+                                      text: ('${pregunta.sp_SubPregunta}'),
                                       style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
                                   ]
@@ -316,7 +309,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                       style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
                                     ),
                                     TextSpan(
-                                      text: ('${filteredQuestions[index].sp_Rango}'),
+                                      text: ('${pregunta.sp_Rango}'),
                                       style: TextStyle(fontSize: isTabletDevice ? 10.sp : 12.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
                                     )
                                   ]
@@ -334,161 +327,21 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         },
       ),
     );
-
-
-    /*
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(28.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: filteredQuestions.length,
-              physics: const NeverScrollableScrollPhysics(), // Evita conflictos de desplazamiento
-              itemBuilder: (BuildContext context, int index) {
-                final pregunta = filteredQuestions[index];
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isExpandedList[index] = !_isExpandedList[index];
-                    });
-                  },
-                  child: Card(
-                    elevation: 5,//para elevar hacia delante los cuadros de la preguntas
-                    margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: ExpandablePanel(
-                      theme: ExpandableThemeData(
-                        expandIcon: Icons.arrow_drop_down_circle_outlined, // Ícono para expandir
-                        collapseIcon: Icons.arrow_circle_up_sharp, // Ícono para colapsar
-                        iconSize: isTabletDevice ? 50 : 45.0, // Tamaño del ícono predeterminado
-                        iconColor: const Color.fromARGB(255, 12, 44, 19), // Cambia el color si lo deseas
-                      ),
-                      header: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Número de la pregunta: ',
-                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 18.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                              ),
-                              TextSpan(
-                                text: '${filteredQuestions[index].sp_noIdentifEncuesta}',
-                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                              )
-                            ]
-                          )
-                        ),
-                      ),
-                      collapsed: Container(), // Puedes añadir contenido para mostrar cuando el panel esté colapsado
-                      expanded: Padding(
-                        padding: const EdgeInsets.only(top: 20.0, bottom: 50.0, left: 45.0, right: 45.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Respuesta que solo recibe es: \n',
-                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                  ),
-                                  TextSpan(
-                                    text: ('  ${filteredQuestions[index].sp_TipoRespuesta}'),
-                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                  )
-                                ]
-                              )
-                            ),
-                            const SizedBox(height: 15),
-                            RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '- Pregunta: \n',
-                                    style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                  ),
-                                  TextSpan(
-                                    text: ('    ${filteredQuestions[index].sp_Pregunta}'),
-                                    style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                  )
-                                ]
-                              )
-                            ),
-                            const SizedBox(height: 15),
-                            if (filteredQuestions[index].sp_SubPregunta != null)
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '-- Sub-Pregunta: \n',
-                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                    ),
-                                    TextSpan(
-                                      text: ('    ${filteredQuestions[index].sp_SubPregunta}'),
-                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                    )
-                                  ]
-                                )
-                              ),
-                            const SizedBox(height: 5),
-                            if (filteredQuestions[index].sp_Rango != null)
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '--- Requerimiento: \n',
-                                      style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo en negrita
-                                    ),
-                                    TextSpan(
-                                      text: ('    ${filteredQuestions[index].sp_Rango}'),
-                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)), // Estilo normal
-                                    )
-                                  ]
-                                )
-                              ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  _showPreguntaDialog(filteredQuestions[index]); // Muestra el diálogo al hacer clic
-                                },
-                                child: Text('Responder.', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 17.sp))
-                              ),
-                            ),
-                          ]
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        )
-      ),
-    );*/
   }
-
+  
   void _showPreguntaDialog(SpPreguntascompleta question) async {
     final isTabletDevice = isTablet(context);
 
     // Filtrar preguntas que tienen estado en true
-    final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == true).toList();
+    final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == 1).toList();
     final currentIndex = filteredQuestions.indexOf(question);
-    final isFirstQuestion = currentIndex == filteredQuestions.length - 1;
-    final isLastQuestion = currentIndex == 0;
+    final isFirstQuestion = currentIndex == 0;
+    final isLastQuestion = currentIndex == filteredQuestions.length - 1;
 
     showDialog(
         context: context,
         barrierDismissible: false, // Evita cerrar al tocar fuera del diálogo
-        builder: (BuildContext context, ) {
+        builder: (BuildContext context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
                 // Reinicializa 'selectedAnswer' para cada nueva pregunta
@@ -839,7 +692,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 });
                               }
                             },
-                            child: Text("Pregunta \nAnterior", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
+                            child: Text("Anterior", style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
                         ),
                       ),
 
@@ -879,7 +732,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                     // Aquí forzamos una recarga del estado global
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
                                       _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
-
                                     });
                                   } else {
                                     _showSuccessDialog(context, 'Has respondido todas las preguntas.');
@@ -892,7 +744,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 }
                               }
                             },
-                            child: Text('Proxima Pregunta', style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
+                            child: Text('Siguiente', style: TextStyle(fontSize: isTabletDevice ? 10.5.sp : 10.5.sp))
                         ),
                       ),
 
@@ -984,10 +836,10 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
-      DatosCachesRespuestas cache = DatosCachesRespuestas();
+      // DatosCachesRespuestas cache = DatosCachesRespuestas();
 
       try {
-
+        /*
         final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
         print('Respuesta existente: $respuestaExistente');
 
@@ -1000,9 +852,9 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
           await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
 
           print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
-        }
+        }*/
 
-        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
         print('Respuesta guardada localmente');
 
         if(finalizarSesion == 0) {
@@ -1010,7 +862,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
               const SnackBar(content: Text('Respuesta guardada con éxito'))
           );
         } else {
-          await _respuestaCrud.permissionToEdict();
+          // await _respuestaCrud.permissionToEdict();
           _respuestaController.syncDataResp();
           _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
         }

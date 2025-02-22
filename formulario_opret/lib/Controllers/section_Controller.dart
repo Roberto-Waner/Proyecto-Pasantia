@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:formulario_opret/data/section_crud.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/services/Stream/stream_services.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 
 class SectionController {
   final SectionCrud _sectionCrud = SectionCrud();
-  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://192.168.1.5:7190');
-  final StreamServices _streamServices = StreamServices('https://192.168.1.5:7190');
+  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://10.0.2.2:7190');
+  final StreamServices _streamServices = StreamServices('https://10.0.2.2:7190');
 
   SectionController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {
@@ -16,66 +17,42 @@ class SectionController {
     });
   }
 
-  // Future<List<SpPreguntascompleta>> loadFromSQLite() async {
-  //   try{
-  //     return await _sectionCrud.querySectionCrud();
-  //   } catch (e) {
-  //     print('Error loading from SQLite: $e');
-  //     rethrow;
-  //   }
-  // }
-
-  Future<void> syncData() async {
-    try {
-      final preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada();
-
-      // Filtrar preguntas con estado 'true'
-      final preguntasHabilitadas = preguntasApi.where((q) => q.sp_Estado == true).toList();
-
-      final preguntasCache = await _sectionCrud.querySectionCrud();
-
-      if (preguntasCache.isNotEmpty) {
-        await _sectionCrud.truncateSectionCrud();
-        print('Las preguntas locales han sido eliminadas.');
-      }
-
-      for (var pregunta in preguntasHabilitadas) {
-        await _sectionCrud.insertSectionCrud(pregunta);
-      }
-
-      print("✅ Sincronización completada: ${preguntasHabilitadas.length} registros insertados.");
+  /*Future<List<SpPreguntascompleta>> loadFromSQLite() async {
+    try{
+      return await _sectionCrud.querySectionCrud();
     } catch (e) {
-      print("⚠️ Error en la sincronización: $e");
+      print('Error loading from SQLite: $e');
+      rethrow;
     }
   }
 
-  // Future<List<SpPreguntascompleta>> loadFromApi() async {
-  //   try{
-  //     final response = await _apiServiceSesion2.getSpPreguntascompletaListada();
-  //     // final responseCache = await _sectionCrud.querySectionCrud();
-  //
-  //     if(response.isNotEmpty) {
-  //       // await syncData(response);
-  //       _sectionCrud.truncateSectionCrud();
-  //       print('Datos de la cache vacia con éxito desde, guardando preguntas en SQLite.');
-  //       return response;
-  //
-  //     } else {
-  //       // print('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
-  //       // return response;
-  //       throw Exception('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
-  //       // print('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
-  //     }
-  //
-  //     // return response;
-  //   } catch (e) {
-  //     print('Error loading from API: $e');
-  //     rethrow;
-  //   }
-  // }
+  Future<List<SpPreguntascompleta>> loadFromApi() async {
+    try{
+      final response = await _apiServiceSesion2.getSpPreguntascompletaListada();
+      // final responseCache = await _sectionCrud.querySectionCrud();
+  
+      if(response.isNotEmpty) {
+        // await syncData(response);
+        _sectionCrud.truncateSectionCrud();
+        print('Datos de la cache vacia con éxito desde, guardando preguntas en SQLite.');
+        return response;
+  
+      } else {
+        // print('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
+        // return response;
+        throw Exception('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
+        // print('Datos sincronizados con éxito desde la API y guardando preguntas en SQLite.');
+      }
+  
+      // return response;
+    } catch (e) {
+      print('Error loading from API: $e');
+      rethrow;
+    }
+  }
 
   // Sincronizar datos entre SQLite y la API
-  /*
+  
   Future<void> syncData([List<SpPreguntascompleta>? preguntasDesdeApi]) async {
     try {
       // Obtener preguntas desde la API y actualizar SQLite
@@ -102,10 +79,10 @@ class SectionController {
     } catch (e) {
       print('Error al sincronizar datos: $e');
     }
-  }*/
+  }
 
   // Método para comparar preguntas
-  /*
+  
   bool compareQuestions(SpPreguntascompleta localQuestion, SpPreguntascompleta apiQuestion) {
     return localQuestion.sp_CodPregunta == apiQuestion.sp_CodPregunta &&
            localQuestion.sp_TipoRespuesta == apiQuestion.sp_TipoRespuesta &&
@@ -114,9 +91,44 @@ class SectionController {
            localQuestion.sp_Estado == apiQuestion.sp_Estado &&
            localQuestion.sp_Rango == apiQuestion.sp_Rango;
   }*/
-  /*
-  El método compareQuestions tiene el propósito de comparar dos objetos SpPreguntascompleta y determinar si son equivalentes. 
-  Este método es crucial cuando intentamos decidir si una pregunta obtenida desde la API debe ser actualizada en la base de 
-  datos local SQLite.
-  */
+
+  Future<List<SpPreguntascompleta>> loadPreguntasFromCache() async {
+    try {
+      List<SpPreguntascompleta> preguntasCache = await _sectionCrud.querySectionCrud();
+      // print('📌 Preguntas cargadas desde la caché: $preguntasCache');
+
+      final preguntasHabilitados = preguntasCache.where((p) => p.sp_Estado == 1).toList();
+      return preguntasHabilitados;
+    } catch (e) {
+      print('⚠️ Error al cargar preguntas desde la caché: $e');
+      return [];
+    }
+  }
+
+  Future<void> syncData() async {
+    try {
+      List<SpPreguntascompleta> preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada();
+      print("Datos obtenidos desde la API: $preguntasApi");
+
+      // Filtrar preguntas con estado 'true'
+      final preguntasHabilitadas = preguntasApi.where((q) => q.sp_Estado == 1).toList();
+      print('✅ Preguntas habilitadas: ${preguntasHabilitadas.length}');
+
+      if (preguntasHabilitadas.isNotEmpty) {
+        await _sectionCrud.truncateSectionCrud();
+        print('🗑️ Preguntas locales eliminadas.');
+
+        for (SpPreguntascompleta pregunta in preguntasHabilitadas) {
+          await _sectionCrud.insertSectionCrud(pregunta);
+        }
+
+        print("✅ Sincronización completada: ${preguntasHabilitadas.length} registros insertados.");
+      } else {
+        print("⚠️ La API no devolvió preguntas habilitadas.");
+      }
+
+    } catch (e) {
+      print("⚠️ Error en la sincronización: $e");
+    }
+  }
 }

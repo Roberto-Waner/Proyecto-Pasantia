@@ -28,7 +28,7 @@ class RegistroEmpl extends StatefulWidget {
 }
 
 class _RegistroEmplState extends State<RegistroEmpl> {
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://192.168.1.5:7190'); // Cambia por tu URL
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190'); // Cambia por tu URL
   late Future<List<Usuarios>> _usuariosdata;
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();

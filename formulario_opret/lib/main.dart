@@ -78,7 +78,6 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // filtrarCedula: filtrarCedula,
         ),
 
         'login': (_) => const LoginScreen(),
@@ -87,35 +86,30 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // filtrarCedula: filtrarCedula, 
         ),
 
         'newuser': (_) => NewUser(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // filtrarCedula: filtrarCedula,
         ),
 
         'registroEmpleados': (_) => RegistroEmpl(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         ),
 
         'FormularioEncuesta': (_) => FormEncuestaScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         ),
         
         'pregunta': (_) => PreguntaEncuestaScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
           noEncuestaFiltrar: noEncuestaFiltrar,
         ),
 
@@ -123,28 +117,24 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         ),
 
         'ModifyTable': (_) => ModifyTable(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         ),
 
         'respuestaScreen': (_) => RepuestaResultadosScreen(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         ),
 
         'reportForm': (_) => ReportFormulario(
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-          // // filtrarCedula: filtrarCedula,
         )
       },
 

@@ -6,8 +6,8 @@ import 'package:formulario_opret/services/respuestas_services.dart';
 class RespuestaController {
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
   // final RespuestaRepository _respuestaRepository = RespuestaRepository();
-  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://192.168.1.5:7190');
-  final StreamServices _streamServices = StreamServices('https://192.168.1.5:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://10.0.2.2:7190');
+  final StreamServices _streamServices = StreamServices('https://10.0.2.2:7190');
 
   RespuestaController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {
@@ -32,11 +32,8 @@ class RespuestaController {
 
         // Si la sincronización es exitosa, vacía la tabla local
         if (postResponse.statusCode == 200 || postResponse.statusCode == 201) {
-          // await Future.delayed(const Duration(seconds: 5), () async {
-            await _respuestaCrud.vaciarTable();
-            print('Respuestas sincronizadas con la API y tabla local vaciada');
-          // });
-
+          await _respuestaCrud.vaciarTable();
+          print('Respuestas sincronizadas con la API y tabla local vaciada');
         } else {
           print('Error al sincronizar las respuestas: ${postResponse.statusCode}');
           print('Cuerpo de la respuesta: ${postResponse.body}');

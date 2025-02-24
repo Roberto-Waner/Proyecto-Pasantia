@@ -46,7 +46,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   @override
   void initState() {
     super.initState();
-    print("initState ejecutado");
     _preguntasFuture = _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
     _setInitialValues(); // para que la fecha y la hora se asignen automaticamente de acuerdo a la tabla
   }
@@ -55,8 +54,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     try {
       await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
 
-      List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache();
-      // List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud();
+      List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
       print("Preguntas cargadas: $preguntas");
 
       setState(() {
@@ -64,8 +62,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       });
 
       // Sincronización en segundo plano
-      _respuestaController.syncDataResp();
-
+      await _respuestaController.syncDataResp();
       return preguntas; // Devuelve la lista de preguntas
     } catch (e) {
       print("⚠️ Error: $e");
@@ -106,11 +103,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                   icon: Icon(Icons.refresh, size: isTabletDevice ? 15.sp : 15.sp),
                   tooltip: 'Recargar',
                   onPressed: () async {
-                    List<SpPreguntascompleta> getNewQuestion = await _refreshPreguntas();
+                    // List<SpPreguntascompleta> getNewQuestion = await _refreshPreguntas();
                     setState(() {
                       // _refreshPreguntas();
-                      // _preguntasFuture = _refreshPreguntas();
-                      dataQuestion = getNewQuestion;
+                      _preguntasFuture = _refreshPreguntas();
+                      // dataQuestion = getNewQuestion;
                     });
                   },
                 )
@@ -120,7 +117,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
             body: Column(
               children: [
                 Expanded(
-                  child: FutureBuilder(
+                  child: FutureBuilder<List<SpPreguntascompleta>>(
                       future: _preguntasFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -191,7 +188,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
   Widget _buildPreguntaList() {
     //filtrar las preguntas segun el estado sea igual a true
-    final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == 1).toList();
+    // final filteredQuestions = dataQuestion.where((question) => question.sp_Estado == 1).toList();
+    final List<SpPreguntascompleta> filteredQuestions = dataQuestion.where((question) => question.sp_Estado == 1).toList();
     print("Preguntas filtradas: ${filteredQuestions.length}");
     final isTabletDevice = isTablet(context);
 
@@ -201,7 +199,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         itemCount: filteredQuestions.length,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
-          final pregunta = filteredQuestions[index];
+          // final pregunta = filteredQuestions[index];
+          final SpPreguntascompleta pregunta = filteredQuestions[index];
           print("Mostrando pregunta: ${pregunta.sp_Pregunta}");
           return GestureDetector(
             onTap: () => _showPreguntaDialog(pregunta), // Abre el diálogo al hacer clic en la tarjeta
@@ -350,7 +349,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 String? selectedAnswer = '';
 
                 return AlertDialog(
-                  // title: Text('No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp)),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -735,14 +733,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
                                       _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
                                     });
-                                  } else {
-                                    _showSuccessDialog(context, 'Has respondido todas las preguntas.');
+                                  }/* else {
+                                    // _showSuccessDialog(context, 'Has respondido todas las preguntas.');
 
                                     // Manejo del caso cuando ya no hay más preguntas
                                     Future.delayed(const Duration(seconds: 2), () {
                                       Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
                                     });
-                                  }
+                                  }*/
                                 }
                               }
                             },
@@ -838,46 +836,48 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
-      // DatosCachesRespuestas cache = DatosCachesRespuestas();
-
-      try {
-
-        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0, 0); // pendiente
+      try {/*
+        final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0); // pendiente
         print('Respuesta existente: $respuestaExistente');
 
         if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1 && nuevaRespuesta.permission != 1) {
           // Actualizar la respuesta existente
-          nuevaRespuesta.id = respuestaExistente.id;
-          // nuevaRespuesta.idSesion = respuestaExistente.idSesion;
-          await _respuestaCrud.updateRespuesta(nuevaRespuesta);
-          print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
+          // if (nuevaRespuesta.finalizarSesion != 1 && nuevaRespuesta.permission != 1) {
+            nuevaRespuesta.idSesion = respuestaExistente.idSesion;
+            await _respuestaCrud.updateRespuesta(nuevaRespuesta);
+            print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
+          // } else {
+          //   await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+          //   print('No se permite la actualización debido a permisos.');
+          // }
+
         } else {
           await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
           print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
+        }*/
 
-          // Recuperar la última respuesta insertada para obtener su ID autoincrementado
-          // final newAnswer = await _respuestaCrud.getAnswerCrud();
-          // nuevaRespuesta.id = newAnswer.last.id;
-        }
-
-        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
         print('Respuesta guardada localmente');
 
         if(finalizarSesion == 0) {
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Respuesta guardada con éxito'))
           );
-          await _respuestaCrud.resetPermissionToEdict();
+          // await _respuestaCrud.resetPermissionToEdict();
         } else {
-          await _respuestaCrud.permissionToEdict();
-          await _respuestaController.syncDataResp();
+          // await _respuestaCrud.permissionToEdict();
           _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
+          await _respuestaController.syncDataResp();
         }
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e, guardada localmente'))
         );
+
+        // Guardar respuesta localmente incluso si hay un error
+        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+        // print('Respuesta guardada localmente a pesar del error.');
       }
     } else {
       // Si el formulario no es válido

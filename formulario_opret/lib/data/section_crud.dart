@@ -1,6 +1,5 @@
 import 'package:formulario_opret/database_cache/Database_Helper.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
-import 'package:sqflite/sqflite.dart';
 
 class SectionCrud {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;

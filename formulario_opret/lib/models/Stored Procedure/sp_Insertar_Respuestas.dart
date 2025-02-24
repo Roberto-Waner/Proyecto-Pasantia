@@ -42,7 +42,8 @@ class SpInsertarRespuestas {
   // Conversión a JSON (cuando se envía datos al backend)
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    if(id != null) data['id'] = id;
+    // if(id != null) data['id'] = id;
+    // data['isUpdated'] = permission;
     data['idUsuarios'] = idUsuarios;
     data['idSesion'] = idSesion;
     data['respuesta'] = respuesta;
@@ -54,29 +55,3 @@ class SpInsertarRespuestas {
     return data;
   }
 }
-
-/*
-class DatosCachesRespuestas {
-  int? id;
-  int? idSesion;
-  int? permitirEdic;
-
-  DatosCachesRespuestas({this.id, this.idSesion, this.permitirEdic});
-
-  factory DatosCachesRespuestas.fromJson(Map<String, dynamic> cache) {
-    return DatosCachesRespuestas(
-      id: cache['id'],
-        idSesion: cache['idSesion'],
-        permitirEdic: cache['isUpdated']
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> dataCache = <String, dynamic>{};
-    dataCache['id'] = id;
-    dataCache['idSesion'] = idSesion;
-    dataCache['isUpdated'] = permitirEdic;
-    return dataCache;
-  }
-}
- */

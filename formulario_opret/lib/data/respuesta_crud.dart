@@ -16,7 +16,7 @@ class RespuestaCrud {
       batch.insert(
         'localRespuestas',
         respuesta.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.ignore, // No sobrescribe respuestas previas
+        conflictAlgorithm: ConflictAlgorithm.ignore,
       );
     }
 
@@ -42,14 +42,17 @@ class RespuestaCrud {
   }
 
   // Cargar una respuesta específica desde la caché local
-  Future<SpInsertarRespuestas?> getRespuestaById(int idSesion, int id) async {
+  Future<SpInsertarRespuestas?> getRespuestaById(int id) async {
     try {
       final db = await DatabaseHelper.instance.database;
-      final result = await db.query(
+      final List<Map<String, dynamic>> result = await db.query(
         'localRespuestas',
-        where: 'idSesion = ? and id = ?',
-        whereArgs: [idSesion, id],
+        where: 'idSesion = ?',
+        whereArgs: [id],
       );
+
+      print('🔍 Resultado de la consulta getRespuestaById para id=$id: $result');
+
       if (result.isNotEmpty) {
         return SpInsertarRespuestas.fromJson(result.first);
       }
@@ -61,19 +64,22 @@ class RespuestaCrud {
   }
 
   // Actualizar una respuesta específica en la caché local
-  Future<void> updateRespuesta(SpInsertarRespuestas respuesta) async {
+  Future<int> updateRespuesta(SpInsertarRespuestas respuesta) async {
     try {
       final db = await DatabaseHelper.instance.database;
-      await db.update(
+      int count = await db.update(
         'localRespuestas',
         respuesta.toJson(),
-        where: 'idSesion = ? and id = ?',
-        whereArgs: [respuesta.idSesion, respuesta.id],
+        where: 'idSesion = ?',
+        whereArgs: [respuesta.idSesion],
       );
-      print('Respuesta actualizada en la caché local para idSesion: ${respuesta.idSesion}');
+      print('Respuesta actualizada en la caché local para id: ${respuesta.idSesion}');
       print('dato actualizado: $db');
+
+      return count;
     } catch (e) {
       print('Error al actualizar la respuesta: $e');
+      return 0;
     }
   }
 
@@ -84,7 +90,7 @@ class RespuestaCrud {
     int updateRows = await db.update(
         'localRespuestas',
         {'isUpdated': 1},
-        where: 'finalizarSesion = 1'
+        // where: 'finalizarSesion = 1'
     );
 
     return updateRows;

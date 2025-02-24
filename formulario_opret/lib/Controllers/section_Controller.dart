@@ -32,7 +32,7 @@ class SectionController {
 
   Future<void> syncData() async {
     try {
-      List<SpPreguntascompleta> preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada();
+      List<SpPreguntascompleta> preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada().timeout(const Duration(seconds: 20));
       print("Datos obtenidos desde la API: $preguntasApi");
 
       // Filtrar preguntas con estado 'true'
@@ -42,10 +42,6 @@ class SectionController {
       if (preguntasHabilitadas.isNotEmpty) {
         await _sectionCrud.truncateSectionCrud();
         print('🗑️ Preguntas locales eliminadas.');
-
-        // for (SpPreguntascompleta pregunta in preguntasHabilitadas) {
-        //   await _sectionCrud.insertSectionCrud(pregunta);
-        // }
 
         await _sectionCrud.insertSectionCrud(preguntasHabilitadas);
 

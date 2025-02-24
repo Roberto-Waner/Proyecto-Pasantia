@@ -109,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
               // filtrarCedula: _filtrarCedula
             ))
           );
-          
         });
       } else {
         _showSuccessDialog(context);

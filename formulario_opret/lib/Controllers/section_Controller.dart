@@ -32,7 +32,7 @@ class SectionController {
 
   Future<void> syncData() async {
     try {
-      List<SpPreguntascompleta> preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada().timeout(const Duration(seconds: 20));
+      List<SpPreguntascompleta> preguntasApi = await _apiServiceSesion2.getSpPreguntascompletaListada().timeout(const Duration(seconds: 5));
       print("Datos obtenidos desde la API: $preguntasApi");
 
       // Filtrar preguntas con estado 'true'

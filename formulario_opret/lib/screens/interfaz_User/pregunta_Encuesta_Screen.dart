@@ -6,6 +6,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formulario_opret/Controllers/respuesta_Controller.dart';
 import 'package:formulario_opret/Controllers/section_Controller.dart';
 import 'package:formulario_opret/data/respuesta_crud.dart';
+import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
@@ -38,7 +39,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
-  // final SectionCrud _sectionCrud = SectionCrud();
+  final SectionCrud _sectionCrud = SectionCrud();
   final TextEditingController fechaController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
   late Future<List<SpPreguntascompleta>> _preguntasFuture;
@@ -54,7 +55,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     try {
       await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
 
-      List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
+      // List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
+      List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud();
       print("Preguntas cargadas: $preguntas");
 
       setState(() {
@@ -63,6 +65,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
       // Sincronización en segundo plano
       await _respuestaController.syncDataResp();
+      await _respuestaController.syncDataStoredResp();
       return preguntas; // Devuelve la lista de preguntas
     } catch (e) {
       print("⚠️ Error: $e");
@@ -152,7 +155,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           print('Error al cargar los datos: ${snapshot.error}');
                           return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
                         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-                          return const Center(child: Text("No hay preguntas disponibles", style: TextStyle(fontSize: 30.0)));
+                          return const Center(child: Text('No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas conexión a "internet"', style: TextStyle(fontSize: 30.0)));
                         } else {
                           return _buildPreguntaList();
                         }
@@ -332,6 +335,9 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   
   void _showPreguntaDialog(SpPreguntascompleta question) async {
     final isTabletDevice = isTablet(context);
+    Map<int, SpInsertarRespuestas> stoppedAnswer = {};
+    SpInsertarRespuestas? saveResp = stoppedAnswer[question.sp_CodPregunta ?? 0];
+    saveResp ??= await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
 
     // Filtrar preguntas que tienen estado en true
     final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == 1).toList();
@@ -368,15 +374,37 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       ],
                     ),
                     content: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),  // Aplica margen
+                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),  // Aplica margen
                       width: isTabletDevice ? 700 : 500,
                       padding: EdgeInsets.zero,
                       child: FormBuilder(
                           key: _formKey,
-                          // initialValue: initialValue,
+                          initialValue: {
+                            'sub-preguntas': question.sp_SubPregunta,
+                            'respuesta_selected': saveResp?.respuesta ?? '',
+                            'comentarios': saveResp?.comentarios ?? '',
+                            'justificacion': saveResp?.justificacion ?? ''
+                          },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              if (question.sp_SubPregunta != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 25),
+                                  child: FormBuilderTextField(
+                                    name: 'sub-preguntas',
+                                    enabled: false,
+                                    style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 168, 163, 170)),
+                                    decoration: InputDecorations.inputDecoration(
+                                      labeltext: 'Perteneciente a la sub-pregunta',
+                                      labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
+                                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                                      icono: const Icon(Icons.question_answer, size: 30.0, color: const Color.fromARGB(255, 168, 163, 170)),
+                                      errorSize: isTabletDevice ? 10.sp : 10.sp,
+                                    ),
+                                  ),
+                                ),
+                                // const SizedBox(height: 20),
 
                               // Determina el tipo de respuesta y muestra el widget adecuado segun el tipo Respuesta de la tabla sesion
                               if (question.sp_TipoRespuesta == 'Respuesta Abierta')
@@ -388,12 +416,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                     child: FormBuilderTextField(
                                       name: 'respuesta_selected',
                                       maxLines: null,
-                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                       decoration: InputDecorations.inputDecoration(
                                         labeltext: 'Escribe tu respuesta',
                                         labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                         hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                        icono: const Icon(Icons.notes, size: 30.0),
+                                        icono: const Icon(Icons.notes, size: 30.0, color: const Color.fromARGB(255, 168, 163, 170)),
                                         errorSize: isTabletDevice ? 10.sp : 10.sp,
                                       ),
                                       validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
@@ -404,12 +432,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               if(question.sp_TipoRespuesta == 'Seleccionar: Si, No, N/A')
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Seleccionar: Si, No, N/A',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: const Icon(Icons.check_circle, size: 30.0),
+                                    icono: const Icon(Icons.check_circle, size: 30.0, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -424,12 +452,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0, // Altura máxima del cuadro desplegable
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Calific. 1 a 10',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: const Icon(Icons.numbers, size: 30.0),
+                                    icono: const Icon(Icons.numbers, size: 30.0, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -450,12 +478,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               if(question.sp_TipoRespuesta == 'Solo SI o No')
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Seleciona solo Si o No',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.check, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.check, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -474,12 +502,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0,
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige la Edad',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -499,12 +527,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               if(question.sp_TipoRespuesta == 'Nacionalidad')
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige la Nacionalidad',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.boy_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.boy_rounded, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -518,12 +546,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               if(question.sp_TipoRespuesta == 'Título de transporte')
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige el Título de transporte',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.credit_card, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.credit_card, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -537,12 +565,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0,
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige el Producto utilizado',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.monetization_on_outlined, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.monetization_on_outlined, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -557,12 +585,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                               if(question.sp_TipoRespuesta == 'Género')
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige el Género',
                                     labelFrontSize: 26.0,
                                     hintFrontSize: 26.0,
-                                    icono: Icon(Icons.wc_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.wc_rounded, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -576,12 +604,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0,
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige la Frecuencia de viajes por semana',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -598,12 +626,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0,
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Elige la Expectativa del pasajero',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.timeline, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.timeline, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -623,12 +651,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                   child: SingleChildScrollView(
                                     child: FormBuilderTextField(
                                       name: 'respuesta_Conclusion',
-                                      style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                      style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                       decoration: InputDecorations.inputDecoration(
                                           labeltext: 'Escribe la Conclusión (Opcional)',
                                           labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                           hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                          icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
+                                          icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170))
                                       ),
                                       maxLines: null,
                                     ),
@@ -639,12 +667,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                 FormBuilderDropdown(
                                   name: 'respuesta_selected',
                                   menuMaxHeight: 200.0,
-                                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                   decoration: InputDecorations.inputDecoration(
                                     labeltext: 'Cual es el motivo del viaje a metro',
                                     labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                                     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp),
+                                    icono: Icon(Icons.airplanemode_active, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170)),
                                     errorSize: isTabletDevice ? 10.sp : 10.sp,
                                   ),
                                   items: const [
@@ -823,40 +851,34 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
       // Creamos el objeto `Respuesta` con los datos recopilados
       SpInsertarRespuestas nuevaRespuesta = SpInsertarRespuestas(
-          idUsuarios: widget.filtrarId.text, // ID del usuario extraido del token
-          idSesion: question.sp_CodPregunta!, //  sp_CodPregunta estraido del modelo SpPreguntascompleta que hace referencia a un stored procedure
-          respuesta: respuestaFinal, // para recibir diferentes tipos de respuestas
-          comentarios: dataAnswer['comentarios'],
-          justificacion: dataAnswer['justificacion'],
-          horaResp: currentTime,
-          fechaResp: currentDate,
-          finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con 1 = true y 0 = false
+        idUsuarios: widget.filtrarId.text, // ID del usuario extraido del token
+        idSesion: question.sp_CodPregunta!, //  sp_CodPregunta estraido del modelo SpPreguntascompleta que hace referencia a un stored procedure
+        respuesta: respuestaFinal, // para recibir diferentes tipos de respuestas
+        comentarios: dataAnswer['comentarios'],
+        justificacion: dataAnswer['justificacion'],
+        horaResp: currentTime,
+        fechaResp: currentDate,
+        finalizarSesion: finalizarSesion // recibir la respuesta atravez de un boton con 1 = true y 0 = false
       );
 
       // Imprimir los datos a enviar para depuración
       print('Datos de la respuesta: ${nuevaRespuesta.toJson()}');
 
-      try {/*
+      try {
         final respuestaExistente = await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0); // pendiente
         print('Respuesta existente: $respuestaExistente');
 
-        if (respuestaExistente != null && nuevaRespuesta.finalizarSesion != 1 && nuevaRespuesta.permission != 1) {
-          // Actualizar la respuesta existente
-          // if (nuevaRespuesta.finalizarSesion != 1 && nuevaRespuesta.permission != 1) {
-            nuevaRespuesta.idSesion = respuestaExistente.idSesion;
-            await _respuestaCrud.updateRespuesta(nuevaRespuesta);
-            print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
-          // } else {
-          //   await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
-          //   print('No se permite la actualización debido a permisos.');
-          // }
+        if (respuestaExistente != null) {
+          nuevaRespuesta.idSesion = respuestaExistente.idSesion;
+          await _respuestaCrud.updateRespuesta(nuevaRespuesta);
+          print('Respuesta actualizada: ${nuevaRespuesta.toJson()}');
 
         } else {
           await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
           print('Respuesta insertada: ${nuevaRespuesta.toJson()}');
-        }*/
+        }
 
-        await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
+        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
         print('Respuesta guardada localmente');
 
         if(finalizarSesion == 0) {
@@ -866,18 +888,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
           // await _respuestaCrud.resetPermissionToEdict();
         } else {
           // await _respuestaCrud.permissionToEdict();
-          _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
           await _respuestaController.syncDataResp();
+          _showSuccessDialog(context, 'Respuesta guardada con éxito y Fin de la Encuesta.');
+          await _respuestaController.syncDataStoredResp();
         }
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e, guardada localmente'))
         );
-
-        // Guardar respuesta localmente incluso si hay un error
-        // await _respuestaCrud.insertRespuestas([nuevaRespuesta]);
-        // print('Respuesta guardada localmente a pesar del error.');
       }
     } else {
       // Si el formulario no es válido
@@ -1190,13 +1209,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         child: SingleChildScrollView(
           child: FormBuilderTextField(
             name: 'comentarios',
-            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+            style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
             decoration: InputDecorations.inputDecoration(
                 labeltext: 'Agregar comentarios (Opcional)',
                 labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                 hintext: ' ',
                 hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
+                icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170))
             ),
             maxLines: null,
           ),
@@ -1215,13 +1234,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         child: SingleChildScrollView(
           child: FormBuilderTextField(
             name: 'justificacion',
-            style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+            style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
             decoration: InputDecorations.inputDecoration(
                 labeltext: 'Justifique su respuesta (Opcional)',
                 labelFrontSize: isTabletDevice ? 13.sp : 13.sp,
                 hintext: ' ',
                 hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp)
+                icono: Icon(Icons.notes, size: isTabletDevice ? 15.sp : 15.sp, color: const Color.fromARGB(255, 168, 163, 170))
             ),
             maxLines: null,
           ),

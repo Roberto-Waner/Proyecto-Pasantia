@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 
 class RespuestaCrud {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
-  int incremento = 1; //pendiente
 
   // Insertar múltiples respuestas localmente
   Future<void> insertRespuestas(List<SpInsertarRespuestas> respuestas) async {
@@ -26,7 +25,7 @@ class RespuestaCrud {
 
   Future<List<SpInsertarRespuestas>> getAnswerCrud() async {
     final db = await _databaseHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
+    final maps = await db.query(
       'localRespuestas',
     );
     return List.generate(maps.length, (i) {

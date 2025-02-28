@@ -10,12 +10,12 @@ namespace WebApiForm.Controllers
     public class ReportController : ControllerBase
     {
         private readonly RespuestaService _respuestaService;
-        private readonly ExcelExportService _excelExport;
+        //private readonly ExcelExportService _excelExport;
 
-        public ReportController(RespuestaService respuestaService, ExcelExportService excelExport)
+        public ReportController(RespuestaService respuestaService/*, ExcelExportService excelExport*/)
         {
             _respuestaService = respuestaService;
-            _excelExport = excelExport;
+            //_excelExport = excelExport;
         }
 
         [HttpGet("ExportReporte")]

@@ -2,6 +2,7 @@
 {
     public interface IEmailSender
     {
-        Task SendPasswordResetEmailAsync(string email, string token);
+        Task SendEmail(string toEmail, string subject, string body);
+        //El método es asíncrono(Task), lo cual es ideal para operaciones de red, como enviar correos, que pueden tardar un poco.
     }
 }

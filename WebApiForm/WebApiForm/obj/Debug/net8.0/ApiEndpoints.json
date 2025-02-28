@@ -374,44 +374,12 @@
   },
   {
     "ContainingType": "WebApiForm.Controllers.LoginController",
-    "Method": "ForgotPassword",
-    "RelativePath": "api/Login/ForgotPassword",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "forgot",
-        "Type": "WebApiForm.Capa_de_Servicio.Modelo_Tokens.ForgotPasswordDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "WebApiForm.Controllers.LoginController",
     "Method": "Logout",
     "RelativePath": "api/Login/Logout",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "WebApiForm.Controllers.LoginController",
-    "Method": "ResetPassword",
-    "RelativePath": "api/Login/ResetPassword",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "resert",
-        "Type": "WebApiForm.DTO__Data_Transfer_Object_.ResetPasswordDto",
-        "IsRequired": true
-      }
-    ],
     "ReturnTypes": []
   },
   {
@@ -425,6 +393,38 @@
       {
         "Name": "login",
         "Type": "WebApiForm.Services.Modelos_Tokens.Login_Model",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApiForm.Controllers.PasswordRecoveryController",
+    "Method": "RequestPasswordRecovery",
+    "RelativePath": "api/PasswordRecovery/request",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "forgotEmail",
+        "Type": "WebApiForm.DTO__Data_Transfer_Object_.ForgotPasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApiForm.Controllers.PasswordRecoveryController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/PasswordRecovery/reset",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "WebApiForm.DTO__Data_Transfer_Object_.ResetPasswordDto",
         "IsRequired": true
       }
     ],

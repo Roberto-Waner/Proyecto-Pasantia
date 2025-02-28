@@ -3,8 +3,28 @@
   "WorkspaceRootPath": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\dto (data transfer object)\\preguntacompleta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\dto (data transfer object)\\preguntacompleta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\capa de servicio\\smtpemailsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\capa de servicio\\smtpemailsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\controllers\\passwordrecoverycontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\controllers\\passwordrecoverycontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\dto (data transfer object)\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\dto (data transfer object)\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\capa de servicio\\passwordrecoveryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\capa de servicio\\passwordrecoveryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|d:\\proyecto pasantias\\formulario opret\\webapiform\\webapiform\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{467CB038-D2D4-48F1-8AFE-A8020D023F24}|WebApiForm\\WebApiForm.csproj|solutionrelative:webapiform\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +39,79 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "PreguntaCompleta.cs",
-              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\PreguntaCompleta.cs",
-              "RelativeDocumentMoniker": "WebApiForm\\DTO (Data Transfer Object)\\PreguntaCompleta.cs",
-              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\PreguntaCompleta.cs",
-              "RelativeToolTip": "WebApiForm\\DTO (Data Transfer Object)\\PreguntaCompleta.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAnAAAAAAAAAA==",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\appsettings.json",
+              "RelativeDocumentMoniker": "WebApiForm\\appsettings.json",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\appsettings.json",
+              "RelativeToolTip": "WebApiForm\\appsettings.json",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABIAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-02-28T13:43:44.038Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ResetPasswordDto.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\ResetPasswordDto.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\DTO (Data Transfer Object)\\ResetPasswordDto.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\DTO (Data Transfer Object)\\ResetPasswordDto.cs",
+              "RelativeToolTip": "WebApiForm\\DTO (Data Transfer Object)\\ResetPasswordDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-21T02:15:11.648Z",
+              "WhenOpened": "2025-02-26T20:32:12.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PasswordRecoveryController .cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\PasswordRecoveryController .cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Controllers\\PasswordRecoveryController .cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Controllers\\PasswordRecoveryController .cs",
+              "RelativeToolTip": "WebApiForm\\Controllers\\PasswordRecoveryController .cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAzwBcAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-26T20:28:13.113Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SmtpEmailSender.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Capa de Servicio\\SmtpEmailSender.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Capa de Servicio\\SmtpEmailSender.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Capa de Servicio\\SmtpEmailSender.cs",
+              "RelativeToolTip": "WebApiForm\\Capa de Servicio\\SmtpEmailSender.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwBwAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-26T20:21:08.888Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PasswordRecoveryService.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Capa de Servicio\\PasswordRecoveryService.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Capa de Servicio\\PasswordRecoveryService.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Capa de Servicio\\PasswordRecoveryService.cs",
+              "RelativeToolTip": "WebApiForm\\Capa de Servicio\\PasswordRecoveryService.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAYwD4AAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-26T13:07:17.441Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Program.cs",
+              "RelativeDocumentMoniker": "WebApiForm\\Program.cs",
+              "ToolTip": "D:\\Proyecto Pasantias\\Formulario OPRET\\WebApiForm\\WebApiForm\\Program.cs",
+              "RelativeToolTip": "WebApiForm\\Program.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAmwBsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T19:31:59.685Z",
               "EditorCaption": ""
             }
           ]

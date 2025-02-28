@@ -57,6 +57,7 @@ builder.Services.AddScoped<ExcelExportService>();
 
 // Registrar el servicio de envío de correo electrónico
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+builder.Services.AddTransient<PasswordRecoveryService>();
 
 var app = builder.Build();
 

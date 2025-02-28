@@ -1,4 +1,4 @@
-﻿namespace WebApiForm.Capa_de_Servicio.Modelo_Tokens
+﻿namespace WebApiForm.DTO__Data_Transfer_Object_
 {
     public class ForgotPasswordDto
     {

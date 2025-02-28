@@ -269,3 +269,7 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\Ex
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\RBush.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\SixLabors.Fonts.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\System.IO.Packaging.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Debug\net8.0\WebApiForm.staticwebassets.endpoints.json
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Debug\net8.0\staticwebassets\msbuild.WebApiForm.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

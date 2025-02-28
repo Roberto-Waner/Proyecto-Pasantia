@@ -6,42 +6,42 @@ namespace WebApiForm.Capa_de_Servicio
 {
     public class SmtpEmailSender : IEmailSender
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _config;
 
-        public SmtpEmailSender(IConfiguration configuration)
+        public SmtpEmailSender(IConfiguration config)
         {
-            _configuration = configuration;
+            _config = config;
         }
 
-        public async Task SendPasswordResetEmailAsync(string email, string token)
+        public async Task SendEmail(string toEmail, string subject, string body)
         {
-            // Asegúrate de que el valor del puerto no sea nulo antes de intentar analizarlo
-            string portValue = _configuration["Smtp:Port"];
-            if (string.IsNullOrEmpty(portValue))
+            var smtpSettings = _config.GetSection("Smtp"); //lee la configuración del SMTP desde appsettings.json
+            //configura la dirección de correo del remitente (fromAddress) y del destinatario (toAddress).
+            var fromAddress = new MailAddress(smtpSettings["FromEmail"], "No-Reply");
+            var toAddress = new MailAddress(toEmail);
+            string fromPassword = smtpSettings["Password"];
+
+            //configura el cliente SMTP con los valores obtenidos de la configuración, como Host, Port, EnableSsl, etc.
+            var smtp = new SmtpClient
             {
-                throw new ArgumentNullException(nameof(portValue), "El valor del puerto SMTP no puede ser nulo");
+                Host = smtpSettings["Host"],
+                Port = int.Parse(smtpSettings["Port"]),
+                EnableSsl = bool.Parse(smtpSettings["EnableSsl"]),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            /*crea un mensaje de correo (MailMessage) con el asunto y cuerpo especificados,
+                y se envía utilizando smtp.SendMailAsync(message).*/
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body,
+            })
+            {
+                await smtp.SendMailAsync(message);
             }
-
-            var smtpClient = new SmtpClient(_configuration["Smtp:Host"])
-            {
-                Port = int.Parse(_configuration["Smtp:Host"]),
-                Credentials = new NetworkCredential(_configuration["Smtp:Username"], _configuration["Smtp:Password"]),
-                EnableSsl = bool.Parse(_configuration["Smtp:EnableSsl"])
-            };
-
-            var from = new MailAddress(_configuration["Smtp:From"], "Encuesta OPRET");
-            var to = new MailAddress(email);
-            var mailMessage = new MailMessage
-            {
-                From = from,
-                Subject = "Recuperación de Contraseña",
-                Body = $"Usa este token para resetear tu contraseña: {token}",
-                IsBodyHtml = true,
-            };
-
-            mailMessage.To.Add(to);
-
-            await smtpClient.SendMailAsync(mailMessage);
         }
     }
 }

@@ -361,9 +361,9 @@ class _NewUserState extends State<NewUser> {
                                 autocorrect: false,
                                 decoration: InputDecorations.inputDecoration(
                                   hintext: 'ejemplo20##@gmail.com',
-                                    hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
+                                  hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
                                   labeltext: 'Correo Electronico',
-                                    labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
+                                  labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
                                   icono: Icon(Icons.alternate_email_rounded, size: isTabletDevice ? 15.sp : 20.sp,),
                                   errorSize: 20
                                 ),

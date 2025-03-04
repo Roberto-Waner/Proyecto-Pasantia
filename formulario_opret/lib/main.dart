@@ -1,6 +1,7 @@
 // "mateapp" utilizado para importar de manera automatica el main()
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/modifyTable_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/report_Formulario.dart';
@@ -12,6 +13,7 @@ import 'package:formulario_opret/screens/login_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.dart';
 import 'package:formulario_opret/screens/new_User.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
+import 'package:formulario_opret/screens/resertPassword_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
@@ -135,10 +137,22 @@ class MyApp extends StatelessWidget {
           filtrarUsuarioController: filtrarUsuarioController,
           filtrarEmailController: filtrarEmailController,
           filtrarId: filtrarId,
-        )
+        ),
+
+        'recuperacion': (_) => ForgotpasswordScreen(
+          filtrarUsuarioController: filtrarUsuarioController,
+          filtrarEmailController: filtrarEmailController,
+          filtrarId: filtrarId,
+        ),
+
+        'resetPassword': (_) => ResertpasswordScreen(
+          filtrarUsuarioController: filtrarUsuarioController,
+          filtrarEmailController: filtrarEmailController,
+          filtrarId: filtrarId,
+        ),
       },
 
-      initialRoute: 'presentation',
+      initialRoute: 'recuperacion',
     );
   }
 }

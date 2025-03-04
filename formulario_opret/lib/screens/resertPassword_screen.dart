@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:formulario_opret/models/resertPassword.dart';
-import 'package:formulario_opret/screens/presentation_screen.dart';
-import 'package:formulario_opret/screens/resertPassword_screen.dart';
-import 'package:formulario_opret/services/resertPassword_services.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 
-class ForgotpasswordScreen extends StatefulWidget {
+class ResertpasswordScreen extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
   final TextEditingController filtrarEmailController;
   final TextEditingController filtrarId;
 
-  const ForgotpasswordScreen({
+  const ResertpasswordScreen({
     super.key,
     required this.filtrarUsuarioController,
     required this.filtrarEmailController,
@@ -19,12 +17,12 @@ class ForgotpasswordScreen extends StatefulWidget {
   });
 
   @override
-  State<ForgotpasswordScreen> createState() => _ForgotpasswordScreenState();
+  State<ResertpasswordScreen> createState() => _ResertpasswordScreenState();
 }
 
-class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
+class _ResertpasswordScreenState extends State<ResertpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://10.0.2.2:7190');
+  bool _obscureText = true;
 
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -33,27 +31,10 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
     return isTabletWidth && isTabletHeight;
   }
 
-  Future<void> _requestPassword() async {
-  if (_formkey.currentState!.saveAndValidate()) {
-      final data = _formkey.currentState!.value;
-
-      Request insertRequest = Request(email: data['email']);
-
-      try{
-        final response = await _apiResertPassServ.postEmail(insertRequest);
-
-        if (response.statusCode == 200) {
-          print('✔️ Email enviado con éxito');
-          _showSuccessDialog(context, 'Se ha enviado un correo con el código de verificación. \nPor favor, revisa tu bandeja de entrada. \nSi no lo encuentras, revisa la carpeta de spam.');
-        } else {
-          print('❌ Error al enviar el email');
-          _showErrorDialog(context, 'Error al enviar el email. Usuario no encontrado. \nPor favor, intenta de nuevo.');
-        }
-      } catch (e) {
-        print('❌ Error al enviar el email: $e');
-        _showErrorDialog(context, 'Error al enviar la solicitud de recuperación de contraseña.');
-      }
-    }
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
@@ -61,7 +42,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
     final isTabletDevice = isTablet(context);
 
     return ScreenUtilInit(
-      designSize: const Size(360, 740),
+      designSize: const Size(360, 690),
       builder: (context, child) => Scaffold(
         body: Container(
           width: double.infinity,
@@ -84,7 +65,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
             ],
           ),
           child: Stack(
-            alignment: AlignmentDirectional.topStart,
+            // alignment: AlignmentDirectional.topStart,
             children: [
               Padding( // Padding para el contenedor principal
                 padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0),
@@ -95,7 +76,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                   child: Column(
                     children: [
                       Container( // Contenedor del logo
-                        margin: const EdgeInsets.only(top: 50), // Margen superior del contenedor
+                        margin: const EdgeInsets.only(top: 50),
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle, // El logo estará dentro de un contenedor circular
                           color: Color.fromRGBO(255, 254, 254, 1),
@@ -104,13 +85,13 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                           padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0), // Margen dentro del logo
                           // padding: EdgeInsets.all(20.0),
                           child: const Icon(
-                            Icons.email_outlined, // Icono de un candado
+                            Icons.lock_reset_outlined, // Icono de un candado
                             size: 100, // Tamaño del icono
                             color: Color.fromARGB(255, 12, 0, 0), // Color del icono
                           ),
                         ),
                       ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 20),
 
                       const Text(
                         "Recupera tu cuenta", // Título de la pantalla
@@ -125,10 +106,10 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container( //Para el cuadro blanco
-                            padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 70),
+                            padding: const EdgeInsets.all(80),
                             decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 255, 252, 252),
-                              borderRadius: BorderRadius.circular(100),
+                              borderRadius: BorderRadius.circular(40),
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
@@ -138,31 +119,30 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                               ],
                             ),
                             child: Column(
-                              // mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [                      
                                 const Text(
-                                  "Paso 1: Verifica tu correo", // Título de la pantalla
+                                  "Paso 2: Crea una nueva contraseña", // Título de la pantalla
                                   style: TextStyle(
                                     fontSize: 40, // Tamaño de la fuente
                                     fontWeight: FontWeight.bold, // Peso de la fuente
                                     color: Color.fromARGB(255, 12, 0, 0), // Color de la fuente
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 40),
+                                const SizedBox(height: 80),
                                   
                                 FormBuilder(
                                   key: _formkey,
                                   child: Column(
                                     children: [
                                       FormBuilderTextField(
-                                        name: 'email',
+                                        name: 'token',
                                         decoration: InputDecoration(
-                                          labelText: 'Correo Electrónico',
+                                          labelText: 'Código de verificación',
                                           labelStyle: TextStyle(fontSize: isTabletDevice ? 15.sp : 13.sp),
-                                          hintText: 'Tu@ejemplo.com',
+                                          hintText: 'Ingresa el código de verificación',
                                           hintStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 138, 138, 138)),
-                                          prefixIcon: Icon(Icons.account_circle, size: isTabletDevice ? 15.sp : 15.sp),
+                                          prefixIcon: Icon(Icons.vpn_key_outlined, size: isTabletDevice ? 15.sp : 15.sp),
                                           border: const OutlineInputBorder(),
                                           enabledBorder: const UnderlineInputBorder(
                                             borderSide: BorderSide(color: Color.fromARGB(255, 39, 99, 41)),
@@ -175,33 +155,81 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                           errorStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp,),
                                         ),
                                         style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                                        keyboardType: TextInputType.emailAddress, // Tipo de teclado
-                                        validator: (value){
-                                          // expresion regular
-                                          String pattern = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$';
-                                          RegExp regExp = RegExp(pattern);
-                                          return regExp.hasMatch(value ?? '')
-                                            ? null
-                                            : 'Ingrese un correo electronico valido';
-                                        },
-                                      ),
-                                
-                                      const SizedBox(height: 20), // Separación entre el campo de texto y el botón
-                          
-                                      Text(
-                                        "Te enviaremos un código de verificación a este correo. Si todo sale bien entonces iremos al paso 2.", // Descripción de la pantalla
-                                        style: TextStyle(
-                                          fontSize: isTabletDevice ? 10.5.sp : 10.sp, // Tamaño de la fuente
-                                          color: const Color.fromARGB(255, 138, 138, 138), // Color de la fuente
+                                        keyboardType: TextInputType.text,// Tipo de teclado
+                                        validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                                      ),                              
+                                      const SizedBox(height: 30), // Separación entre el campo de texto y el botón
+                                                  
+                                      FormBuilderTextField(
+                                        name: 'password',
+                                        decoration: InputDecoration(
+                                          labelText: 'Nueva contraseña',
+                                          labelStyle: TextStyle(fontSize: isTabletDevice ? 15.sp : 13.sp),
+                                          hintText: 'Ingresa tu nueva contraseña',
+                                          hintStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 138, 138, 138)),
+                                          prefixIcon: Icon(Icons.lock_outline_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                                          border: const OutlineInputBorder(),
+                                          enabledBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Color.fromARGB(255, 39, 99, 41)),
+                                          ),
+                                          focusedBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Color.fromARGB(255, 12, 0, 0), // Color del borde
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp,),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                                              color: const Color.fromARGB(255, 138, 138, 138),
+                                              size: isTabletDevice ? 15.sp : 15.sp,
+                                            ),
+                                            onPressed: _togglePasswordVisibility,
+                                          ),
                                         ),
-                                        textAlign: TextAlign.center, // Alineación del texto
+                                        style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                        keyboardType: TextInputType.text,// Tipo de teclado
+                                        validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                                       ),
-                                      const SizedBox(height: 10),
-                                
+
+                                      const SizedBox(height: 30),
+
+                                      FormBuilderTextField(
+                                        name: 'password-confirm',
+                                        decoration: InputDecoration(
+                                          labelText: 'Confirmar contraseña',
+                                          labelStyle: TextStyle(fontSize: isTabletDevice ? 15.sp : 13.sp),
+                                          hintText: 'Confirma tu nueva contraseña',
+                                          hintStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 138, 138, 138)),
+                                          prefixIcon: Icon(Icons.lock_outline_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+                                          border: const OutlineInputBorder(),
+                                          enabledBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Color.fromARGB(255, 39, 99, 41)),
+                                          ),
+                                          focusedBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Color.fromARGB(255, 12, 0, 0), // Color del borde
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp,),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                                              color: const Color.fromARGB(255, 138, 138, 138),
+                                              size: isTabletDevice ? 15.sp : 15.sp,
+                                            ),
+                                            onPressed: _togglePasswordVisibility,
+                                          ),
+                                        ),
+                                        style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                        keyboardType: TextInputType.text,// Tipo de teclado
+                                        validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                                      ),
+                                                              
                                       Container(
-                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 1.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
+                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 33.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
                                         // padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                                        margin: const EdgeInsets.only(top: 30),
+                                        margin: const EdgeInsets.only(top: 100),
                                         decoration: BoxDecoration(
                                           gradient: const LinearGradient(
                                             colors: [
@@ -221,7 +249,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                           ],
                                         ),
                                         child: ElevatedButton(
-                                          onPressed: () => _requestPassword(),
+                                          onPressed: () {},
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
                                             shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
@@ -231,7 +259,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                             ),
                                           ),
                                           child: Text(
-                                            'Enviar Código de Recuperación',
+                                            'Restablecer contraseña',
                                             style: TextStyle(
                                               fontSize: isTabletDevice ? 15.5.sp : 17.sp,
                                               fontWeight: FontWeight.bold
@@ -240,10 +268,10 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                           ),
                                         ),
                                       ),
-                                
+                                                              
                                       Container(
                                         // padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 60.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 37.h, vertical: 15.w),
-                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 73.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
+                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 33.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
                                         margin: const EdgeInsets.only(top: 30),
                                         decoration: BoxDecoration(
                                           gradient: const LinearGradient(
@@ -267,7 +295,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                           onPressed: () {
                                             Navigator.push(
                                               context,
-                                              MaterialPageRoute(builder: (context) => PresentationScreen(
+                                              MaterialPageRoute(builder: (context) => ForgotpasswordScreen(
                                                 filtrarUsuarioController: widget.filtrarUsuarioController,
                                                 filtrarEmailController: widget.filtrarEmailController,
                                                 filtrarId: widget.filtrarId,
@@ -291,7 +319,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                               ),
                                               const SizedBox(width: 5), // Espacio entre el ícono y el texto
                                               Text(
-                                                'Volver a inicio',
+                                                'Volver al paso anterior',
                                                 style: TextStyle(
                                                   //fontSize: isTabletDevice ? 17.sp : 17.sp,
                                                   fontSize: isTabletDevice ? 15.sp : 17.sp,
@@ -317,132 +345,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
             ]
           ),
         ),
-      ),
-    );
-  }
-
-  // cuadro de acceso exito
-  void _showSuccessDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3)
-                )
-              ]
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
-                const SizedBox(height: 20),
-                const Text( 
-                  '¡Éxito!', 
-                  style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold), 
-                ),
-                const SizedBox(height: 8.0),
-                Text( 
-                  message, 
-                  style: const TextStyle(fontSize: 25.0), 
-                  textAlign: TextAlign.center, 
-                ), 
-                const SizedBox(height: 24.0),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(
-                        builder: (context) => ResertpasswordScreen(
-                          filtrarUsuarioController: widget.filtrarUsuarioController,
-                          filtrarEmailController: widget.filtrarEmailController,
-                          filtrarId: widget.filtrarId),
-                      )
-                    );
-                  }, 
-                  child: const Text('OK', style: TextStyle(fontSize: 18.0)),
-                )
-              ]
-            )
-          )
-        );
-      }
-    );
-  }
-
-  // para mostrar los errores
-  void _showErrorDialog (BuildContext context, String message) {
-    final isTabletDevice = isTablet(context);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3)
-                )
-              ]
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline_sharp, color: Color.fromARGB(255, 181, 3, 3), size: 80.0),
-                const SizedBox(height: 20),
-                const Text(
-                  'Error!',
-                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  message,
-                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24.0),
-                Flex(
-                  direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {Navigator.of(context).pop();},
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                      child: Text('Ok', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
-                    )
-                  ],
-                )
-              ]
-            )
-          )
-        );
-      }
+      )
     );
   }
 }

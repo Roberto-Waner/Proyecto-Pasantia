@@ -34,35 +34,7 @@ class ApiServiceRespuesta {
       throw Exception('Error en la solicitud POST: $e');
     }
   }
-
-  /*Future<http.Response> postRespuesta(List<SpInsertarRespuestas> respuestas) async {
-    // Intenta realizar una verificación de conexión antes de hacer la solicitud.
-    final isCheckOk = await service.check();
-    if (isCheckOk) {
-      try {
-        // Convertir la lista de respuestas a JSON
-        List<Map<String, dynamic>> respuestasJson = respuestas.map((r) => r.toJson()).toList();
-
-        // Enviar el array de respuestas a la API
-        return await service.postDataList('Respuestas/insertar', respuestasJson);
-      } catch (e) {
-        print('Error al enviar respuesta a la API: $e');
-        rethrow;
-      }
-    } else {
-      throw Exception('No hay conexión con la API.');
-    }
-  }*/
-
-  // Future<http.Response> putRespuesta (String noEncuesta, Respuesta respuesta) async {
-  //   final isCheckOk = await service.check();
-  //   if(isCheckOk) {
-  //     return await service.putData('Respuestas', respuesta.toJson(), noEncuesta);
-  //   } else {
-  //     return http.Response('Actualizado en SQLite', 204);
-  //   }
-  // }
-
+  
   Future<List<SpFiltrarRespuestas>> getRespuestas() async {
     final isCheckOk = await service.check();
     if (isCheckOk) {

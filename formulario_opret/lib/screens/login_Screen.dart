@@ -206,31 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // cuadro de error
-  // void _showErrorDialog(BuildContext context, String message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-  //         contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
-  //         content: Container(
-  //           margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
-  //           child: Text(message, style: const TextStyle(fontSize: 28))
-  //         ),
-  //         actions: [ 
-  //           TextButton( 
-  //             child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
-  //             onPressed: () { 
-  //               Navigator.of(context).pop(); 
-  //             }, 
-  //           ), 
-  //         ],
-  //       );
-  //     }
-  //   );
-  // }
-
   void _showErrorDialog (BuildContext context, String message) {
     final isTabletDevice = isTablet(context);
     showDialog(
@@ -447,9 +422,9 @@ class _LoginScreenState extends State<LoginScreen> {
             autocorrect: true,
             decoration: InputDecorations.inputDecoration(
               hintext: 'Ingrese el Usuario',
-                hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+              hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
               labeltext: 'Nombre Usuario',
-                labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+              labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
               icono: Icon(Icons.account_circle, size: isTabletDevice ? 15.sp : 15.sp),
               errorSize: 20
             ),
@@ -481,7 +456,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _togglePasswordVisibility, 
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                    size: isTabletDevice ? 15.sp : 15.sp,
+                  size: isTabletDevice ? 15.sp : 15.sp,
                 )
               ),
               errorSize: 20

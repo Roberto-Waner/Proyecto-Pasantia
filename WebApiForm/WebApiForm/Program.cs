@@ -53,11 +53,13 @@ builder.Services.AddScoped<PreguntaCompletaService>();
 builder.Services.AddScoped<RespuestaService>();
 builder.Services.AddScoped<FormularioServices>();
 builder.Services.AddScoped<ExcelExportService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<PasswordRecoveryService>();
 //--------------------------------------------------------
 
 // Registrar el servicio de envío de correo electrónico
-builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
-builder.Services.AddTransient<PasswordRecoveryService>();
+//builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+//builder.Services.AddTransient<PasswordRecoveryService>();
 
 var app = builder.Build();
 

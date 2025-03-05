@@ -1,6 +1,6 @@
-﻿using System.Net.Mail;
-using System.Net;
-using WebApiForm.Interfaces;
+﻿using WebApiForm.Interfaces;
+using MimeKit;
+using MailKit.Security;
 
 namespace WebApiForm.Capa_de_Servicio
 {
@@ -8,39 +8,43 @@ namespace WebApiForm.Capa_de_Servicio
     {
         private readonly IConfiguration _config;
 
-        public SmtpEmailSender(IConfiguration config)
+        public SmtpEmailSender(IConfiguration configuration)
         {
-            _config = config;
+            _config = configuration;
         }
 
-        public async Task SendEmail(string toEmail, string subject, string body)
+        public async Task SendEmail(string toEmail, string subject, string plainTextContent, string htmlContent)
         {
-            var smtpSettings = _config.GetSection("Smtp"); //lee la configuración del SMTP desde appsettings.json
-            //configura la dirección de correo del remitente (fromAddress) y del destinatario (toAddress).
-            var fromAddress = new MailAddress(smtpSettings["FromEmail"], "No-Reply");
-            var toAddress = new MailAddress(toEmail);
-            string fromPassword = smtpSettings["Password"];
+            // Cargar configuración SMTP desde appsettings.json
+            var smtpConfig = _config.GetSection("Smtp");
+            var host = smtpConfig["Host"];
+            var port = int.Parse(smtpConfig["Port"]);
+            var username = smtpConfig["Username"];
+            var password = smtpConfig["Password"];
+            var fromEmail = smtpConfig["FromEmail"];
+            var fromName = smtpConfig["FromName"];
+            //var enableSsl = bool.Parse(smtpConfig["EnableSsl"]);
 
-            //configura el cliente SMTP con los valores obtenidos de la configuración, como Host, Port, EnableSsl, etc.
-            var smtp = new SmtpClient
+            // Crear el mensaje de correo
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(fromName, fromEmail));
+            message.To.Add(new MailboxAddress("Cliente Usuario", toEmail));
+            message.Subject = subject;
+
+            var bodyBuilder = new BodyBuilder
             {
-                Host = smtpSettings["Host"],
-                Port = int.Parse(smtpSettings["Port"]),
-                EnableSsl = bool.Parse(smtpSettings["EnableSsl"]),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                TextBody = plainTextContent,
+                HtmlBody = htmlContent
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            /*crea un mensaje de correo (MailMessage) con el asunto y cuerpo especificados,
-                y se envía utilizando smtp.SendMailAsync(message).*/
-            using (var message = new MailMessage(fromAddress, toAddress)
+            // Enviar el correo
+            using (var smtpClient = new MailKit.Net.Smtp.SmtpClient())
             {
-                Subject = subject,
-                Body = body,
-            })
-            {
-                await smtp.SendMailAsync(message);
+                await smtpClient.ConnectAsync(host, port, SecureSocketOptions.SslOnConnect); //en caso de utilizar TLS debe de aplicar (SecureSocketOptions.StartTls)
+                await smtpClient.AuthenticateAsync(username, password);
+                await smtpClient.SendAsync(message);
+                await smtpClient.DisconnectAsync(true);
             }
         }
     }

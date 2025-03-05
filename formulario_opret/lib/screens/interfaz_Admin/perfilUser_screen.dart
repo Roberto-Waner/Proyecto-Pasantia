@@ -93,8 +93,8 @@ class _PerfiluserScreenState extends State<PerfiluserScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                              ),
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                        ),
                         SizedBox(height: 20),
                         Text(
                           'Cargando...',

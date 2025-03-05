@@ -401,9 +401,9 @@ class _NewUserState extends State<NewUser> {
                                 obscureText: _obscureText,
                                 decoration: InputDecorations.inputDecoration(
                                   hintext: '******',
-                                    hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
+                                  hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
                                   labeltext: 'Contraseña',
-                                    labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
+                                  labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
                                   // icono: const Icon(Icons.lock_person_rounded, size: 30.0),
                                   icono: Icon(Icons.lock_person_outlined, size: isTabletDevice ? 15.sp : 20.sp,),
                                   suffIcon: IconButton(
@@ -615,30 +615,6 @@ class _NewUserState extends State<NewUser> {
     //   }
     // });
   }
-
-  // void _showErrorDialog(BuildContext context, String message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text("Error", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-  //         contentPadding: EdgeInsets.zero,  // Elimina el padding por defecto
-  //         content: Container(
-  //           margin: const EdgeInsets.fromLTRB(70, 20, 70, 50),  // Aplica margen
-  //           child: Text(message, style: const TextStyle(fontSize: 28))
-  //         ),
-  //         actions: [ 
-  //           TextButton( 
-  //             child: const Text("OK", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue)), 
-  //             onPressed: () { 
-  //               Navigator.of(context).pop(); 
-  //             }, 
-  //           ), 
-  //         ],
-  //       );
-  //     }
-  //   );
-  // }
 
   void _showErrorDialog (BuildContext context, String message) {
     final isTabletDevice = isTablet(context);

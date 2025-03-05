@@ -854,7 +854,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                         errorSize: isTabletDevice ? 10.sp : 10
                       ),
                       style: TextStyle(fontSize: isTabletDevice ? 23.7 : 17), // Cambiar tamaño de letra del texto filtrado
-                      // validator: FormBuilderValidators.required(),
                       validator: (value) {
                         if (userUpload.rol == "Administrador") {
                           return 'No puedes cambiar los datos de un Administrador';
@@ -898,9 +897,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                           return 'Ingrese un correo electrónico válido'; 
                         }
                         return null;
-                        // return regExp.hasMatch(value ?? '')
-                        //   ? null
-                        //   : 'Ingrese un correo electronico valido';
                       },
                     ),
 
@@ -911,7 +907,6 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                       enabled: userUpload.rol != "Administrador",
                       keyboardType: TextInputType.visiblePassword,
                       style: TextStyle(fontSize: isTabletDevice ? 23.7 : 17),
-                      // controller: passwordController,
                       decoration: InputDecorations.inputDecoration(
                         labeltext: 'Contraseña',
                         labelFrontSize: isTabletDevice ? 30.5 : 18.5,
@@ -959,7 +954,8 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                     nombreApellido: formData['nombreApellido'],
                     usuario1: formData['usuario'],
                     email: formData['email'],
-                    passwords: userUpload.passwords, // Mantener la contraseña original
+                    // passwords: userUpload.passwords,
+                    passwords: formData['password'],
                     fechaCreacion: userUpload.fechaCreacion, // Mantener la fecha original
                     rol: userUpload.rol, // Mantener el rol original
                     // fotoEmpl: usuario.fotoEmpl, // Mantener la foto original

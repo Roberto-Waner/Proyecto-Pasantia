@@ -56,7 +56,8 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
 
       // List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
-      List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud();
+      List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud().timeout(const Duration(seconds: 1));
+      // var preguntas = await _sectionCrud.querySectionCrud().timeout(const Duration(seconds: 6));
       print("Preguntas cargadas: $preguntas");
 
       setState(() {
@@ -155,7 +156,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           print('Error al cargar los datos: ${snapshot.error}');
                           return const Center(child: Text("Error al cargar las preguntas", style: TextStyle(fontSize: 30.0)));
                         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-                          return const Center(child: Text('No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas conexión a "internet"', style: TextStyle(fontSize: 30.0)));
+                          return const Center(child: Text(
+                            'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
+                            style: TextStyle(fontSize: 30.0),
+                            textAlign: TextAlign.center
+                          ));
                         } else {
                           return _buildPreguntaList();
                         }
@@ -365,12 +370,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp),
                           ),
                         ),
-                        const SizedBox(width: 35),
+                        /*const SizedBox(width: 35),
                         // Botón de cierre
                         IconButton(
                             icon: Icon(Icons.close, color: Colors.red, size: isTabletDevice ? 20.sp : 20.sp),
                             onPressed: () => Navigator.of(context).pop()
-                        ),
+                        ),*/
                       ],
                     ),
                     content: Container(

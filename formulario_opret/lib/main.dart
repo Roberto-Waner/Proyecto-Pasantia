@@ -152,7 +152,7 @@ class MyApp extends StatelessWidget {
         ),
       },
 
-      initialRoute: 'recuperacion',
+      initialRoute: 'presentation',
     );
   }
 }

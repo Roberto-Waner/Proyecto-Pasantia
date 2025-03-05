@@ -282,7 +282,6 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting){
                     return Center(
-                        // child: CircularProgressIndicator()
                         child: Dialog(
                           backgroundColor: Colors.transparent,
                           child: Container(
@@ -300,7 +299,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                                       ),
                                 SizedBox(height: 20),
                                 Text(
-                                  /*hasError ? 'Error' : */'Cargando...',
+                                  'Cargando...',
                                   style: TextStyle(color: Colors.white, fontSize: 20),
                                 ),
                               ],

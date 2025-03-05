@@ -25,6 +25,7 @@ class ForgotpasswordScreen extends StatefulWidget {
 class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
   final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://10.0.2.2:7190');
+  bool _isLoading = false;
 
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -34,23 +35,63 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   }
 
   Future<void> _requestPassword() async {
-  if (_formkey.currentState!.saveAndValidate()) {
+    if (_formkey.currentState!.saveAndValidate()) {
       final data = _formkey.currentState!.value;
 
       Request insertRequest = Request(email: data['email']);
 
+      // Mostrar pantalla de carga
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+            child: const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: 100,
+                height: 150,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.green)),
+                      SizedBox(height: 20),
+                      Text(
+                        "Enviando correo...",
+                        style: TextStyle(fontSize: 18)
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      );
+
       try{
-        final response = await _apiResertPassServ.postEmail(insertRequest);
+        final response = await _apiResertPassServ.postEmail(insertRequest).timeout(const Duration(seconds: 20));
 
         if (response.statusCode == 200) {
           print('✔️ Email enviado con éxito');
           _showSuccessDialog(context, 'Se ha enviado un correo con el código de verificación. \nPor favor, revisa tu bandeja de entrada. \nSi no lo encuentras, revisa la carpeta de spam.');
         } else {
           print('❌ Error al enviar el email');
+          // Cerrar el cuadro de carga
+          Navigator.pop(context);
           _showErrorDialog(context, 'Error al enviar el email. Usuario no encontrado. \nPor favor, intenta de nuevo.');
         }
       } catch (e) {
-        print('❌ Error al enviar el email: $e');
+        print('❌ Error al enviar el email UI: $e');
+        // Cerrar el cuadro de carga
+        Navigator.pop(context);
         _showErrorDialog(context, 'Error al enviar la solicitud de recuperación de contraseña.');
       }
     }
@@ -88,7 +129,6 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
             children: [
               Padding( // Padding para el contenedor principal
                 padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0),
-                // padding: const EdgeInsets.all(40.0),
                 child: SizedBox(
                   width: double.infinity,
                   height: double.infinity,
@@ -101,8 +141,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                           color: Color.fromRGBO(255, 254, 254, 1),
                         ),
                         child: Padding(
-                          padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0), // Margen dentro del logo
-                          // padding: EdgeInsets.all(20.0),
+                          padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0), // Marge
                           child: const Icon(
                             Icons.email_outlined, // Icono de un candado
                             size: 100, // Tamaño del icono
@@ -200,23 +239,15 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                 
                                       Container(
                                         padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 1.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
-                                        // padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                                         margin: const EdgeInsets.only(top: 30),
                                         decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color.fromARGB(255, 16, 110, 63),
-                                              Color(0xFF155799),
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                          ),
+                                          color: const Color.fromARGB(255, 16, 110, 63),
                                           borderRadius: BorderRadius.circular(100),
-                                          boxShadow: const [
+                                          boxShadow: [
                                             BoxShadow(
                                               color: Colors.black12,
-                                              blurRadius: 10,
-                                              offset: Offset(5, 20),
+                                              blurRadius: isTabletDevice ? 17.sp : 17.sp,
+                                              offset: const Offset(5, 10),
                                             ),
                                           ],
                                         ),
@@ -242,26 +273,26 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                       ),
                                 
                                       Container(
-                                        // padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 60.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 37.h, vertical: 15.w),
-                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 73.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
+                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 73.h, vertical: 1.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
                                         margin: const EdgeInsets.only(top: 30),
                                         decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
+                                          /* gradient: const LinearGradient(
                                             colors: [
                                               Color(0xFF155799),
                                               Color.fromARGB(255, 16, 110, 63),
                                             ],
                                             begin: Alignment.centerLeft,
                                             end: Alignment.centerRight,
-                                          ),
+                                          ),*/
+                                          color: const Color.fromRGBO(255, 254, 254, 1),
                                           borderRadius: BorderRadius.circular(100),
-                                          boxShadow: [
+                                          /*boxShadow: [
                                             BoxShadow(
                                               color: Colors.black12,
                                               blurRadius: isTabletDevice ? 17.sp : 17.sp,
-                                              offset: const Offset(5, 20),
+                                              offset: const Offset(5, 10),
                                             ),
-                                          ],
+                                          ],*/
                                         ),
                                         child: ElevatedButton(
                                           onPressed: () {
@@ -277,7 +308,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
                                             shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
-                                            foregroundColor: const Color.fromARGB(255, 254, 255, 255),
+                                            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(100)), // Borde redondeado
                                             ),
@@ -293,7 +324,6 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                                               Text(
                                                 'Volver a inicio',
                                                 style: TextStyle(
-                                                  //fontSize: isTabletDevice ? 17.sp : 17.sp,
                                                   fontSize: isTabletDevice ? 15.sp : 17.sp,
                                                   fontWeight: FontWeight.bold
                                                 ),
@@ -427,7 +457,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {Navigator.of(context).pop();},
+                      onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
                         shape: RoundedRectangleBorder(

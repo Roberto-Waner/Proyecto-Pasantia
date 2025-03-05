@@ -33,9 +33,14 @@ class ApiResertPasswordServices {
     if (isCheckOk) {
       try {
         final response = await service.postData('PasswordRecovery/reset', resert.toJson());
+        if (response.statusCode == 200) {
+          print('✔️ Token y nueva contraseña enviados correctamente');
+        } else {
+          print('❌ Error al enviar el token y la nueva contraseña: ${response.statusCode}');
+        }
         return response;
       } catch (e) {
-        print('❌ Error al enviar el token y la nueva contraseña: $e');
+        print('❌ Token inválido o expirado: $e');
         throw Exception('Error en la solicitud POST: $e');
       }
     } else {

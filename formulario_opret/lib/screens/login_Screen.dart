@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:formulario_opret/models/login.dart';
+import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
 // import 'package:formulario_opret/models/login_Admin.dart';
 import 'package:formulario_opret/screens/interfaz_User/welcome_screen.dart';
@@ -122,12 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 filtrarEmailController: _filtrarEmailController,
                 filtrarId: _filtrarId,
               )
-              // EmpleadoScreens(
-              //   filtrarUsuarioController: _filtrarUsuarioController,
-              //   filtrarEmailController: _filtrarEmailController,
-              //   filtrarId: _filtrarId,
-              //   // filtrarCedula: _filtrarCedula
-              // )
             )
           );
         });
@@ -269,6 +264,93 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _showWarning (BuildContext context, String message) {
+    final isTabletDevice = isTablet(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+              ),
+              child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3)
+                        )
+                      ]
+                  ),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.security, color: Color.fromARGB(255, 0, 44, 62), size: 60.0),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Haz olvidado la Contraseña!!!',
+                          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          message,
+                          style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24.0),
+                        Flex(
+                          direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: Text('Cancelar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
+                            ),
+
+                            const SizedBox(height: 10.0, width: 10.0),
+
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ForgotpasswordScreen(
+                                      filtrarUsuarioController: _filtrarUsuarioController,
+                                      filtrarEmailController: _filtrarEmailController,
+                                      filtrarId: _filtrarId,
+                                      // filtrarCedula: _filtrarId,
+                                    ))
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                child: Text('Continuar', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 184, 135, 0)))
+                            ),
+                          ],
+                        )
+                      ]
+                  )
+              )
+          );
+        }
+    );
+  }
+
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isTabletWidth = size.width > 600;
@@ -397,7 +479,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text('Inicio Sesión', style: TextStyle(fontSize: isTabletDevice ? 20.sp : 20.sp)),
                       SizedBox(height: isTabletDevice ? 30.h : 10.h),
                       _loginForm(isTabletDevice),
-                      SizedBox(height: isTabletDevice ? 50.h : 50.h),
+                      SizedBox(height: isTabletDevice ? 25.h : 20.h),
                       _loginButton(isTabletDevice)
                     ],
                   ),
@@ -472,6 +554,40 @@ class _LoginScreenState extends State<LoginScreen> {
               return null;
             },
           ),
+          const SizedBox(height: 10),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () => _showWarning(context, 'A continuación iremos restablecer la contraseña. ¿Estás seguro de que deseas continuar?'),
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => ForgotpasswordScreen(
+                  //     filtrarUsuarioController: _filtrarUsuarioController,
+                  //     filtrarEmailController: _filtrarEmailController,
+                  //     filtrarId: _filtrarId,
+                  //     // filtrarCedula: _filtrarId,
+                  //   ))
+                  // );
+                
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
+                  shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
+                  foregroundColor: const Color.fromARGB(255, 0, 0, 0)
+                ),
+                child: Text(
+                  'Olvidé la contraseña',
+                  style: TextStyle(
+                    fontSize: isTabletDevice ? 10.sp : 17.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 0, 0, 0)
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ]
+          )
         ],
       ),
     );
@@ -480,7 +596,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Center _loginButton(bool isTabletDevice) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Centra los botones horizontalmente
+        //mainAxisAlignment: MainAxisAlignment.center, // Centra los botones horizontalmente
         children: [
           ElevatedButton(
             onPressed: _login,

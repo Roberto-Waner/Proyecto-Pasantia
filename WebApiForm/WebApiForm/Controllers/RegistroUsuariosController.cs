@@ -72,7 +72,7 @@ namespace WebApiForm.Controllers
             if (!string.IsNullOrWhiteSpace(registroUsuario.Passwords))
             {
                 // Generar un nuevo salt y hash para la nueva contraseña
-                string newSalt = SaltHelper.GenerateSalt(32);
+                string newSalt = SaltHelper.GenerateSalt();
                 string newHashedPassword = HashHelper.Hash(registroUsuario.Passwords, newSalt);
 
                 // Actualizar la contraseña en el registro del usuario

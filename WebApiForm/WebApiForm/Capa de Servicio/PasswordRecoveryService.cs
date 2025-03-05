@@ -67,11 +67,9 @@ namespace WebApiForm.Capa_de_Servicio
             await _context.SaveChangesAsync();
 
             // Enlace del endpoint "reset"
-            //string resetLink = $"https://localhost:7190/api/PasswordRecovery/reset={token}";
             string resetLink = $"{token}";
 
             string subject = "Recuperación de Contraseña";
-            //string plainTextContent = $"Haga clic en el siguiente enlace para restablecer su contraseña: https://localhost:7190/api/PasswordRecovery/request={resetLink}";
             string plainTextContent = $"✨ Recuperación de Contraseña ✨\r\n\r\n" +
                 $"Hola,\r\n\r\n" +
                 $"Hemos recibido tu solicitud para restablecer tu contraseña. \r\n" +
@@ -83,7 +81,6 @@ namespace WebApiForm.Capa_de_Servicio
                 $"- Si no solicitaste este cambio, puedes ignorar este mensaje.\r\n\r\n" +
                 $"Gracias,  " +
                 $"\r\nEquipo de Soporte Técnico\r\n";
-            //string htmlContent = $"<strong>Haga clic en el siguiente enlace para restablecer su contraseña:</strong> <a href='https://localhost:7190/api/PasswordRecovery/request={resetLink}'>Recuperar Contraseña</a>";
             string htmlContent = $@"
                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; color: #333;'>
                     <h2 style='text-align: center; color: #667db6;'>✨ ¡Recupera tu Contraseña! ✨</h2>

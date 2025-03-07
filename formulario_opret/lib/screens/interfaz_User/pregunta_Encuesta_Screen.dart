@@ -49,7 +49,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
     super.initState();
     _preguntasFuture =
         _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(seconds: 1), () {
       _preguntasFuture = _refreshPreguntas();
     });
     _setInitialValues(); // para que la fecha y la hora se asignen automaticamente de acuerdo a la tabla
@@ -163,13 +163,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           print('Error al cargar los datos: ${snapshot.error}');
                           return const Center(
                               child: Text("Error al cargar las preguntas",
-                                  style: TextStyle(fontSize: 30.0)));
+                                  style: TextStyle(fontSize: 20.0)));
                         } else if (!snapshot.hasData ||
                             (snapshot.data as List).isEmpty) {
                           return const Center(
                               child: Text(
                                   'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
-                                  style: TextStyle(fontSize: 30.0),
+                                  style: TextStyle(fontSize: 20.0),
                                   textAlign: TextAlign.center));
                         } else {
                           return _buildPreguntaList();

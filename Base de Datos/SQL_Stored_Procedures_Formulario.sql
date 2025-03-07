@@ -133,7 +133,7 @@ BEGIN
     DECLARE @noEncuesta VARCHAR(100)
 	DECLARE @identifacador_form INT
 
-    -- Obtener el año actual
+    -- Obtener el aï¿½o actual
     SET @year = CAST(YEAR(GETDATE()) AS VARCHAR(4))
 
 	-- Obtener el identificador del formulario correspondiente al idUsuarios
@@ -141,29 +141,28 @@ BEGIN
 	from Formulario
 	-- para que las respuesta encajen perfectamente con el formulario estas deberande coincidir con idUsuario y la fecha de las dos tablas
 	where id_usuarios = @idUsuarios and fecha = @fechaRespuestas
-	ORDER BY identifacador_form DESC -- esta cláusula ayuda a seleccionar el formulario más reciente si hay múltiples formularios con la misma fecha para el mismo usuario.
+	ORDER BY identifacador_form DESC -- esta clï¿½usula ayuda a seleccionar el formulario mï¿½s reciente si hay mï¿½ltiples formularios con la misma fecha para el mismo usuario.
 
     -- Insertar el nuevo registro en la tabla Respuestas
     -- Utilizando un noEncuesta temporal (NULL)
     INSERT INTO Respuestas (id_usuarios, no_encuesta, id_sesion, respuesta, comentarios, justificacion, hora_respuestas, identifacador_form, fecha_respuestas)
     VALUES (@idUsuarios, NULL, @idSesion, @respuesta, @comentarios, @justificacion, @horaRespuestas, @identifacador_form, @fechaRespuestas)
 
-    -- Generar el noEncuesta y actualizarlo solo si se finaliza la sesión
+    -- Generar el noEncuesta y actualizarlo solo si se finaliza la sesiï¿½n
     IF @finalizarSesion = 1
-    BEGIN
-        -- Obtener el número de orden global para el año actual
-        SELECT @orden = ISNULL(MAX(CONVERT(INT, SUBSTRING(no_encuesta, 8, 2))), 0) + 1
-        FROM Respuestas
-        WHERE no_encuesta IS NOT NULL AND YEAR(GETDATE()) = YEAR(GETDATE())
+	BEGIN
+		SELECT @orden = ISNULL(MAX(CONVERT(INT, SUBSTRING(no_encuesta, CHARINDEX(' - ', no_encuesta) + 3, LEN(no_encuesta) - CHARINDEX(' - ', no_encuesta) - 2))), 0) + 1
+		FROM Respuestas
+		WHERE no_encuesta IS NOT NULL 
+		  AND TRY_CAST(SUBSTRING(no_encuesta, CHARINDEX(' - ', no_encuesta) + 3, LEN(no_encuesta) - CHARINDEX(' - ', no_encuesta) - 2) AS INT) IS NOT NULL
+		  AND YEAR(GETDATE()) = YEAR(GETDATE())
 
-        -- Generar el noEncuesta
-        SET @noEncuesta = @year + ' - ' + RIGHT('00' + CAST(@orden AS VARCHAR(2)), 2)
+		SET @noEncuesta = @year + ' - ' + CAST(@orden AS VARCHAR)
 
-        -- Actualizar el no_encuesta en la tabla Respuestas para el conjunto de preguntas
-        UPDATE Respuestas
-        SET no_encuesta = @noEncuesta
-        WHERE no_encuesta IS NULL
-    END
+		UPDATE Respuestas
+		SET no_encuesta = @noEncuesta
+		WHERE no_encuesta IS NULL
+	END
 END
 
 --DROP PROCEDURE IF EXISTS sp_InsertarRespuesta;
@@ -176,7 +175,7 @@ EXEC sp_InsertarRespuesta
 	@horaRespuestas = '10:11:10 AM',
     @respuesta = 'Si',
     @comentarios = 'Algunos comentarios adicionales',
-    @justificacion = 'Una justificación adicional',
+    @justificacion = 'Una justificaciï¿½n adicional',
 	@fechaRespuestas = '01-02-2025',
     @finalizarSesion = 1 
 
@@ -186,7 +185,7 @@ EXEC sp_InsertarRespuesta
 	@horaRespuestas = '10:11 AM',
     @respuesta = 'No',
     @comentarios = 'Algunos comentarios adicionales',
-    @justificacion = 'Una justificación adicional',
+    @justificacion = 'Una justificaciï¿½n adicional',
 	@fechaRespuestas = '01-02-2025',
     @finalizarSesion = 0
 
@@ -196,7 +195,7 @@ EXEC sp_InsertarRespuesta
 	@horaRespuestas = '10:30 AM',
     @respuesta = '15 - 25',
     @comentarios = 'Algunos comentarios adicionales',
-    @justificacion = 'Una justificación adicional',
+    @justificacion = 'Una justificaciï¿½n adicional',
 	@fechaRespuestas = '01-02-2025',
     @finalizarSesion = 0
 
@@ -206,7 +205,7 @@ EXEC sp_InsertarRespuesta
 	@horaRespuestas = '10:45 AM',
     @respuesta = '10',
     @comentarios = 'Algunos comentarios adicionales',
-    @justificacion = 'Una justificación adicional',
+    @justificacion = 'Una justificaciï¿½n adicional',
 	@fechaRespuestas = '01-02-2025',
     @finalizarSesion = 1
 

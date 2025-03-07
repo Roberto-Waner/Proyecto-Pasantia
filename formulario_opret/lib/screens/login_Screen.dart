@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _filtrarId = TextEditingController();
   // final TextEditingController _filtrarCedula = TextEditingController();
 
-  final ApiServiceToken _serviceToken = ApiServiceToken('https://10.0.2.2:7190',false);
+  final ApiServiceToken _serviceToken = ApiServiceToken('https://192.168.1.9:7190',false);
   String myToken ="";
   bool _isLoading = false;
   bool _obscureText = true;
@@ -372,7 +372,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Stack(
             children: [
               cajaverde(size),
-              // buttonBack(size),
               ventanalogin(isTabletDevice, context),
               if (_isLoading)
                 Center(
@@ -450,14 +449,11 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // const SizedBox(height: 50),
               Container(
-                // padding: EdgeInsets.symmetric(horizontal: isTabletHeight ? 0.18 : 0.10),
                 padding: isTabletDevice ? EdgeInsets.symmetric(horizontal: 0.07.sh) : EdgeInsets.symmetric(horizontal: 0.04.sh),
                 margin: const EdgeInsets.symmetric(horizontal: 30),
                 width: double.infinity,
-                // height: size.height * (orientation == Orientation.portrait ? 0.85 : 0.96), // Ajuste según la orientación
-                height: isTabletDevice ? 0.92.sh : 0.92.sh,
+                height: isTabletDevice ? 0.87.sh : 0.87.sh,
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(255, 252, 252, 252),
                   borderRadius: BorderRadius.circular(25),
@@ -473,7 +469,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       // const SizedBox(height: 100),
-                      SizedBox(height: isTabletDevice ? 80.h : 80.h),
+                      SizedBox(height: isTabletDevice ? 40.h : 40.h),
                       logoInsideLogin(isTabletDevice),
                       SizedBox(height: isTabletDevice ? 30.h : 10.h),
                       Text('Inicio Sesión', style: TextStyle(fontSize: isTabletDevice ? 20.sp : 20.sp)),

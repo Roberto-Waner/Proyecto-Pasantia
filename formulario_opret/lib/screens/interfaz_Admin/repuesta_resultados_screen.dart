@@ -29,7 +29,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://10.0.2.2:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.9:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
@@ -104,19 +104,6 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     final isTabletHeight = size.height > 800;
     return isTabletWidth && isTabletHeight;
   }
-
-  /*
-  Future<void> openExcelReport() async {
-    String endpoint = 'api/Report/ExportReporte';
-    final Uri url = Uri.parse('https://10.0.2.2:7190/$endpoint');
-
-    if(!await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    )){
-      throw 'No se pudo abrir el archivo Excel $url';
-    }
-  }*/
 
   Future<void> exportToCsv(BuildContext context) async {
     try {
@@ -637,7 +624,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
     );
   }
 
-  void _showSuccessDialog(BuildContext context, String message) {
+  /*void _showSuccessDialog(BuildContext context, String message) {
     final isTabletDevice = isTablet(context);
     showDialog(
       context: context,
@@ -700,7 +687,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
         );
       }
     );
-  }
+  }*/
 }
 
 class RespuestasDataSource extends DataTableSource {

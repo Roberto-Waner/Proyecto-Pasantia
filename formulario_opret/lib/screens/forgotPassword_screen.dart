@@ -24,7 +24,7 @@ class ForgotpasswordScreen extends StatefulWidget {
 
 class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://10.0.2.2:7190');
+  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://192.168.1.9:7190');
   bool _isLoading = false;
 
   bool isTablet(BuildContext context) {
@@ -77,7 +77,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
       );
 
       try{
-        final response = await _apiResertPassServ.postEmail(insertRequest).timeout(const Duration(seconds: 20));
+        final response = await _apiResertPassServ.postEmail(insertRequest)/*.timeout(const Duration(seconds: 20))*/;
 
         if (response.statusCode == 200) {
           print('✔️ Email enviado con éxito');
@@ -104,247 +104,225 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
     return ScreenUtilInit(
       designSize: const Size(360, 740),
       builder: (context, child) => Scaffold(
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF159957),
-                Color(0xFF155799),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        body: SingleChildScrollView(
+          child: ConstrainedBox( // ConstrainedBox para el scroll de la pantalla
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height, // Altura mínima de la pantalla
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(5, 20),
+            child: Container(
+              width: double.infinity,
+              // height: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF159957),
+                    Color(0xFF155799),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(5, 20),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Stack(
-            alignment: AlignmentDirectional.topStart,
-            children: [
-              Padding( // Padding para el contenedor principal
+              child: Padding( // Padding para el contenedor principal
                 padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Column(
-                    children: [
-                      Container( // Contenedor del logo
-                        margin: const EdgeInsets.only(top: 50), // Margen superior del contenedor
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle, // El logo estará dentro de un contenedor circular
-                          color: Color.fromRGBO(255, 254, 254, 1),
-                        ),
-                        child: Padding(
-                          padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0), // Marge
-                          child: const Icon(
-                            Icons.email_outlined, // Icono de un candado
-                            size: 100, // Tamaño del icono
-                            color: Color.fromARGB(255, 12, 0, 0), // Color del icono
-                          ),
+                child: Column(
+                  children: [
+                    Container( // Contenedor del logo
+                      margin: const EdgeInsets.symmetric(vertical: 60), // Margen superior del contenedor
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle, // El logo estará dentro de un contenedor circular
+                        color: Color.fromRGBO(255, 254, 254, 1),
+                      ),
+                      child: Padding(
+                        padding: isTabletDevice ? const EdgeInsets.all(50.0) : const EdgeInsets.all(30.0), // Marge
+                        child: const Icon(
+                          Icons.email_outlined, // Icono de un candado
+                          size: 100, // Tamaño del icono
+                          color: Color.fromARGB(255, 12, 0, 0), // Color del icono
                         ),
                       ),
-                      const SizedBox(height: 50),
-
-                      const Text(
-                        "Recupera tu cuenta", // Título de la pantalla
-                        style: TextStyle(
-                          fontSize: 40, // Tamaño de la fuente
-                          fontWeight: FontWeight.bold, // Peso de la fuente
-                          color: Color.fromARGB(255, 255, 255, 255), // Color de la fuente
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Container( //Para el cuadro blanco
-                            padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 70),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 255, 252, 252),
-                              borderRadius: BorderRadius.circular(100),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(5, 20),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              // mainAxisAlignment: MainAxisAlignment.center,
-                              children: [                      
-                                const Text(
-                                  "Paso 1: Verifica tu correo", // Título de la pantalla
-                                  style: TextStyle(
-                                    fontSize: 40, // Tamaño de la fuente
-                                    fontWeight: FontWeight.bold, // Peso de la fuente
-                                    color: Color.fromARGB(255, 12, 0, 0), // Color de la fuente
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 40),
-                                  
-                                FormBuilder(
-                                  key: _formkey,
-                                  child: Column(
-                                    children: [
-                                      FormBuilderTextField(
-                                        name: 'email',
-                                        decoration: InputDecoration(
-                                          labelText: 'Correo Electrónico',
-                                          labelStyle: TextStyle(fontSize: isTabletDevice ? 15.sp : 13.sp),
-                                          hintText: 'Tu@ejemplo.com',
-                                          hintStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 138, 138, 138)),
-                                          prefixIcon: Icon(Icons.account_circle, size: isTabletDevice ? 15.sp : 15.sp),
-                                          border: const OutlineInputBorder(),
-                                          enabledBorder: const UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Color.fromARGB(255, 39, 99, 41)),
-                                          ),
-                                          focusedBorder: const UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromARGB(255, 12, 0, 0), // Color del borde
-                                            ),
-                                          ),
-                                          errorStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp,),
-                                        ),
-                                        style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                                        keyboardType: TextInputType.emailAddress, // Tipo de teclado
-                                        validator: (value){
-                                          // expresion regular
-                                          String pattern = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$';
-                                          RegExp regExp = RegExp(pattern);
-                                          return regExp.hasMatch(value ?? '')
-                                            ? null
-                                            : 'Ingrese un correo electronico valido';
-                                        },
-                                      ),
-                                
-                                      const SizedBox(height: 20), // Separación entre el campo de texto y el botón
+                    ),
+                    // const SizedBox(height: 10),
                           
-                                      Text(
-                                        "Te enviaremos un código de verificación a este correo. Si todo sale bien entonces iremos al paso 2.", // Descripción de la pantalla
-                                        style: TextStyle(
-                                          fontSize: isTabletDevice ? 10.5.sp : 10.sp, // Tamaño de la fuente
-                                          color: const Color.fromARGB(255, 138, 138, 138), // Color de la fuente
-                                        ),
-                                        textAlign: TextAlign.center, // Alineación del texto
+                    const Text(
+                      "Recupera tu cuenta", // Título de la pantalla
+                      style: TextStyle(
+                        fontSize: 40, // Tamaño de la fuente
+                        fontWeight: FontWeight.bold, // Peso de la fuente
+                        color: Color.fromARGB(255, 255, 255, 255), // Color de la fuente
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                          
+                    Container( //Para el cuadro blanco
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 255, 252, 252),
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(5, 20),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [                      
+                          const Text(
+                            "Paso 1: Verifica tu correo", // Título de la pantalla
+                            style: TextStyle(
+                              fontSize: 22, // Tamaño de la fuente
+                              fontWeight: FontWeight.bold, // Peso de la fuente
+                              color: Color.fromARGB(255, 12, 0, 0), // Color de la fuente
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 40),
+                            
+                          FormBuilder(
+                            key: _formkey,
+                            child: Column(
+                              children: [
+                                FormBuilderTextField(
+                                  name: 'email',
+                                  decoration: InputDecoration(
+                                    labelText: 'Correo Electrónico',
+                                    labelStyle: TextStyle(fontSize: isTabletDevice ? 15.sp : 13.sp),
+                                    hintText: 'Tu@ejemplo.com',
+                                    hintStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 138, 138, 138)),
+                                    prefixIcon: Icon(Icons.account_circle, size: isTabletDevice ? 15.sp : 15.sp),
+                                    border: const OutlineInputBorder(),
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(color: Color.fromARGB(255, 39, 99, 41)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color.fromARGB(255, 12, 0, 0), // Color del borde
                                       ),
-                                      const SizedBox(height: 10),
-                                
-                                      Container(
-                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 1.h, vertical: 10.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
-                                        margin: const EdgeInsets.only(top: 30),
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(255, 16, 110, 63),
-                                          borderRadius: BorderRadius.circular(100),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              blurRadius: isTabletDevice ? 17.sp : 17.sp,
-                                              offset: const Offset(5, 10),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ElevatedButton(
-                                          onPressed: () => _requestPassword(),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
-                                            shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
-                                            foregroundColor: const Color.fromARGB(255, 254, 255, 255),
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(100)), // Borde redondeado
-                                            ),
-                                          ),
-                                          child: Text(
-                                            'Enviar Código de Recuperación',
-                                            style: TextStyle(
-                                              fontSize: isTabletDevice ? 15.5.sp : 17.sp,
-                                              fontWeight: FontWeight.bold
-                                            ),
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                      ),
-                                
-                                      Container(
-                                        padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 73.h, vertical: 1.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 10.w),
-                                        margin: const EdgeInsets.only(top: 30),
-                                        decoration: BoxDecoration(
-                                          /* gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFF155799),
-                                              Color.fromARGB(255, 16, 110, 63),
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                          ),*/
-                                          color: const Color.fromRGBO(255, 254, 254, 1),
-                                          borderRadius: BorderRadius.circular(100),
-                                          /*boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              blurRadius: isTabletDevice ? 17.sp : 17.sp,
-                                              offset: const Offset(5, 10),
-                                            ),
-                                          ],*/
-                                        ),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(builder: (context) => PresentationScreen(
-                                                filtrarUsuarioController: widget.filtrarUsuarioController,
-                                                filtrarEmailController: widget.filtrarEmailController,
-                                                filtrarId: widget.filtrarId,
-                                              ))
-                                            );
-                                          }, 
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
-                                            shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
-                                            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(100)), // Borde redondeado
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el espacio
-                                            children: [
-                                              const Icon(
-                                                Icons.arrow_back_ios_new_rounded,
-                                                //size: isTabletDevice ? 14.sp : 17.sp,
-                                              ),
-                                              const SizedBox(width: 5), // Espacio entre el ícono y el texto
-                                              Text(
-                                                'Volver a inicio',
-                                                style: TextStyle(
-                                                  fontSize: isTabletDevice ? 15.sp : 17.sp,
-                                                  fontWeight: FontWeight.bold
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                    ),
+                                    errorStyle: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp,),
+                                  ),
+                                  style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  keyboardType: TextInputType.emailAddress, // Tipo de teclado
+                                  validator: (value){
+                                    // expresion regular
+                                    String pattern = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$';
+                                    RegExp regExp = RegExp(pattern);
+                                    return regExp.hasMatch(value ?? '')
+                                      ? null
+                                      : 'Ingrese un correo electronico valido';
+                                  },
+                                ),
+                          
+                                const SizedBox(height: 20), // Separación entre el campo de texto y el botón
+                    
+                                Text(
+                                  "Te enviaremos un código de verificación a este correo. Si todo sale bien entonces iremos al paso 2.", // Descripción de la pantalla
+                                  style: TextStyle(
+                                    fontSize: isTabletDevice ? 9.sp : 7.sp, // Tamaño de la fuente
+                                    color: const Color.fromARGB(255, 138, 138, 138), // Color de la fuente
+                                  ),
+                                  textAlign: TextAlign.center, // Alineación del texto
+                                ),
+                                const SizedBox(height: 10),
+                          
+                                Container(
+                                  padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 1.h, vertical: 4.w) : EdgeInsets.symmetric(horizontal: 1.h, vertical: 4.w),
+                                  margin: const EdgeInsets.only(top: 30),
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 16, 110, 63),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: isTabletDevice ? 17.sp : 17.sp,
+                                        offset: const Offset(5, 10),
                                       ),
                                     ],
                                   ),
-                                )
+                                  child: ElevatedButton(
+                                    onPressed: () => _requestPassword(),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
+                                      shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
+                                      foregroundColor: const Color.fromARGB(255, 254, 255, 255),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(100)), // Borde redondeado
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Enviar Código de Recuperación',
+                                      style: TextStyle(
+                                        fontSize: isTabletDevice ? 12.sp : 12.sp,
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
+                                ),
+                          
+                                Container(
+                                  padding: isTabletDevice ?  EdgeInsets.symmetric(horizontal: 7.h, vertical: 1.w) : EdgeInsets.symmetric(horizontal: 5.h, vertical: 1.w),
+                                  margin: const EdgeInsets.only(top: 5),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.transparent,
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => PresentationScreen(
+                                          filtrarUsuarioController: widget.filtrarUsuarioController,
+                                          filtrarEmailController: widget.filtrarEmailController,
+                                          filtrarId: widget.filtrarId,
+                                        ))
+                                      );
+                                    }, 
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent, // Fondo transparente para mostrar el degradado
+                                      shadowColor: Colors.transparent, // Evitar sombras que cubran el degradado
+                                      foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(100)), // Borde redondeado
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el espacio
+                                      children: [
+                                        const Icon(
+                                          Icons.arrow_back_ios_new_rounded,
+                                          //size: isTabletDevice ? 14.sp : 17.sp,
+                                        ),
+                                        const SizedBox(width: 5), // Espacio entre el ícono y el texto
+                                        Text(
+                                          'Volver a inicio',
+                                          style: TextStyle(
+                                            fontSize: isTabletDevice ? 12.sp : 12.sp,
+                                            fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ),
+                          )
+                        ],
                       ),
-                    ],
-                  )
+                    ),
+                  ],
                 ),
               ),
-            ]
+            ),
           ),
         ),
       ),

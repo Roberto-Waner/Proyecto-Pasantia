@@ -24,8 +24,7 @@ class ForgotpasswordScreen extends StatefulWidget {
 
 class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://192.168.1.9:7190');
-  bool _isLoading = false;
+  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://192.168.1.103:7190');
 
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -41,11 +40,6 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
       Request insertRequest = Request(email: data['email']);
 
       // Mostrar pantalla de carga
-
-      setState(() {
-        _isLoading = true;
-      });
-
       showDialog(
         context: context,
         barrierDismissible: false,

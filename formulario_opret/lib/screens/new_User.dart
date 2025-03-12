@@ -36,7 +36,7 @@ class _NewUserState extends State<NewUser> {
   // final UpperCaseTextEditingController _controller = UpperCaseTextEditingController();
   final TextEditingController datePicker = TextEditingController();
   DateTime? _selectedDate;
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://192.168.1.9:7190');
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://192.168.1.103:7190');
   bool _obscureText = true;
   bool isLoading = false; // Variable de control para el cuadro de carga
   // bool hasError = true; // Variable de control para el cuadro de Error de carga

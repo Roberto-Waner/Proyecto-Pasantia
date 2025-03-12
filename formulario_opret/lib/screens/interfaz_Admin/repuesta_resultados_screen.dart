@@ -29,13 +29,13 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.9:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.103:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarRespuestas> respuestasFiltrados = [];
   List<SpFiltrarRespuestas> todasLasRespuestas = [];
-  String selectedFilter = 'ID del Usuario'; 
+  String selectedFilter = 'ID del Usuario';
 
   @override
   void initState() {
@@ -265,35 +265,33 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
             ),
             Expanded(
               child: FutureBuilder<List<SpFiltrarRespuestas>>(
-                future: _respuestaData, 
+                future: _respuestaData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting){
-                    return Center(
-                        child: Dialog(
-                          backgroundColor: Colors.transparent,
-                          child: Container(
-                            width: 200,
-                            height: 220,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                    return Dialog(
+                      backgroundColor: const Color.fromARGB(255, 56, 56, 56),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: SizedBox(
+                          width: 90,
+                          height: 130,
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                                      ),
+                                CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.green)),
                                 SizedBox(height: 20),
                                 Text(
                                   'Cargando...',
-                                  style: TextStyle(color: Colors.white, fontSize: 20),
+                                  style: TextStyle(fontSize: 18, color: Colors.white)
                                 ),
                               ],
                             ),
                           ),
-                        )
-                      );
+                        ),
+                      ),
+                    );
                   }else if (snapshot.hasError){
                     print('Error al cargar los datos de las respuestas: ${snapshot.error}');
                     return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp)));
@@ -375,7 +373,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?", report);
+                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?\n\nDebe de esperar un poco en breve aparecera el reporte en Excel.", report);
                       },
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -623,71 +621,6 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
       }
     );
   }
-
-  /*void _showSuccessDialog(BuildContext context, String message) {
-    final isTabletDevice = isTablet(context);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3)
-                )
-              ]
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 60.0),
-                const SizedBox(height: 20),
-                const Text(
-                  '¡Éxito!',
-                  style: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  message,
-                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24.0),
-                Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // exportToExcel(exportReporte);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                      child: Text('Continuar', style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp, color: Colors.blue)),
-                    ),
-
-                  ],
-                )
-              ]
-            )
-          )
-        );
-      }
-    );
-  }*/
 }
 
 class RespuestasDataSource extends DataTableSource {

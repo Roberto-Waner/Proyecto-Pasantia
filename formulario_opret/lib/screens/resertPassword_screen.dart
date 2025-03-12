@@ -25,10 +25,9 @@ class ResertpasswordScreen extends StatefulWidget {
 
 class _ResertpasswordScreenState extends State<ResertpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _resert = ApiResertPasswordServices('https://192.168.1.9:7190');
+  final ApiResertPasswordServices _resert = ApiResertPasswordServices('https://192.168.1.103:7190');
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
-  bool _isLoading = false;
 
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -57,10 +56,6 @@ class _ResertpasswordScreenState extends State<ResertpasswordScreen> {
         token: formData['token'],
         newPassword: formData['password-confirm']
       );
-
-      setState(() {
-        _isLoading = true;
-      });
 
       showDialog(
         context: context,

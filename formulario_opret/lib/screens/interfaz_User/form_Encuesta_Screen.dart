@@ -31,9 +31,9 @@ class FormEncuestaScreen extends StatefulWidget {
 
 class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://192.168.1.103:7190');
-  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://192.168.1.103:7190');
-  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://192.168.1.103:7190');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('http://backend-api.somee.com');
+  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('http://backend-api.somee.com');
+  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('http://backend-api.somee.com');
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   String? _selectLineMetro; // Línea seleccionada
   int? _selectedStation; // Estación seleccionada
@@ -120,7 +120,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
         print('Response body: ${response.body}');
 
         if(response.statusCode == 201){
-
           Navigator.of(context).pushAndRemoveUntil( //elimina la pantalla anterior para que no retroceda
             MaterialPageRoute(
               builder: (context) => PreguntaEncuestaScreen(
@@ -365,9 +364,7 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                         const SizedBox(height: 42),
                     
                         ElevatedButton(
-                          onPressed: () {
-                            _registrarFormEncuesta();
-                          },                          
+                          onPressed: () => _registrarFormEncuesta(),                          
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromRGBO(1, 135, 76, 1), //  se usa para definir el color de fondo del botón.
                             foregroundColor: const Color.fromARGB(255, 255, 255, 255), // se usa para definir el color del texto y los iconos dentro del botón.
@@ -520,4 +517,5 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
       }
     );
   }
+
 }

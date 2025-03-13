@@ -7,8 +7,8 @@ import 'package:formulario_opret/services/respuestas_services.dart';
 class RespuestaController {
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
   final StoredRespuestasCrud _storedRespuestasCrud = StoredRespuestasCrud();
-  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://192.168.1.103:7190');
-  final StreamServices _streamServices = StreamServices('https://192.168.1.103:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('http://backend-api.somee.com');
+  final StreamServices _streamServices = StreamServices('http://backend-api.somee.com');
 
   RespuestaController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {
@@ -21,31 +21,6 @@ class RespuestaController {
       }
     });
   }
-
-  /*Future<void> syncDataResp() async {
-    try{
-      List<SpInsertarRespuestas> respuestasPendientes = await _respuestaCrud.getAnswerCrud();
-
-      if (respuestasPendientes.isNotEmpty) {
-        // Envía las respuestas al backend
-        final postResponse = await _apiServiceRespuesta.postRespuesta(respuestasPendientes);
-        print(postResponse);
-
-        // Si la sincronización es exitosa, vacía la tabla local
-        if (postResponse.statusCode == 200 || postResponse.statusCode == 201) {
-          await _respuestaCrud.vaciarTable();
-          print('Respuestas sincronizadas con la API y tabla local vaciada');
-        } else {
-          print('Error al sincronizar las respuestas: ${postResponse.statusCode}');
-          print('Cuerpo de la respuesta: ${postResponse.body}');
-        }
-      } else {
-        print('No hay respuestas pendientes para sincronizar');
-      }
-    } catch (e) {
-      print('Error al sincronizar la respuesta: $e');
-    }
-  }*/
 
   Future<void> syncDataResp() async {
     try{

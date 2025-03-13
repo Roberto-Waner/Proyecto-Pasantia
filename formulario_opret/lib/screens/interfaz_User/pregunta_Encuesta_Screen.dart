@@ -34,8 +34,7 @@ class PreguntaEncuestaScreen extends StatefulWidget {
 class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   final RespuestaController _respuestaController = RespuestaController();
   final SectionController _sectionController = SectionController();
-  late List<SpPreguntascompleta> dataQuestion =
-      []; //para la llamada de los datos
+  late List<SpPreguntascompleta> dataQuestion = []; //para la llamada de los datos
   late List<SpInsertarRespuestas> dataRespuesta = []; //para para ingresar
   final _formKey = GlobalKey<FormBuilderState>();
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
@@ -47,8 +46,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   @override
   void initState() {
     super.initState();
-    _preguntasFuture =
-        _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
+    _preguntasFuture = _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
     Future.delayed(const Duration(seconds: 1), () {
       _preguntasFuture = _refreshPreguntas();
     });
@@ -57,8 +55,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
 
   Future<List<SpPreguntascompleta>> _refreshPreguntas() async {
     try {
-      await _sectionController
-          .syncData(); // esperando a que se sincronice primero la api con la cache.
+      await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
 
       // List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
       List<SpPreguntascompleta> preguntas = await _sectionCrud
@@ -164,13 +161,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           return const Center(
                               child: Text("Error al cargar las preguntas",
                                   style: TextStyle(fontSize: 20.0)));
-                        } else if (!snapshot.hasData ||
-                            (snapshot.data as List).isEmpty) {
+                        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
                           return const Center(
-                              child: Text(
-                                  'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
-                                  style: TextStyle(fontSize: 20.0),
-                                  textAlign: TextAlign.center));
+                            child: Text(
+                              'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
+                              style: TextStyle(fontSize: 20.0),
+                              textAlign: TextAlign.center
+                            )
+                          );
                         } else {
                           return _buildPreguntaList();
                         }
@@ -382,14 +380,11 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void _showPreguntaDialog(SpPreguntascompleta question) async {
     final isTabletDevice = isTablet(context);
     Map<int, SpInsertarRespuestas> stoppedAnswer = {};
-    SpInsertarRespuestas? saveResp =
-        stoppedAnswer[question.sp_CodPregunta ?? 0];
-    saveResp ??=
-        await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
+    SpInsertarRespuestas? saveResp = stoppedAnswer[question.sp_CodPregunta ?? 0];
+    saveResp ??= await _respuestaCrud.getRespuestaById(question.sp_CodPregunta ?? 0);
 
     // Filtrar preguntas que tienen estado en true
-    final filteredQuestions =
-        dataQuestion.where((q) => q.sp_Estado == 1).toList();
+    final filteredQuestions = dataQuestion.where((q) => q.sp_Estado == 1).toList();
     final currentIndex = filteredQuestions.indexOf(question);
     final isFirstQuestion = currentIndex == 0;
     final isLastQuestion = currentIndex == filteredQuestions.length - 1;
@@ -433,36 +428,33 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                             children: [
                               Expanded(
                                 child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'No: ${question.sp_noIdentifEncuesta}. ${question.sp_Pregunta}',
-                                      style: TextStyle(
-                                          fontSize:
-                                              isTabletDevice ? 12.sp : 12.sp),
+                                      style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp),
                                       // textAlign: TextAlign.left,
                                     ),
                                     const SizedBox(height: 10),
                                     if (question.sp_SubPregunta != null)
                                       Text(
                                         '|-------Sub-preg: ${question.sp_SubPregunta}.',
-                                        style: TextStyle(
-                                            fontSize:
-                                                isTabletDevice ? 9.sp : 9.sp),
+                                        style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp),
                                         // textAlign: TextAlign.left,
                                       )
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 35),
+                              /*const SizedBox(width: 35),
                               // Botón de cierre
                               IconButton(
-                                  icon: Icon(Icons.close,
-                                      color: Colors.red,
-                                      size: isTabletDevice ? 20.sp : 20.sp),
-                                  onPressed: () => Navigator.of(context).pop()),
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                  size: isTabletDevice ? 20.sp : 20.sp
+                                ),
+                              onPressed: () => Navigator.of(context).pop()),*/
                             ],
                           ),
                         ),
@@ -474,7 +466,6 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           child: FormBuilder(
                             key: _formKey,
                             initialValue: {
-                              // 'sub-preguntas': question.sp_SubPregunta,
                               'respuesta_selected': saveResp?.respuesta ?? '',
                               'comentarios': saveResp?.comentarios ?? '',
                               'justificacion': saveResp?.justificacion ?? ''
@@ -496,6 +487,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                             child: FormBuilderTextField(
                                               name: 'respuesta_selected',
                                               maxLines: null,
+                                              // initialValue: '',
                                               style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                               decoration: InputDecorations.inputDecoration(
                                                 labeltext: 'Escribe tu respuesta',
@@ -1231,85 +1223,92 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void _showContinue(BuildContext context, String message, Function onConfirm) {
     final isTabletDevice = isTablet(context);
     showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3))
-                      ]),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.send_to_mobile_outlined,
-                        color: Color.fromARGB(255, 165, 0, 220), size: 70.0),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Finalizar Encuesta y Enviar',
-                      style: TextStyle(
-                          fontSize: 30.0, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      message,
-                      style:
-                          TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24.0),
-                    Flex(
-                      direction:
-                          isTabletDevice ? Axis.horizontal : Axis.vertical,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 45, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                          ),
-                          child: Text('Cancelar',
-                              style: TextStyle(
-                                  fontSize: isTabletDevice ? 10.sp : 10.sp,
-                                  color:
-                                      const Color.fromARGB(255, 243, 33, 33))),
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),
+          child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3))
+                  ]),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.send_to_mobile_outlined,
+                    color: Color.fromARGB(255, 165, 0, 220), size: 70.0),
+                const SizedBox(height: 20),
+                const Text(
+                  'Finalizar Encuesta y Enviar',
+                  style: TextStyle(
+                      fontSize: 30.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style:
+                      TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Flex(
+                  direction:
+                      isTabletDevice ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                        const SizedBox(height: 10.0, width: 10.0),
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              onConfirm();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                            ),
-                            child: Text('Continuar',
-                                style: TextStyle(
-                                    fontSize: isTabletDevice ? 10.sp : 10.sp,
-                                    color: const Color.fromARGB(
-                                        255, 184, 135, 0)))),
-                      ],
-                    )
-                  ])));
-        });
+                      ),
+                      child: Text('Cancelar',
+                          style: TextStyle(
+                              fontSize: isTabletDevice ? 10.sp : 10.sp,
+                              color:
+                                  const Color.fromARGB(255, 243, 33, 33))),
+                    ),
+                    const SizedBox(height: 10.0, width: 10.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onConfirm();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text(
+                        'Continuar',
+                        style: TextStyle(
+                          fontSize: isTabletDevice ? 10.sp : 10.sp,
+                          color: const Color.fromARGB(255, 184, 135, 0)
+                        )
+                      )
+                    ),
+                  ],
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
   }
 
   List<Widget> comentarios() {

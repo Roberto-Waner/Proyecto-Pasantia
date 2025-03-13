@@ -29,7 +29,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.103:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('http://backend-api.somee.com');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
@@ -373,7 +373,7 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?\n\nDebe de esperar un poco en breve aparecera el reporte en Excel.", report);
+                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?\n\nDebe de esperar un poco. En breve aparecerá el reporte en Excel.", report);
                       },
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,

@@ -47,7 +47,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
   void initState() {
     super.initState();
     _preguntasFuture = _refreshPreguntas(); //utilizado para cargar los datos al cargar la pagina y se cargan los datos
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _preguntasFuture = _refreshPreguntas();
     });
     _setInitialValues(); // para que la fecha y la hora se asignen automaticamente de acuerdo a la tabla
@@ -58,9 +58,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       await _sectionController.syncData(); // esperando a que se sincronice primero la api con la cache.
 
       // List<SpPreguntascompleta> preguntas = await _sectionController.loadPreguntasFromCache().timeout(const Duration(seconds: 5));
-      List<SpPreguntascompleta> preguntas = await _sectionCrud
-          .querySectionCrud()
-          .timeout(const Duration(seconds: 1));
+      List<SpPreguntascompleta> preguntas = await _sectionCrud.querySectionCrud().timeout(const Duration(seconds: 5));
       // var preguntas = await _sectionCrud.querySectionCrud().timeout(const Duration(seconds: 6));
       print("Preguntas cargadas: $preguntas");
 
@@ -466,9 +464,9 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           child: FormBuilder(
                             key: _formKey,
                             initialValue: {
-                              'respuesta_selected': saveResp?.respuesta ?? '',
-                              'comentarios': saveResp?.comentarios ?? '',
-                              'justificacion': saveResp?.justificacion ?? ''
+                              'respuesta_selected_${question.sp_CodPregunta}': saveResp?.respuesta ?? '',
+                              'comentarios_${question.sp_CodPregunta}': saveResp?.comentarios ?? '',
+                              'justificacion_${question.sp_CodPregunta}': saveResp?.justificacion ?? ''
                             },
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -485,9 +483,9 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                           ),
                                           child: SingleChildScrollView(
                                             child: FormBuilderTextField(
-                                              name: 'respuesta_selected',
+                                              name: 'respuesta_selected_${question.sp_CodPregunta}',
                                               maxLines: null,
-                                              // initialValue: '',
+                                              initialValue: '',
                                               style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                               decoration: InputDecorations.inputDecoration(
                                                 labeltext: 'Escribe tu respuesta',
@@ -497,13 +495,15 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 errorSize: isTabletDevice ? 10.sp : 10.sp,
                                               ),
                                               validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                                              onChanged: (value) => setState(() {}), //Esto obliga a Flutter a redibujar el widget cuando cambia el valor
                                             ),
                                           ),
                                         ),
                                                 
                                       if(question.sp_TipoRespuesta == 'Seleccionar: Si, No, N/A')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
+                                          initialValue: null,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Seleccionar: Si, No, N/A',
@@ -518,12 +518,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                             DropdownMenuItem(value: 'N/A', child: Text('N/A')),
                                           ],
                                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                                          onChanged: (value) => setState(() {}),
                                         ),
                                                 
                                       if(question.sp_TipoRespuesta == 'Calificar del 1 a 10')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0, // Altura máxima del cuadro desplegable
+                                          initialValue: null,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Calific. 1 a 10',
@@ -545,11 +547,13 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                             DropdownMenuItem(value: '10', child: Text('10')),
                                           ],
                                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                                          onChanged: (value) => setState(() {}),
                                         ),
                                                 
                                       if(question.sp_TipoRespuesta == 'Solo SI o No')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
+                                          initialValue: null,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Seleciona solo Si o No',
@@ -568,11 +572,12 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                               selectedAnswer = value ?? '';
                                             });
                                           },
+                                          onChanged: (value) => setState(() {}),
                                         ),
                                                 
                                       if(question.sp_TipoRespuesta == 'Edad')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
@@ -598,7 +603,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Nacionalidad')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Elige la Nacionalidad',
@@ -617,7 +622,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Título de transporte')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Elige el Título de transporte',
@@ -635,7 +640,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Producto utilizado')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
@@ -656,7 +661,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Género')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
                                             labeltext: 'Elige el Género',
@@ -674,7 +679,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Frecuencia de viajes por semana')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
@@ -696,7 +701,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Expectativa del pasajero')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
@@ -737,7 +742,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                 
                                       if(question.sp_TipoRespuesta == 'Motivo del viaje')
                                         FormBuilderDropdown(
-                                          name: 'respuesta_selected',
+                                          name: 'respuesta_selected_${question.sp_CodPregunta}',
                                           menuMaxHeight: 200.0,
                                           style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 1, 1)),
                                           decoration: InputDecorations.inputDecoration(
@@ -758,29 +763,17 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                           validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
                                         ),
                                                 
-                                      if (question.sp_Rango == 'Comentarios y Justificación (Opcional)') ...comentarios() + justificacion()
+                                      if (question.sp_Rango == 'Comentarios y Justificación (Opcional)') 
+                                        ...comentarios() + justificacion()
                                       else if (question.sp_Rango == 'Requiere Comentarios (Opcional)') ...comentarios()
                                       else if (question.sp_Rango == 'Requiere Justificación (Opcional)') ...justificacion(),
                                     ]
                                   ),
-                                ),                                    // Determina el tipo de respuesta y muestra el widget adecuado segun el tipo Respuesta de la tabla sesion
-                                                                
+                                ),
+
                                 // Botones de navegación
                                 Container(
                                   margin: const EdgeInsets.only(top: 10),
-                                  // padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  /*decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(100),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-                                        spreadRadius: 1,
-                                        blurRadius: 3,
-                                        offset: const Offset(0, 3)
-                                      )
-                                    ]
-                                  ),*/
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center, // Alinea los botones al centro
                                     children: [
@@ -870,14 +863,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                                                   WidgetsBinding.instance.addPostFrameCallback((_) {
                                                     _showPreguntaDialog(nextQuestion); // Abre el diálogo con la próxima pregunta
                                                   });
-                                                }/* else {
-                                                  // _showSuccessDialog(context, 'Has respondido todas las preguntas.');
-                                                      
-                                                  // Manejo del caso cuando ya no hay más preguntas
-                                                  Future.delayed(const Duration(seconds: 2), () {
-                                                    Navigator.of(context).pop(); // Cerrar el diálogo si no hay más preguntas
-                                                  });
-                                                }*/
+                                                }
                                               }
                                             }
                                           },
@@ -934,7 +920,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
       final dataAnswer = formKey.currentState!.value;
 
       // Determinamos el tipo de respuesta ingresada por el usuario
-      final String? respuestaFinal = dataAnswer['respuesta_selected'];
+      final String? respuestaFinal = dataAnswer['respuesta_selected_${question.sp_CodPregunta}'];
 
       // Verificamos que exista alguna respuesta válida
       if (respuestaFinal == null || respuestaFinal.isEmpty) {

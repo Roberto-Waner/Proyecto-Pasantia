@@ -6,12 +6,14 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\WebApiForm.pdb
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Azure.Core.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Azure.Identity.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\BouncyCastle.Cryptography.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ClosedXML.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ClosedXML.Parser.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.Framework.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\ExcelNumberFormat.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Humanizer.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\MailKit.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.AspNetCore.Razor.Language.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
@@ -60,6 +62,7 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\MimeKit.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Mono.TextTemplating.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\Newtonsoft.Json.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\NuGet.Common.dll
@@ -91,6 +94,7 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Memory.Data.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Reflection.MetadataLoadContext.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Runtime.Caching.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Security.Cryptography.Pkcs.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Security.Cryptography.ProtectedData.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Security.Permissions.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\System.Windows.Extensions.dll
@@ -242,6 +246,7 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\PubTmp\Out\WebApiForm.deps.json

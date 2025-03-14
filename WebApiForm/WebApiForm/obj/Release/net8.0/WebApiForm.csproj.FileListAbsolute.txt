@@ -269,3 +269,12 @@ D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\SixLabors.Fonts.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\StarkbankEcdsa.dll
 D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\System.IO.Packaging.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\WebApiForm.staticwebassets.endpoints.json
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\BouncyCastle.Cryptography.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\MailKit.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\MimeKit.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\bin\Release\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\staticwebassets.build.endpoints.json
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\staticwebassets\msbuild.WebApiForm.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+D:\Proyecto Pasantias\Formulario OPRET\WebApiForm\WebApiForm\obj\Release\net8.0\staticwebassets.upToDateCheck.txt

@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "31h+gk3dWn5ujAn9o9Mlqa7ah3dtsGj2waXM1FjVBE0=",
+  "Hash": "7dvkjNw7xZO93Hv1CjCCTJn6iPvG48NnlipMFSkrXao=",
   "Source": "WebApiForm",
   "BasePath": "_content/WebApiForm",
   "Mode": "Default",
   "ManifestType": "Publish",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }
